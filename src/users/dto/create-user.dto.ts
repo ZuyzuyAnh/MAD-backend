@@ -19,10 +19,6 @@ export class CreateUserDto {
 
   @IsString()
   @Length(3, 50)
-  @Matches(/^[a-zA-Z0-9_-]+$/, {
-    message:
-      'Username can only contain letters, numbers, underscores and hyphens',
-  })
   username: string;
 
   @IsEmail()

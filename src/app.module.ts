@@ -4,6 +4,7 @@ import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
 import { MediaResroucesModule } from './media_resrouces/media_resrouces.module';
 import * as Joi from 'joi';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import * as Joi from 'joi';
     DatabaseModule,
     UsersModule,
     MediaResroucesModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

@@ -7,7 +7,7 @@ import {
   OneToOne,
 } from 'typeorm';
 import { MediaResource } from '../../media_resrouces/entities/media_resrouce.entity';
-import { JoinColumn } from 'typeorm/browser';
+import { JoinColumn } from 'typeorm';
 
 export enum UserRole {
   USER = 'user',
@@ -45,7 +45,6 @@ export class User {
 
   @OneToOne(() => MediaResource)
   @JoinColumn({ name: 'profile_image_id' })
-  @Column({ nullable: true })
   profileImage: MediaResource;
 
   @Column({ default: true })
