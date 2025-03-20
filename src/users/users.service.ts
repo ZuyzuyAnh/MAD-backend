@@ -6,12 +6,14 @@ import { Repository } from 'typeorm';
 import DuplicateEntityException from '../exception/duplicate-entity.exception';
 import NotfoundException from '../exception/notfound.exception';
 import * as bcrypt from 'bcryptjs';
+import { UploadFileService } from '../aws/uploadfile.s3.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly fileService: UploadFileService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -56,5 +58,21 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async updateProfileImage(userId: number, file: Express.Multer.File) {
+    const user = await this.userRepository.findOneBy({
+      id: userId,
+    });
+
+    if (!user) {
+      throw new NotfoundException('user', 'id', userId);
+    }
+
+    const imageUrl = await this.fileService.uploadFileToPublicBucket(file);
+
+    user.profile_image_url = imageUrl;
+
+    return this.userRepository.save(user);
   }
 }

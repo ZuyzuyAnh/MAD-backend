@@ -4,15 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToOne,
 } from 'typeorm';
-import { MediaResource } from '../../media_resrouces/entities/media_resrouce.entity';
-import { JoinColumn } from 'typeorm';
 
 export enum UserRole {
   USER = 'user',
   ADMIN = 'admin',
-  TEACHER = 'teacher',
 }
 
 @Entity('users')
@@ -43,9 +39,10 @@ export class User {
   })
   role: UserRole;
 
-  @OneToOne(() => MediaResource)
-  @JoinColumn({ name: 'profile_image_id' })
-  profileImage: MediaResource;
+  @Column({
+    nullable: true,
+  })
+  profile_image_url: string;
 
   @Column({ default: true })
   active: boolean;

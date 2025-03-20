@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
-import { MediaResroucesModule } from './media_resrouces/media_resrouces.module';
 import * as Joi from 'joi';
 import { AuthModule } from './auth/auth.module';
+import { LanguagesModule } from './languages/languages.module';
+import { AwsModule } from './aws/aws.module';
 
 @Module({
   imports: [
@@ -29,8 +30,9 @@ import { AuthModule } from './auth/auth.module';
     }),
     DatabaseModule,
     UsersModule,
-    MediaResroucesModule,
     AuthModule,
+    LanguagesModule,
+    AwsModule,
   ],
   controllers: [],
   providers: [],

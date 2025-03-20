@@ -18,21 +18,18 @@ export class UploadFileService {
     });
   }
 
-  async uploadFileToPublicBucket(
-    path: string,
-    { file, fileName }: { file: Express.Multer.File; fileName: string },
-  ) {
+  async uploadFileToPublicBucket(file: Express.Multer.File) {
     const bucketName = this.configService.get<string>('AWS_S3_PUBLIC_BUCKET');
-    const key = `${path}/${Date.now().toString()}-${fileName}`;
+    const key = `${Date.now().toString()}-${file.originalname}`;
 
     await this.s3Client.send(
       new PutObjectCommand({
         Bucket: bucketName,
         Key: key,
-        Body: file.buffer as Buffer,
-        ContentType: file.mimetype as string,
+        Body: file.buffer,
+        ContentType: file.mimetype,
         ACL: 'public-read',
-        ContentLength: file.size as number,
+        ContentLength: file.size,
       }),
     );
 

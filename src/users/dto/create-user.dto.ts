@@ -38,8 +38,5 @@ export class CreateUserDto {
   role?: UserRole;
 
   @IsOptional()
-  profile_image_id?: number;
-
-  @IsOptional()
   active?: boolean;
 }
