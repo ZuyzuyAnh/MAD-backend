@@ -6,6 +6,9 @@ import * as Joi from 'joi';
 import { AuthModule } from './auth/auth.module';
 import { LanguagesModule } from './languages/languages.module';
 import { AwsModule } from './aws/aws.module';
+import { VocabTopicsModule } from './vocab_topics/vocab_topics.module';
+import { VocabsModule } from './vocabs/vocabs.module';
+import { BootstrapModule } from './bootstrap/bootstrap.module';
 
 @Module({
   imports: [
@@ -33,6 +36,9 @@ import { AwsModule } from './aws/aws.module';
     AuthModule,
     LanguagesModule,
     AwsModule,
+    VocabTopicsModule,
+    VocabsModule,
+    BootstrapModule,
   ],
   controllers: [],
   providers: [],
