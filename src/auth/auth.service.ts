@@ -18,7 +18,6 @@ export class AuthService {
     const isPasswordMatch = await this.isPasswordMatch(password, user.password);
 
     if (user && isPasswordMatch) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: _, ...result } = user;
       return result;
     }

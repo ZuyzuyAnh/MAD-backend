@@ -10,6 +10,7 @@ import { VocabTopicsModule } from './vocab_topics/vocab_topics.module';
 import { VocabsModule } from './vocabs/vocabs.module';
 import { BootstrapModule } from './bootstrap/bootstrap.module';
 import { ProgressModule } from './progress/progress.module';
+import { ExercisesModule } from './exercises/exercises.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ProgressModule } from './progress/progress.module';
     VocabsModule,
     BootstrapModule,
     ProgressModule,
+    ExercisesModule,
   ],
   controllers: [],
   providers: [],
