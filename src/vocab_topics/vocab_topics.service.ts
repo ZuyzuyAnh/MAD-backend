@@ -7,7 +7,7 @@ import { VocabTopic } from './entities/vocab_topic.entity';
 import DuplicateEntityException from '../exception/duplicate-entity.exception';
 import NotfoundException from '../exception/notfound.exception';
 import { UploadFileService } from 'src/aws/uploadfile.s3.service';
-import { PaginateDto } from '../utils/dto/paginate.dto';
+import { PaginateDto } from '../common/dto/paginate.dto';
 
 @Injectable()
 export class VocabTopicsService {

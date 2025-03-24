@@ -15,7 +15,7 @@ import { Express } from 'express';
 import { LanguagesService } from './languages.service';
 import { CreateLanguageDto } from './dto/create-language.dto';
 import { UpdateLanguageDto } from './dto/update-language.dto';
-import { PaginateDto } from '../utils/dto/paginate.dto';
+import { PaginateDto } from '../common/dto/paginate.dto';
 
 @Controller('languages')
 export class LanguagesController {

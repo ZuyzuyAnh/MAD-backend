@@ -1,9 +1,11 @@
+import { Progress } from 'src/progress/entities/progress.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 export enum UserRole {
@@ -44,8 +46,8 @@ export class User {
   })
   profile_image_url: string;
 
-  @Column({ default: true })
-  active: boolean;
+  @OneToMany(() => Progress, (progress) => progress.user)
+  progress: Progress[];
 
   @CreateDateColumn()
   created_at: Date;

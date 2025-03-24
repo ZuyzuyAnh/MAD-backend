@@ -5,7 +5,7 @@ import { Vocab, VocabDifficulty } from './entities/vocab.entity';
 import { CreateVocabDto } from './dto/create-vocab.dto';
 import { UpdateVocabDto } from './dto/update-vocab.dto';
 import { UploadFileService } from '../aws/uploadfile.s3.service';
-import { PaginateDto } from '../utils/dto/paginate.dto';
+import { PaginateDto } from '../common/dto/paginate.dto';
 import NotfoundException from '../exception/notfound.exception';
 
 @Injectable()

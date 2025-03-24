@@ -15,7 +15,7 @@ import { Express } from 'express';
 import { VocabTopicsService } from './vocab_topics.service';
 import { CreateVocabTopicDto } from './dto/create-vocab_topic.dto';
 import { UpdateVocabTopicDto } from './dto/update-vocab_topic.dto';
-import { PaginateDto } from '../utils/dto/paginate.dto';
+import { PaginateDto } from '../common/dto/paginate.dto';
 
 @Controller('vocab-topics')
 export class VocabTopicsController {

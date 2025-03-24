@@ -32,8 +32,8 @@ export class BootstrapService implements OnModuleInit {
 
     if (users.data.length === 0) {
       await this.usersService.create({
-        first_name: 'Admin',
-        last_name: 'Admin',
+        firstName: 'Admin',
+        lastName: 'Admin',
         username: 'admin',
         email: 'admin@learning.com',
         password: 'Admin@123',

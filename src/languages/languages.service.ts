@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { Language } from './entities/language.entity';
 import DuplicateEntityException from '../exception/duplicate-entity.exception';
 import NotfoundException from '../exception/notfound.exception';
-import { PaginateDto } from '../utils/dto/paginate.dto';
+import { PaginateDto } from '../common/dto/paginate.dto';
 import { UploadFileService } from 'src/aws/uploadfile.s3.service';
 
 @Injectable()

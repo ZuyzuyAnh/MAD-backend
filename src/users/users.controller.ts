@@ -1,15 +1,29 @@
-import { Controller, Param, Put, UploadedFile } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Patch,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @Patch('profile')
+  @UseInterceptors(FileInterceptor('file'))
   updateUserProfileImage(
-    @Param('id') id: number,
+    @GetUser('sub') id: number,
+    @Body() updateUserDto: UpdateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.usersService.updateProfileImage(id, file);
+    return this.usersService.updateUser(id, updateUserDto, file);
   }
 }

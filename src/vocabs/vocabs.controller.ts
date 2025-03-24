@@ -17,7 +17,7 @@ import { ApiConsumes, ApiBody, ApiTags } from '@nestjs/swagger';
 import { VocabsService } from './vocabs.service';
 import { CreateVocabDto } from './dto/create-vocab.dto';
 import { UpdateVocabDto } from './dto/update-vocab.dto';
-import { PaginateDto } from '../utils/dto/paginate.dto';
+import { PaginateDto } from '../common/dto/paginate.dto';
 import { VocabDifficulty } from './entities/vocab.entity';
 
 @ApiTags('vocabs')

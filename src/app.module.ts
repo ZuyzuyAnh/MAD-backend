@@ -9,6 +9,7 @@ import { AwsModule } from './aws/aws.module';
 import { VocabTopicsModule } from './vocab_topics/vocab_topics.module';
 import { VocabsModule } from './vocabs/vocabs.module';
 import { BootstrapModule } from './bootstrap/bootstrap.module';
+import { ProgressModule } from './progress/progress.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { BootstrapModule } from './bootstrap/bootstrap.module';
     VocabTopicsModule,
     VocabsModule,
     BootstrapModule,
+    ProgressModule,
   ],
   controllers: [],
   providers: [],
