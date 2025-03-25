@@ -51,33 +51,25 @@ export class UsersService {
 
     const createdUser = await this.userRepository.save(user);
 
-    const { password, profile_image_url, created_at, updated_at, ...result } =
+    const { password, profileImageUrl, createdAt, updatedAt, ...result } =
       createdUser;
 
     return result;
   }
 
   async findOneByUsername(username: string) {
-    const user = await this.userRepository.findOne({
+    const user = this.userRepository.findOne({
       where: { username },
       relations: {
         progress: true,
       },
     });
 
-    if (!user) {
-      throw new NotfoundException('user', 'username', username);
-    }
-
     return user;
   }
 
   async findById(id: number) {
     const user = await this.userRepository.findOneBy({ id });
-
-    if (!user) {
-      throw new NotfoundException('user', 'id', id);
-    }
 
     return user;
   }
@@ -87,7 +79,7 @@ export class UsersService {
     updateUserDto: UpdateUserDto,
     file?: Express.Multer.File,
   ) {
-    const existingUser = await this.userRepository.findOneBy({ id });
+    const existingUser = await this.findById(id);
 
     if (!existingUser) {
       throw new NotfoundException('user', 'id', id);

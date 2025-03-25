@@ -4,66 +4,48 @@ import { UpdateLanguageDto } from './dto/update-language.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Language } from './entities/language.entity';
-import DuplicateEntityException from '../exception/duplicate-entity.exception';
 import NotfoundException from '../exception/notfound.exception';
 import { PaginateDto } from '../common/dto/paginate.dto';
-import { UploadFileService } from 'src/aws/uploadfile.s3.service';
 
 @Injectable()
 export class LanguagesService {
   constructor(
     @InjectRepository(Language)
     private readonly languageRepository: Repository<Language>,
-    private readonly uploadFileService: UploadFileService,
   ) {}
 
-  async create(
-    createLanguageDto: CreateLanguageDto,
-    flag?: Express.Multer.File,
-  ) {
-    const existingLanguage = await this.languageRepository.findOneBy({
-      name: createLanguageDto.name,
-    });
-
-    if (existingLanguage) {
-      throw new DuplicateEntityException(
-        'language',
-        'name',
-        createLanguageDto.name,
-      );
-    }
-
+  async create(createLanguageDto: CreateLanguageDto): Promise<Language> {
     const language = this.languageRepository.create(createLanguageDto);
-
-    if (flag) {
-      language.flag_url =
-        await this.uploadFileService.uploadFileToPublicBucket(flag);
-    }
-
-    return this.languageRepository.save(language);
+    return await this.languageRepository.save(language);
   }
 
-  async findAll(paginateDto: PaginateDto, name?: string) {
+  async findAll(paginateDto: PaginateDto, name?: string, active?: boolean) {
     const { page, limit } = paginateDto;
 
     const queryBuilder = this.languageRepository.createQueryBuilder('language');
 
     if (name) {
-      queryBuilder.where('language.name LIKE :name', { name: `%${name}%` });
+      queryBuilder.andWhere('language.name LIKE :name', {
+        name: `%${name}%`,
+      });
+    }
+
+    if (active !== undefined) {
+      queryBuilder.andWhere('language.active = :active', { active });
     }
 
     const total = await queryBuilder.getCount();
 
-    const results = await queryBuilder
+    const languages = await queryBuilder
       .skip((page - 1) * limit)
       .take(limit)
-      .orderBy('language.name', 'ASC')
+      .orderBy('language.created_at', 'DESC')
       .getMany();
 
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: results,
+      data: languages,
       meta: {
         total,
         page,
@@ -75,7 +57,7 @@ export class LanguagesService {
     };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<Language> {
     const language = await this.languageRepository.findOneBy({ id });
 
     if (!language) {
@@ -88,40 +70,16 @@ export class LanguagesService {
   async update(
     id: number,
     updateLanguageDto: UpdateLanguageDto,
-    flag?: Express.Multer.File,
-  ) {
+  ): Promise<Language> {
     const language = await this.findOne(id);
-
-    if (updateLanguageDto.name && updateLanguageDto.name !== language.name) {
-      const existingLanguage = await this.languageRepository.findOneBy({
-        name: updateLanguageDto.name,
-      });
-
-      if (existingLanguage) {
-        throw new DuplicateEntityException(
-          'language',
-          'name',
-          updateLanguageDto.name,
-        );
-      }
-    }
-
-    if (flag) {
-      updateLanguageDto.flag_url =
-        await this.uploadFileService.uploadFileToPublicBucket(flag);
-    }
 
     Object.assign(language, updateLanguageDto);
-    return this.languageRepository.save(language);
+
+    return await this.languageRepository.save(language);
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<void> {
     const language = await this.findOne(id);
-
-    if (!language) {
-      throw new NotfoundException('language', 'id', id);
-    }
-
-    return this.languageRepository.remove(language);
+    await this.languageRepository.remove(language);
   }
 }

@@ -1,23 +1,34 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, Length } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateLanguageDto {
   @ApiProperty({
-    description: 'The name of the language',
-    example: 'English',
-    maxLength: 50,
+    description: 'Tên ngôn ngữ',
+    example: 'Tiếng Anh',
+    minLength: 2,
+    maxLength: 100,
   })
-  @IsNotEmpty()
   @IsString()
-  @MaxLength(50)
+  @Length(2, 100)
   name: string;
 
   @ApiProperty({
-    description: 'URL to the language flag image',
+    description: 'Đường dẫn hình ảnh đại diện ngôn ngữ',
     example: 'https://example.com/flags/en.png',
     required: false,
   })
-  @IsOptional()
   @IsString()
-  flag_url?: string;
+  @IsOptional()
+  flagUrl?: string;
+
+  @ApiProperty({
+    description: 'Trạng thái hoạt động của ngôn ngữ',
+    example: true,
+    default: true,
+    required: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  active?: boolean = true;
 }

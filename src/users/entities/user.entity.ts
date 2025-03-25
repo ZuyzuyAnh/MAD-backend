@@ -7,33 +7,46 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
 
 export enum UserRole {
   USER = 'user',
   ADMIN = 'admin',
+  TEACHER = 'teacher',
 }
 
 @Entity('users')
 export class User {
+  @ApiProperty({ description: 'ID của người dùng', example: 1 })
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 50 })
-  first_name: string;
+  @ApiProperty({ description: 'Tên của người dùng', example: 'Nguyễn' })
+  @Column({ name: 'first_name', length: 50 })
+  firstName: string;
 
-  @Column({ length: 50 })
-  last_name: string;
+  @ApiProperty({ description: 'Họ của người dùng', example: 'Văn A' })
+  @Column({ name: 'last_name', length: 50 })
+  lastName: string;
 
-  @Column({ length: 50, unique: true })
+  @ApiProperty({ description: 'Tên đăng nhập', example: 'nguyenvana' })
+  @Column({ name: 'username', length: 50, unique: true })
   username: string;
 
-  @Column({ length: 100, unique: true })
+  @ApiProperty({ description: 'Email', example: 'nguyenvana@example.com' })
+  @Column({ name: 'email', length: 100, unique: true })
   email: string;
 
-  @Column({ length: 255 })
+  @Column({ name: 'password', length: 255 })
   password: string;
 
+  @ApiProperty({
+    description: 'Vai trò người dùng',
+    enum: UserRole,
+    example: UserRole.USER,
+  })
   @Column({
+    name: 'role',
     type: 'enum',
     enum: UserRole,
     default: UserRole.USER,
@@ -41,17 +54,31 @@ export class User {
   })
   role: UserRole;
 
+  @ApiProperty({
+    description: 'URL hình ảnh đại diện',
+    example: 'https://example.com/avatars/user1.jpg',
+  })
   @Column({
+    name: 'profile_image_url',
     nullable: true,
   })
-  profile_image_url: string;
+  profileImageUrl: string;
 
+  @ApiProperty({ description: 'Tiến độ học tập của người dùng' })
   @OneToMany(() => Progress, (progress) => progress.user)
   progress: Progress[];
 
-  @CreateDateColumn()
-  created_at: Date;
+  @ApiProperty({
+    description: 'Thời gian tạo tài khoản',
+    example: '2023-08-01T12:00:00.000Z',
+  })
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
-  @UpdateDateColumn()
-  updated_at: Date;
+  @ApiProperty({
+    description: 'Thời gian cập nhật gần nhất',
+    example: '2023-08-01T12:00:00.000Z',
+  })
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }

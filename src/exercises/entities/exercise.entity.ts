@@ -4,19 +4,18 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Language } from 'src/languages/entities/language.entity';
-import { MediaResource } from 'src/media/entities/media-resource.entity';
+import { ExerciseQuestion } from 'src/exercise-questions/entities/exercise-question.entity';
 
 export enum ExerciseType {
   GRAMMAR = 'grammar',
   LISTENING = 'listening',
   SPEAKING = 'speaking',
-  READING = 'reading',
-  WRITING = 'writing',
 }
 
 export enum ExerciseDifficulty {
@@ -51,7 +50,7 @@ export class Exercise {
   @ApiProperty({
     description: 'Loại bài tập',
     enum: ExerciseType,
-    example: ExerciseType.READING,
+    example: ExerciseType.GRAMMAR,
   })
   @Column({
     type: 'enum',
@@ -81,33 +80,15 @@ export class Exercise {
   language: Language;
 
   @ApiProperty({
-    description: 'ID tài nguyên media (hình ảnh, video, âm thanh)',
-    example: 5,
-    required: false,
+    description: 'Danh sách câu hỏi của bài tập',
+    type: () => [ExerciseQuestion],
   })
-  @Column({ name: 'media_id', nullable: true })
-  mediaId: number | null;
-
-  @ApiProperty({ description: 'Thông tin tài nguyên media của bài tập' })
-  @ManyToOne(() => MediaResource, { nullable: true })
-  @JoinColumn({ name: 'media_id' })
-  media: MediaResource | null;
-
-  @ApiProperty({
-    description: 'Số điểm nhận được khi hoàn thành bài tập',
-    example: 10,
-    default: 10,
-  })
-  @Column({ default: 10 })
-  points: number;
-
-  @ApiProperty({
-    description: 'Trạng thái hoạt động của bài tập',
-    example: true,
-    default: true,
-  })
-  @Column({ default: true })
-  active: boolean;
+  @OneToMany(
+    () => ExerciseQuestion,
+    (exerciseQuestion) => exerciseQuestion.exercise,
+    { eager: true },
+  )
+  questions: ExerciseQuestion[];
 
   @ApiProperty({
     description: 'Thời gian tạo bài tập',

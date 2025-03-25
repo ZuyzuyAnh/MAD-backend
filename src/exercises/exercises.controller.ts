@@ -6,25 +6,17 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   Query,
   ParseIntPipe,
 } from '@nestjs/common';
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UserRole } from '../users/entities/user.entity';
 import AppResponse from '../common/dto/api-response.dto';
 import { PaginateDto } from '../common/dto/paginate.dto';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiQuery,
-} from '@nestjs/swagger';
-import { ExerciseType } from './entities/exercise.entity';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { ExerciseDifficulty, ExerciseType } from './entities/exercise.entity';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { AdminOnly } from 'src/auth/decorators/admin-only.decorator';
 
@@ -34,9 +26,7 @@ export class ExercisesController {
   constructor(private readonly exercisesService: ExercisesService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminOnly()
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Tạo bài tập mới' })
   @ApiResponse({
     status: 201,
@@ -48,12 +38,9 @@ export class ExercisesController {
           title: 'Thực hành đọc tiếng Anh cơ bản',
           description:
             'Bài tập giúp nâng cao khả năng đọc hiểu tiếng Anh cho người mới bắt đầu',
-          type: 'reading',
-          difficulty: 'beginner',
+          type: ExerciseType.GRAMMAR,
+          difficulty: ExerciseDifficulty.BEGINNER,
           languageId: 1,
-          mediaId: null,
-          points: 10,
-          active: true,
           createdAt: '2023-08-01T12:00:00.000Z',
           updatedAt: '2023-08-01T12:00:00.000Z',
         },
@@ -64,8 +51,6 @@ export class ExercisesController {
       },
     },
   })
-  @ApiResponse({ status: 401, description: 'Chưa xác thực' })
-  @ApiResponse({ status: 403, description: 'Không có quyền truy cập' })
   async create(@Body() createExerciseDto: CreateExerciseDto) {
     const exercise = await this.exercisesService.create(createExerciseDto);
     return AppResponse.success({
@@ -101,10 +86,10 @@ export class ExercisesController {
     enum: ExerciseType,
   })
   @ApiQuery({
-    name: 'active',
+    name: 'difficulty',
     required: false,
-    description: 'Trạng thái kích hoạt',
-    type: Boolean,
+    description: 'Độ khó của bài tập',
+    enum: ExerciseDifficulty,
   })
   @ApiResponse({
     status: 200,
@@ -117,22 +102,17 @@ export class ExercisesController {
             title: 'Thực hành đọc tiếng Anh cơ bản',
             description:
               'Bài tập giúp nâng cao khả năng đọc hiểu tiếng Anh cho người mới bắt đầu',
-            type: 'reading',
-            difficulty: 'beginner',
+            type: ExerciseType.GRAMMAR,
+            difficulty: ExerciseDifficulty.BEGINNER,
             languageId: 1,
             language: {
               id: 1,
               name: 'Tiếng Anh',
               code: 'en',
-              // ... more language fields
             },
-            mediaId: null,
-            points: 10,
-            active: true,
             createdAt: '2023-08-01T12:00:00.000Z',
             updatedAt: '2023-08-01T12:00:00.000Z',
           },
-          // more exercises
         ],
         meta: {
           total: 15,
@@ -153,13 +133,13 @@ export class ExercisesController {
     @Query() paginateDto: PaginateDto,
     @Query('languageId') languageId?: number,
     @Query('type') type?: string,
-    @Query('active') active?: boolean,
+    @Query('difficulty') difficulty?: string,
   ) {
     const exercises = await this.exercisesService.findAll(
       paginateDto,
       languageId,
       type,
-      active,
+      difficulty,
     );
     return AppResponse.success({
       data: exercises,
@@ -178,18 +158,14 @@ export class ExercisesController {
           title: 'Thực hành đọc tiếng Anh cơ bản',
           description:
             'Bài tập giúp nâng cao khả năng đọc hiểu tiếng Anh cho người mới bắt đầu',
-          type: 'reading',
-          difficulty: 'beginner',
+          type: ExerciseType.GRAMMAR,
+          difficulty: ExerciseDifficulty.BEGINNER,
           languageId: 1,
           language: {
             id: 1,
             name: 'Tiếng Anh',
             code: 'en',
-            // ... more language fields
           },
-          mediaId: null,
-          points: 10,
-          active: true,
           createdAt: '2023-08-01T12:00:00.000Z',
           updatedAt: '2023-08-01T12:00:00.000Z',
         },
@@ -209,9 +185,7 @@ export class ExercisesController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminOnly()
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Cập nhật thông tin bài tập' })
   @ApiResponse({
     status: 200,
@@ -222,12 +196,9 @@ export class ExercisesController {
           id: 1,
           title: 'Thực hành đọc tiếng Anh nâng cao',
           description: 'Bài tập giúp nâng cao khả năng đọc hiểu tiếng Anh',
-          type: 'reading',
-          difficulty: 'intermediate',
+          type: ExerciseType.GRAMMAR,
+          difficulty: ExerciseDifficulty.INTERMEDIATE,
           languageId: 1,
-          mediaId: null,
-          points: 15,
-          active: true,
           createdAt: '2023-08-01T12:00:00.000Z',
           updatedAt: '2023-08-02T12:00:00.000Z',
         },
@@ -238,9 +209,6 @@ export class ExercisesController {
       },
     },
   })
-  @ApiResponse({ status: 401, description: 'Chưa xác thực' })
-  @ApiResponse({ status: 403, description: 'Không có quyền truy cập' })
-  @ApiResponse({ status: 404, description: 'Không tìm thấy bài tập' })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateExerciseDto: UpdateExerciseDto,
@@ -253,9 +221,7 @@ export class ExercisesController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @AdminOnly()
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Xóa bài tập' })
   @ApiResponse({
     status: 200,
@@ -270,9 +236,6 @@ export class ExercisesController {
       },
     },
   })
-  @ApiResponse({ status: 401, description: 'Chưa xác thực' })
-  @ApiResponse({ status: 403, description: 'Không có quyền truy cập' })
-  @ApiResponse({ status: 404, description: 'Không tìm thấy bài tập' })
   async remove(@Param('id', ParseIntPipe) id: number) {
     await this.exercisesService.remove(id);
     return AppResponse.success({

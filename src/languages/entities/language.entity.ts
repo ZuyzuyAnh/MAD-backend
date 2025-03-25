@@ -2,7 +2,6 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -18,33 +17,34 @@ export class Language {
     description: 'Tên ngôn ngữ',
     example: 'Tiếng Anh',
   })
-  @Column({ length: 100 })
+  @Column({ name: 'name', length: 100 })
   name: string;
-
-  @ApiProperty({
-    description: 'Mã ISO của ngôn ngữ',
-    example: 'en',
-  })
-  @Column({ length: 10, unique: true })
-  code: string;
 
   @ApiProperty({
     description: 'Đường dẫn hình ảnh đại diện ngôn ngữ',
     example: 'https://example.com/flags/en.png',
   })
-  @Column({ nullable: true })
-  flag_url: string;
+  @Column({ name: 'flag_url', nullable: true })
+  flagUrl: string;
 
   @ApiProperty({
     description: 'Trạng thái hoạt động của ngôn ngữ',
     default: true,
   })
-  @Column({ default: true })
+  @Column({ name: 'active', default: true })
   active: boolean;
 
+  @ApiProperty({
+    description: 'Thời gian tạo ngôn ngữ',
+    example: '2023-08-01T12:00:00.000Z',
+  })
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
+  @ApiProperty({
+    description: 'Thời gian cập nhật ngôn ngữ gần nhất',
+    example: '2023-08-01T12:00:00.000Z',
+  })
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }

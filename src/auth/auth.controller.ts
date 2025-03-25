@@ -39,14 +39,17 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Thông tin đăng nhập không hợp lệ' })
   login(@Request() req: any) {
-    const token = this.authService.login(req.user);
-
-    return AppResponse.success({
-      data: {
-        token: token,
-      },
-      message: 'Đăng nhập thành công',
-    });
+    try {
+      const token = this.authService.login(req.user);
+      return AppResponse.success({
+        data: {
+          token: token,
+        },
+        message: 'Đăng nhập thành công',
+      });
+    } catch {
+      return AppResponse.error('Thông tin đăng nhập không hợp lệ', 401);
+    }
   }
 
   @Post('register')

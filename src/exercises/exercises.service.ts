@@ -23,14 +23,13 @@ export class ExercisesService {
     paginateDto: PaginateDto,
     languageId?: number,
     type?: string,
-    active?: boolean,
+    difficulty?: string,
   ) {
     const { page, limit } = paginateDto;
 
     const queryBuilder = this.exerciseRepository
       .createQueryBuilder('exercise')
-      .leftJoinAndSelect('exercise.language', 'language')
-      .leftJoinAndSelect('exercise.media', 'media');
+      .leftJoinAndSelect('exercise.language', 'language');
 
     if (languageId) {
       queryBuilder.andWhere('exercise.language_id = :languageId', {
@@ -42,8 +41,10 @@ export class ExercisesService {
       queryBuilder.andWhere('exercise.type = :type', { type });
     }
 
-    if (active !== undefined) {
-      queryBuilder.andWhere('exercise.active = :active', { active });
+    if (difficulty) {
+      queryBuilder.andWhere('exercise.difficulty = :difficulty', {
+        difficulty,
+      });
     }
 
     const total = await queryBuilder.getCount();
@@ -72,7 +73,7 @@ export class ExercisesService {
   async findOne(id: number): Promise<Exercise> {
     const exercise = await this.exerciseRepository.findOne({
       where: { id },
-      relations: ['language', 'media'],
+      relations: ['language'],
     });
 
     if (!exercise) {

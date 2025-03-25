@@ -11,6 +11,8 @@ import { VocabsModule } from './vocabs/vocabs.module';
 import { BootstrapModule } from './bootstrap/bootstrap.module';
 import { ProgressModule } from './progress/progress.module';
 import { ExercisesModule } from './exercises/exercises.module';
+import { ExerciseQuestionsModule } from './exercise-questions/exercise-questions.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -43,6 +45,7 @@ import { ExercisesModule } from './exercises/exercises.module';
     BootstrapModule,
     ProgressModule,
     ExercisesModule,
+    ExerciseQuestionsModule,
   ],
   controllers: [],
   providers: [],
