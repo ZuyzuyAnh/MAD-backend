@@ -69,7 +69,15 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect(
+        'user.progress',
+        'progress',
+        'progress.isCurrentActive = true',
+      )
+      .where('user.id = :id', { id })
+      .getOne();
 
     return user;
   }

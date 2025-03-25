@@ -5,6 +5,10 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  Get,
+  Param,
+  ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -18,6 +22,7 @@ import {
   ApiConsumes,
   ApiBody,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import AppResponse from 'src/common/dto/api-response.dto';
 
@@ -97,6 +102,33 @@ export class UsersController {
     return AppResponse.success({
       data: updatedUser,
       message: 'Cập nhật thông tin thành công',
+    });
+  }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Lấy thông tin người dùng hiện tại' })
+  @ApiQuery({
+    name: 'activeProgressOnly',
+    required: false,
+    type: Boolean,
+    description:
+      'Chỉ lấy tiến độ đang hoạt động (true) hoặc tất cả (false/không cung cấp)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Thông tin người dùng',
+  })
+  async getProfile(@GetUser('sub') userId: number) {
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      return AppResponse.error('Không tìm thấy người dùng', 404);
+    }
+
+    return AppResponse.success({
+      data: user,
     });
   }
 }
