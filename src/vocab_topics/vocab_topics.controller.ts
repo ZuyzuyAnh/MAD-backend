@@ -308,6 +308,11 @@ export class VocabTopicsController {
                         enum: Object.values(VocabLevel),
                         example: VocabLevel.BEGINNER,
                       },
+                      vocabCount: {
+                        type: 'number',
+                        description: 'Số lượng từ vựng trong chủ đề',
+                        example: 20,
+                      },
                       createdAt: {
                         type: 'string',
                         format: 'date-time',

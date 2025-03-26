@@ -4,11 +4,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Language } from '../../languages/entities/language.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Vocab } from 'src/vocabs/entities/vocab.entity';
 
 export enum VocabLevel {
   BEGINNER = 'beginner',
@@ -72,4 +74,7 @@ export class VocabTopic {
   @ManyToOne(() => Language)
   @JoinColumn({ name: 'language_id' })
   language: Language;
+
+  @OneToMany(() => Vocab, (vocab) => vocab.topic)
+  vocabs: Vocab[];
 }
