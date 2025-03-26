@@ -33,13 +33,6 @@ export class VocabTopic {
   topic: string;
 
   @ApiProperty({
-    description: 'ID của ngôn ngữ',
-    example: 1,
-  })
-  @Column({ name: 'language_id' })
-  languageId: number;
-
-  @ApiProperty({
     description: 'URL hình ảnh đại diện cho chủ đề',
     example: 'https://example.com/images/animals.jpg',
   })
