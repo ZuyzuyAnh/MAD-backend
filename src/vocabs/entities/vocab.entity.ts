@@ -10,13 +10,19 @@ import {
 import { VocabTopic } from '../../vocab_topics/entities/vocab_topic.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
+/**
+ * Độ khó của từ vựng
+ * @enum {string}
+ */
 export enum VocabDifficulty {
-  EASY = 'easy',
-  MEDIUM = 'medium',
-  HARD = 'hard',
-  BEGINNER = 'BEGINNER',
+  BEGINNER = 'beginner',
+  INTERMEDIATE = 'intermediate',
+  ADVANCED = 'advanced',
 }
 
+/**
+ * Entity đại diện cho từ vựng trong hệ thống.
+ */
 @Entity('vocabs')
 export class Vocab {
   @ApiProperty({
@@ -44,6 +50,7 @@ export class Vocab {
   @ApiProperty({
     description: 'Ví dụ sử dụng từ vựng',
     example: 'I have a pet cat at home.',
+    required: false,
   })
   @Column({ type: 'text', nullable: true })
   example: string;
@@ -51,6 +58,7 @@ export class Vocab {
   @ApiProperty({
     description: 'Bản dịch của ví dụ',
     example: 'Tôi có một con mèo cưng ở nhà.',
+    required: false,
   })
   @Column({ type: 'text', nullable: true, name: 'example_translation' })
   exampleTranslation: string;
@@ -58,9 +66,14 @@ export class Vocab {
   @ApiProperty({
     description: 'Độ khó của từ vựng',
     enum: VocabDifficulty,
-    example: VocabDifficulty.EASY,
+    enumName: 'VocabDifficulty',
+    example: VocabDifficulty.BEGINNER,
   })
-  @Column({ type: 'enum', enum: VocabDifficulty })
+  @Column({
+    type: 'enum',
+    enum: VocabDifficulty,
+    default: VocabDifficulty.BEGINNER,
+  })
   difficulty: VocabDifficulty;
 
   @ApiProperty({
@@ -73,6 +86,7 @@ export class Vocab {
   @ApiProperty({
     description: 'URL hình ảnh minh họa cho từ vựng',
     example: 'https://example.com/images/cat.jpg',
+    nullable: true,
   })
   @Column({ nullable: true, name: 'image_url' })
   imageUrl: string;

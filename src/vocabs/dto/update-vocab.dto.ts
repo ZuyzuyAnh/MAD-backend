@@ -1,18 +1,22 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateVocabDto } from './create-vocab.dto';
-import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEnum,
-  IsNumber,
+  IsInt,
   IsOptional,
   IsString,
   Length,
+  Min,
 } from 'class-validator';
 import { VocabDifficulty } from '../entities/vocab.entity';
 
+/**
+ * DTO for updating an existing vocabulary
+ * Makes all properties from CreateVocabDto optional
+ */
 export class UpdateVocabDto extends PartialType(CreateVocabDto) {
   @ApiProperty({
-    description: 'Từ vựng',
+    description: 'Từ vựng cần học',
     example: 'cat',
     minLength: 1,
     maxLength: 100,
@@ -24,7 +28,7 @@ export class UpdateVocabDto extends PartialType(CreateVocabDto) {
   word?: string;
 
   @ApiProperty({
-    description: 'Định nghĩa của từ vựng',
+    description: 'Định nghĩa hoặc nghĩa của từ vựng',
     example:
       'Con mèo, một loại động vật có lông, thường được nuôi làm thú cưng',
     minLength: 1,
@@ -37,18 +41,20 @@ export class UpdateVocabDto extends PartialType(CreateVocabDto) {
   definition?: string;
 
   @ApiProperty({
-    description: 'Ví dụ sử dụng từ vựng',
+    description: 'Ví dụ câu sử dụng từ vựng',
     example: 'The cat is sleeping on the sofa.',
     required: false,
+    nullable: true,
   })
   @IsOptional()
   @IsString()
   example?: string;
 
   @ApiProperty({
-    description: 'Bản dịch của ví dụ',
+    description: 'Bản dịch của câu ví dụ',
     example: 'Con mèo đang ngủ trên ghế sofa.',
     required: false,
+    nullable: true,
   })
   @IsOptional()
   @IsString()
@@ -57,26 +63,33 @@ export class UpdateVocabDto extends PartialType(CreateVocabDto) {
   @ApiProperty({
     description: 'Độ khó của từ vựng',
     enum: VocabDifficulty,
-    example: VocabDifficulty.BEGINNER,
+    enumName: 'VocabDifficulty',
+    example: VocabDifficulty.INTERMEDIATE,
     required: false,
   })
   @IsOptional()
-  @IsEnum(VocabDifficulty)
+  @IsEnum(VocabDifficulty, {
+    message:
+      'Độ khó phải là một trong các giá trị: beginner, intermediate, advanced',
+  })
   difficulty?: VocabDifficulty;
 
   @ApiProperty({
     description: 'ID của chủ đề từ vựng',
-    example: 1,
+    example: 2,
     required: false,
+    minimum: 1,
   })
   @IsOptional()
-  @IsNumber()
+  @IsInt()
+  @Min(1)
   topicId?: number;
 
   @ApiProperty({
     description: 'URL hình ảnh minh họa cho từ vựng',
     example: 'https://example.com/images/cat_updated.jpg',
     required: false,
+    nullable: true,
   })
   @IsOptional()
   @IsString()
