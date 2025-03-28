@@ -3,5 +3,4 @@ export default interface Response<T> {
   statusCode: number;
   message: string;
   success: boolean;
-  timestamp: string;
 }

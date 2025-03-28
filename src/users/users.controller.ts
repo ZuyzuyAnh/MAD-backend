@@ -74,19 +74,34 @@ export class UsersController {
           isFirstTime: false,
         },
         statusCode: 200,
-        message: 'Success',
+        message: 'Cập nhật thông tin thành công',
         success: true,
-        timestamp: '2023-08-01T12:00:00.000Z',
       },
     },
   })
   @ApiResponse({
     status: 401,
     description: 'Chưa xác thực',
+    schema: {
+      example: {
+        data: null,
+        statusCode: 401,
+        message: 'Chưa xác thực',
+        success: false,
+      },
+    },
   })
   @ApiResponse({
     status: 404,
     description: 'Không tìm thấy người dùng',
+    schema: {
+      example: {
+        data: null,
+        statusCode: 404,
+        message: 'Không tìm thấy người dùng với id: 1',
+        success: false,
+      },
+    },
   })
   async updateUserProfile(
     @GetUser('sub') id: number,
@@ -99,7 +114,7 @@ export class UsersController {
       file,
     );
 
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: updatedUser,
       message: 'Cập nhật thông tin thành công',
     });
@@ -119,6 +134,42 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Thông tin người dùng',
+    schema: {
+      example: {
+        data: {
+          id: 1,
+          firstName: 'Nguyen',
+          lastName: 'Van A',
+          username: 'nguyenvana',
+          email: 'nguyenvana@example.com',
+          profile_image_url: 'https://example.com/images/avatar.jpg',
+          role: 'user',
+          progress: [
+            {
+              id: 1,
+              courseId: 1,
+              lessonId: 3,
+              isCurrentActive: true,
+            },
+          ],
+        },
+        statusCode: 200,
+        message: 'Success',
+        success: true,
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Không tìm thấy người dùng',
+    schema: {
+      example: {
+        data: null,
+        statusCode: 404,
+        message: 'Không tìm thấy người dùng',
+        success: false,
+      },
+    },
   })
   async getProfile(@GetUser('sub') userId: number) {
     const user = await this.usersService.findById(userId);
@@ -127,7 +178,7 @@ export class UsersController {
       return AppResponse.error('Không tìm thấy người dùng', 404);
     }
 
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: user,
     });
   }

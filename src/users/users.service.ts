@@ -51,10 +51,7 @@ export class UsersService {
 
     const createdUser = await this.userRepository.save(user);
 
-    const { password, profileImageUrl, createdAt, updatedAt, ...result } =
-      createdUser;
-
-    return result;
+    return createdUser;
   }
 
   async findOneByUsername(username: string) {
@@ -114,9 +111,18 @@ export class UsersService {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
 
     if (username) {
-      queryBuilder.where('user.username LIKE :username', {
-        username: `%${username}%`,
-      });
+      queryBuilder
+        .select([
+          'user.id',
+          'user.username',
+          'user.email',
+          'user.role',
+          'user.created_at',
+          'user.updated_at',
+        ])
+        .where('user.username LIKE :username', {
+          username: `%${username}%`,
+        });
     }
 
     if (email) {

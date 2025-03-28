@@ -33,15 +33,25 @@ export class AuthController {
         statusCode: 200,
         message: 'Đăng nhập thành công',
         success: true,
-        timestamp: '2023-08-01T12:00:00.000Z',
       },
     },
   })
-  @ApiResponse({ status: 401, description: 'Thông tin đăng nhập không hợp lệ' })
+  @ApiResponse({
+    status: 401,
+    description: 'Thông tin đăng nhập không hợp lệ',
+    schema: {
+      example: {
+        data: null,
+        statusCode: 401,
+        message: 'Thông tin đăng nhập không hợp lệ',
+        success: false,
+      },
+    },
+  })
   login(@Request() req: any) {
     try {
       const token = this.authService.login(req.user);
-      return AppResponse.success({
+      return AppResponse.successWithData({
         data: {
           token: token,
         },
@@ -71,19 +81,10 @@ export class AuthController {
     description: 'Đăng ký người dùng thành công',
     schema: {
       example: {
-        data: {
-          id: 1,
-          firstName: 'Nguyen',
-          lastName: 'Van A',
-          username: 'nguyenvana',
-          email: 'nguyenvana@example.com',
-          role: 'user',
-          isFirstTime: true,
-        },
+        data: null,
         statusCode: 200,
         message: 'Đăng ký người dùng thành công',
         success: true,
-        timestamp: '2023-08-01T12:00:00.000Z',
       },
     },
   })
@@ -96,20 +97,12 @@ export class AuthController {
         statusCode: 400,
         message: 'Xác thực thất bại',
         success: false,
-        timestamp: '2023-08-01T12:00:00.000Z',
-        errors: {
-          username: 'Tên người dùng là bắt buộc',
-          email: 'Email không hợp lệ',
-        },
       },
     },
   })
   async register(@Body() createUserDto: CreateUserDto) {
     const createdUser = await this.authService.register(createUserDto);
 
-    return AppResponse.success({
-      data: createdUser,
-      message: 'Đăng ký người dùng thành công',
-    });
+    return AppResponse.success('Đăng ký người dùng thành công');
   }
 }
