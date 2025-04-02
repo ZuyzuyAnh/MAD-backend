@@ -237,7 +237,7 @@ export class VocabTopicsController {
       createVocabTopicDto,
       image,
     );
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: topic,
       message: 'Tạo chủ đề từ vựng thành công',
     });
@@ -386,7 +386,7 @@ export class VocabTopicsController {
       topic,
       languageId,
     );
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: result,
     });
   }
@@ -491,7 +491,7 @@ export class VocabTopicsController {
   })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const topic = await this.vocabTopicsService.findOne(id);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: topic,
     });
   }
@@ -708,7 +708,7 @@ export class VocabTopicsController {
       updateVocabTopicDto,
       image,
     );
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: topic,
       message: 'Cập nhật chủ đề từ vựng thành công',
     });
@@ -796,7 +796,7 @@ export class VocabTopicsController {
   })
   async remove(@Param('id', ParseIntPipe) id: number) {
     await this.vocabTopicsService.remove(id);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: null,
       message: 'Xóa chủ đề từ vựng thành công',
     });

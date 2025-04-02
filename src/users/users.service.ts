@@ -9,6 +9,7 @@ import * as bcrypt from 'bcryptjs';
 import { UploadFileService } from '../aws/uploadfile.s3.service';
 import { PaginateDto } from '../common/dto/paginate.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import EntityNotFoundException from '../exception/notfound.exception';
 
 @Injectable()
 export class UsersService {
@@ -87,7 +88,7 @@ export class UsersService {
     const existingUser = await this.findById(id);
 
     if (!existingUser) {
-      throw new NotfoundException('user', 'id', id);
+      throw new EntityNotFoundException('user', 'id', id);
     }
 
     if (file) {

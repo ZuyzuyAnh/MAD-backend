@@ -1,32 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export default class AppResponse<T> {
-  @ApiProperty({
-    description: 'Dữ liệu trả về',
-    example: { id: 1, username: 'nguyenvana' },
-    nullable: true,
-  })
+  @ApiProperty({ description: 'Dữ liệu trả về' })
   data: T;
 
-  @ApiProperty({
-    description: 'Mã trạng thái HTTP',
-    default: 200,
-    example: 200,
-  })
+  @ApiProperty({ description: 'Mã trạng thái HTTP', default: 200 })
   statusCode: number;
 
-  @ApiProperty({
-    description: 'Thông báo kết quả',
-    default: 'Success',
-    example: 'Thao tác thành công',
-  })
+  @ApiProperty({ description: 'Thông báo kết quả', default: 'Success' })
   message: string;
 
-  @ApiProperty({
-    description: 'Trạng thái thành công',
-    default: true,
-    example: true,
-  })
+  @ApiProperty({ description: 'Trạng thái thành công', default: true })
   success: boolean;
 
   constructor(

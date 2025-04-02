@@ -1,7 +1,5 @@
-import { HttpException } from '@nestjs/common';
-
-export default class DuplicateEntityException extends HttpException {
+export default class DuplicateEntityException extends Error {
   constructor(entity: string, field: string, value: string) {
-    super(`${entity} với ${field} ${value} đã tồn tại`, 409);
+    super(`${entity} với ${field} ${value} đã tồn tại`);
   }
 }

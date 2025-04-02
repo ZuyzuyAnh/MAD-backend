@@ -25,21 +25,6 @@ export class VocabTopicsService {
     createVocabTopicDto: CreateVocabTopicDto,
     image?: Express.Multer.File,
   ): Promise<VocabTopic> {
-    const existingTopic = await this.vocabTopicRepository.findOne({
-      where: {
-        topic: createVocabTopicDto.topic,
-        language: { id: createVocabTopicDto.languageId },
-      },
-    });
-
-    if (existingTopic) {
-      throw new DuplicateEntityException(
-        'vocabulary topic',
-        'topic',
-        createVocabTopicDto.topic,
-      );
-    }
-
     const vocabTopic = this.vocabTopicRepository.create({
       topic: createVocabTopicDto.topic,
       level: createVocabTopicDto.level,

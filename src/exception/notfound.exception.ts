@@ -1,7 +1,5 @@
-import { HttpException } from '@nestjs/common';
-
-export default class NotfoundException extends HttpException {
+export default class EntityNotFoundException extends Error {
   constructor(entity: string, field: string, value: any) {
-    super(`${entity} với ${field} ${value} không tồn tại`, 404);
+    super(`${entity} với ${field} = ${value} không tồn tại`);
   }
 }
