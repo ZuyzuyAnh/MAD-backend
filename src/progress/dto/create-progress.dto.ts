@@ -6,10 +6,6 @@ export class CreateProgressDto {
   languageId: number;
 
   @IsOptional()
-  @IsNumber()
-  currentStreak?: number;
-
-  @IsOptional()
   @IsDate()
   @Type(() => Date)
   lastActivity?: Date;

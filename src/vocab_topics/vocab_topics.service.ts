@@ -60,6 +60,7 @@ export class VocabTopicsService {
     paginateDto: PaginateDto,
     topic?: string,
     languageId?: number,
+    userId?: number,
   ): Promise<{
     data: VocabTopic[];
     meta: {

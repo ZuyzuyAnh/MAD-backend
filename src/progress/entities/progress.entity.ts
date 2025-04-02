@@ -17,15 +17,6 @@ export class Progress {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'user_id' })
-  userId: number;
-
-  @Column({ name: 'language_id' })
-  languageId: number;
-
-  @Column({ name: 'current_streak', default: 0 })
-  currentStreak: number;
-
   @Column({ name: 'last_activity', nullable: true, type: 'timestamp' })
   lastActivity: Date;
 

@@ -1,4 +1,12 @@
-import { Controller, Post, UseGuards, Request, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UseGuards,
+  Request,
+  Body,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
@@ -58,7 +66,10 @@ export class AuthController {
         message: 'Đăng nhập thành công',
       });
     } catch {
-      return AppResponse.error('Thông tin đăng nhập không hợp lệ', 401);
+      return AppResponse.error(
+        'Thông tin đăng nhập không hợp lệ',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
   }
 
