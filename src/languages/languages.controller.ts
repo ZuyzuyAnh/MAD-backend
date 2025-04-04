@@ -34,7 +34,6 @@ export class LanguagesController {
           id: 1,
           name: 'Tiếng Anh',
           flagUrl: 'https://example.com/flags/en.png',
-          active: true,
           createdAt: '2023-08-01T12:00:00.000Z',
           updatedAt: '2023-08-01T12:00:00.000Z',
         },
@@ -47,7 +46,7 @@ export class LanguagesController {
   })
   async create(@Body() createLanguageDto: CreateLanguageDto) {
     const language = await this.languagesService.create(createLanguageDto);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: language,
       message: 'Tạo ngôn ngữ thành công',
     });
@@ -72,12 +71,6 @@ export class LanguagesController {
     required: false,
     description: 'Tìm kiếm theo tên ngôn ngữ',
     type: String,
-  })
-  @ApiQuery({
-    name: 'active',
-    required: false,
-    description: 'Lọc theo trạng thái kích hoạt',
-    type: Boolean,
   })
   @ApiResponse({
     status: 200,
@@ -114,14 +107,9 @@ export class LanguagesController {
   async findAll(
     @Query() paginateDto: PaginateDto,
     @Query('name') name?: string,
-    @Query('active') active?: boolean,
   ) {
-    const result = await this.languagesService.findAll(
-      paginateDto,
-      name,
-      active,
-    );
-    return AppResponse.success({
+    const result = await this.languagesService.findAll(paginateDto, name);
+    return AppResponse.successWithData({
       data: result,
     });
   }
@@ -137,7 +125,6 @@ export class LanguagesController {
           id: 1,
           name: 'Tiếng Anh',
           flagUrl: 'https://example.com/flags/en.png',
-          active: true,
           createdAt: '2023-08-01T12:00:00.000Z',
           updatedAt: '2023-08-01T12:00:00.000Z',
         },
@@ -151,7 +138,7 @@ export class LanguagesController {
   @ApiResponse({ status: 404, description: 'Không tìm thấy ngôn ngữ' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const language = await this.languagesService.findOne(id);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: language,
     });
   }
@@ -185,7 +172,7 @@ export class LanguagesController {
     @Body() updateLanguageDto: UpdateLanguageDto,
   ) {
     const language = await this.languagesService.update(id, updateLanguageDto);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: language,
       message: 'Cập nhật ngôn ngữ thành công',
     });
@@ -210,7 +197,7 @@ export class LanguagesController {
   @ApiResponse({ status: 404, description: 'Không tìm thấy ngôn ngữ' })
   async remove(@Param('id', ParseIntPipe) id: number) {
     await this.languagesService.remove(id);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: null,
       message: 'Xóa ngôn ngữ thành công',
     });

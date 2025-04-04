@@ -10,7 +10,6 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Language } from 'src/languages/entities/language.entity';
-import { ExerciseQuestion } from 'src/exercise-questions/entities/exercise-question.entity';
 
 export enum ExerciseType {
   GRAMMAR = 'grammar',
@@ -78,17 +77,6 @@ export class Exercise {
   @ManyToOne(() => Language, { eager: true })
   @JoinColumn({ name: 'language_id' })
   language: Language;
-
-  @ApiProperty({
-    description: 'Danh sách câu hỏi của bài tập',
-    type: () => [ExerciseQuestion],
-  })
-  @OneToMany(
-    () => ExerciseQuestion,
-    (exerciseQuestion) => exerciseQuestion.exercise,
-    { eager: true },
-  )
-  questions: ExerciseQuestion[];
 
   @ApiProperty({
     description: 'Thời gian tạo bài tập',

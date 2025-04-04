@@ -5,14 +5,12 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Language } from '../../languages/entities/language.entity';
 
 @Entity('progress')
-@Unique(['userId', 'languageId'])
 export class Progress {
   @PrimaryGeneratedColumn()
   id: number;

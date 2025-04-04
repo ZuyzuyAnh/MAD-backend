@@ -28,13 +28,6 @@ export class Language {
   flagUrl: string;
 
   @ApiProperty({
-    description: 'Trạng thái hoạt động của ngôn ngữ',
-    default: true,
-  })
-  @Column({ name: 'active', default: true })
-  active: boolean;
-
-  @ApiProperty({
     description: 'Thời gian tạo ngôn ngữ',
     example: '2023-08-01T12:00:00.000Z',
   })

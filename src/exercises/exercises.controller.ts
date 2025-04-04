@@ -53,7 +53,7 @@ export class ExercisesController {
   })
   async create(@Body() createExerciseDto: CreateExerciseDto) {
     const exercise = await this.exercisesService.create(createExerciseDto);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: exercise,
       message: 'Tạo bài tập thành công',
     });
@@ -141,7 +141,7 @@ export class ExercisesController {
       type,
       difficulty,
     );
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: exercises,
     });
   }
@@ -179,7 +179,7 @@ export class ExercisesController {
   @ApiResponse({ status: 404, description: 'Không tìm thấy bài tập' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const exercise = await this.exercisesService.findOne(id);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: exercise,
     });
   }
@@ -214,7 +214,7 @@ export class ExercisesController {
     @Body() updateExerciseDto: UpdateExerciseDto,
   ) {
     const exercise = await this.exercisesService.update(id, updateExerciseDto);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: exercise,
       message: 'Cập nhật bài tập thành công',
     });
@@ -238,7 +238,7 @@ export class ExercisesController {
   })
   async remove(@Param('id', ParseIntPipe) id: number) {
     await this.exercisesService.remove(id);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: null,
       message: 'Xóa bài tập thành công',
     });

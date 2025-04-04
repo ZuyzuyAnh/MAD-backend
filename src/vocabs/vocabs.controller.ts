@@ -146,7 +146,7 @@ export class VocabsController {
     image?: Express.Multer.File,
   ) {
     const vocab = await this.vocabsService.create(createVocabDto, image);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: vocab,
       message: 'Tạo từ vựng thành công',
     });
@@ -238,7 +238,7 @@ export class VocabsController {
       topicId,
       difficulty,
     );
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: result,
     });
   }
@@ -290,7 +290,7 @@ export class VocabsController {
   })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const vocab = await this.vocabsService.findOne(id);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: vocab,
     });
   }
@@ -412,7 +412,7 @@ export class VocabsController {
     }
 
     const vocab = await this.vocabsService.update(id, updateVocabDto, image);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: vocab,
       message: 'Cập nhật từ vựng thành công',
     });
@@ -446,7 +446,7 @@ export class VocabsController {
   })
   async remove(@Param('id', ParseIntPipe) id: number) {
     await this.vocabsService.remove(id);
-    return AppResponse.success({
+    return AppResponse.successWithData({
       data: null,
       message: 'Xóa từ vựng thành công',
     });

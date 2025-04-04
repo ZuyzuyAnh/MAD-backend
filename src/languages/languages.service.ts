@@ -19,7 +19,7 @@ export class LanguagesService {
     return await this.languageRepository.save(language);
   }
 
-  async findAll(paginateDto: PaginateDto, name?: string, active?: boolean) {
+  async findAll(paginateDto: PaginateDto, name?: string) {
     const { page, limit } = paginateDto;
 
     const queryBuilder = this.languageRepository.createQueryBuilder('language');
@@ -28,10 +28,6 @@ export class LanguagesService {
       queryBuilder.andWhere('language.name LIKE :name', {
         name: `%${name}%`,
       });
-    }
-
-    if (active !== undefined) {
-      queryBuilder.andWhere('language.active = :active', { active });
     }
 
     const total = await queryBuilder.getCount();

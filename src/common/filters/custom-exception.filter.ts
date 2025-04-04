@@ -4,6 +4,7 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import AppResponse from '../dto/api-response.dto';
@@ -13,7 +14,10 @@ import EntityNotFoundException from 'src/exception/notfound.exception';
 @Catch(Error)
 export class CustomException implements ExceptionFilter {
   catch(
-    exception: DuplicateEntityException | EntityNotFoundException,
+    exception:
+      | DuplicateEntityException
+      | EntityNotFoundException
+      | UnauthorizedException,
     host: ArgumentsHost,
   ) {
     const ctx = host.switchToHttp();
@@ -29,6 +33,10 @@ export class CustomException implements ExceptionFilter {
     if (exception instanceof EntityNotFoundException) {
       status = HttpStatus.NOT_FOUND;
       message = exception.message;
+    }
+    if (exception instanceof UnauthorizedException) {
+      status = HttpStatus.UNAUTHORIZED;
+      message = 'Thông tin xác thực không hợp lệ';
     }
 
     response.status(status).json({

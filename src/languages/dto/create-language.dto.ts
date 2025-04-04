@@ -21,14 +21,4 @@ export class CreateLanguageDto {
   @IsString()
   @IsOptional()
   flagUrl?: string;
-
-  @ApiProperty({
-    description: 'Trạng thái hoạt động của ngôn ngữ',
-    example: true,
-    default: true,
-    required: false,
-  })
-  @IsBoolean()
-  @IsOptional()
-  active?: boolean = true;
 }
