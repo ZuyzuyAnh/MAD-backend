@@ -15,9 +15,6 @@ export class Progress {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'last_activity', nullable: true, type: 'timestamp' })
-  lastActivity: Date;
-
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
@@ -32,6 +29,6 @@ export class Progress {
   @JoinColumn({ name: 'language_id' })
   language: Language;
 
-  @Column({ name: 'is_current_active', default: false })
+  @Column({ name: 'is_current_active', default: true })
   isCurrentActive: boolean;
 }

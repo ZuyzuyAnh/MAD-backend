@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { Progress } from './entities/progress.entity';
 import { CreateProgressDto } from './dto/create-progress.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto';
-import { PaginateDto } from '../common/dto/paginate.dto';
 import NotFoundException from '../exception/notfound.exception';
 import { UsersService } from '../users/users.service';
 
@@ -13,7 +12,6 @@ export class ProgressService {
   constructor(
     @InjectRepository(Progress)
     private progressRepository: Repository<Progress>,
-    private usersService: UsersService,
   ) {}
 
   async create(userId: number, createProgressDto: CreateProgressDto) {

@@ -35,10 +35,7 @@ export class ProgressController {
     type: CreateProgressDto,
     schema: {
       example: {
-        courseId: 1,
-        lessonId: 1,
         languageId: 1,
-        isCurrentActive: true,
       },
     },
   })
