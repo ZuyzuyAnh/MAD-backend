@@ -1,6 +1,7 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { VocabTopic } from './vocab_topic.entity';
 import { Progress } from 'src/progress/entities/progress.entity';
+import { VocabRepetition } from 'src/vocabs/entities/vocab_repetition.entity';
 
 @Entity('vocab_topic_progress')
 export class VocabTopicProgress {
@@ -12,4 +13,10 @@ export class VocabTopicProgress {
 
   @ManyToOne(() => Progress)
   progress: Progress;
+
+  @OneToMany(
+    () => VocabRepetition,
+    (repetition) => repetition.vocabTopicProgress,
+  )
+  repetitions: VocabRepetition[];
 }

@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThan, LessThanOrEqual, Repository } from 'typeorm';
 import { Vocab, VocabDifficulty } from './entities/vocab.entity';
 import { CreateVocabDto } from './dto/create-vocab.dto';
 import { UpdateVocabDto } from './dto/update-vocab.dto';
 import { UploadFileService } from '../aws/uploadfile.s3.service';
 import { PaginateDto } from '../common/dto/paginate.dto';
 import NotfoundException from '../exception/notfound.exception';
+import { VocabRepetition } from './entities/vocab_repetition.entity';
+import { VocabTopicProgress } from 'src/vocab_topics/entities/vocab_topic_progress.entity';
+import EntityNotFoundException from '../exception/notfound.exception';
 
 /**
  * Service xử lý các thao tác với từ vựng
@@ -16,7 +19,7 @@ export class VocabsService {
   constructor(
     @InjectRepository(Vocab)
     private vocabRepository: Repository<Vocab>,
-    private readonly uploadFileService: UploadFileService,
+    private uploadFileService: UploadFileService,
   ) {}
 
   /**
