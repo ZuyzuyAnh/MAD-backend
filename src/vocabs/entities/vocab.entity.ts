@@ -77,19 +77,20 @@ export class Vocab {
   difficulty: VocabDifficulty;
 
   @ApiProperty({
-    description: 'ID của chủ đề từ vựng',
-    example: 1,
-  })
-  @Column({ name: 'topic_id' })
-  topicId: number;
-
-  @ApiProperty({
     description: 'URL hình ảnh minh họa cho từ vựng',
     example: 'https://example.com/images/cat.jpg',
     nullable: true,
   })
   @Column({ nullable: true, name: 'image_url' })
   imageUrl: string;
+
+  @ApiProperty({
+    description: 'Thông tin chủ đề của từ vựng',
+    type: () => VocabTopic,
+  })
+  @ManyToOne(() => VocabTopic)
+  @JoinColumn({ name: 'topic_id' })
+  topic: VocabTopic;
 
   @ApiProperty({
     description: 'Thời gian tạo từ vựng',
@@ -104,12 +105,4 @@ export class Vocab {
   })
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
-
-  @ApiProperty({
-    description: 'Thông tin chủ đề của từ vựng',
-    type: () => VocabTopic,
-  })
-  @ManyToOne(() => VocabTopic)
-  @JoinColumn({ name: 'topic_id' })
-  topic: VocabTopic;
 }

@@ -1,4 +1,8 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import {
+  createParamDecorator,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { TokenPayloadDto } from '../dto/token-payload.dto';
 
 export const GetUser = createParamDecorator(
@@ -11,7 +15,7 @@ export const GetUser = createParamDecorator(
       if (data in user) {
         return user[data as keyof TokenPayloadDto];
       }
-      throw new Error(`Property ${data} does not exist on user object`);
+      throw new UnauthorizedException('Yêu cầu đăng nhập vào hệ thống');
     }
 
     return user;

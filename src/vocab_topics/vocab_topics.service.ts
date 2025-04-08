@@ -7,8 +7,7 @@ import { CreateVocabTopicDto } from './dto/create-vocab_topic.dto';
 import { UpdateVocabTopicDto } from './dto/update-vocab_topic.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { VocabTopic } from './entities/vocab_topic.entity';
-import DuplicateEntityException from '../exception/duplicate-entity.exception';
+import { VocabLevel, VocabTopic } from './entities/vocab_topic.entity';
 import NotfoundException from '../exception/notfound.exception';
 import { UploadFileService } from 'src/aws/uploadfile.s3.service';
 import { PaginateDto } from '../common/dto/paginate.dto';
@@ -45,7 +44,8 @@ export class VocabTopicsService {
     paginateDto: PaginateDto,
     topic?: string,
     languageId?: number,
-    userId?: number,
+    level?: VocabLevel,
+    isRandom?: boolean,
   ): Promise<{
     data: VocabTopic[];
     meta: {
@@ -74,6 +74,14 @@ export class VocabTopicsService {
       queryBuilder.andWhere('vocab_topic.language.id = :languageId', {
         languageId,
       });
+    }
+
+    if (level) {
+      queryBuilder.andWhere('vocab_topic.level = :level', { level });
+    }
+
+    if (isRandom) {
+      queryBuilder.orderBy('RAND()');
     }
 
     const total = await queryBuilder.getCount();
@@ -133,5 +141,53 @@ export class VocabTopicsService {
     const vocabTopic = await this.findOne(id);
 
     return this.vocabTopicRepository.remove(vocabTopic);
+  }
+
+  /**
+   * Lấy danh sách chủ đề từ vựng mà người dùng đang học
+   * @param userId ID của người dùng
+   * @param paginateDto Thông số phân trang
+   * @returns Danh sách chủ đề từ vựng đang học và thông tin phân trang
+   */
+  async findLearningTopics(userId: number, paginateDto: PaginateDto) {
+    const { page, limit } = paginateDto;
+
+    const queryBuilder = this.vocabTopicRepository
+      .createQueryBuilder('vocab_topic')
+      .innerJoin(
+        'vocab_topic_progress',
+        'vocab_topic_progress',
+        'vocab_topic_progress.topicId = vocab_topic.id',
+      )
+      .innerJoin(
+        'vocab_topic_progress.progress',
+        'progress',
+        'progress.userId = :userId AND progress.isCurrentActive = true',
+        { userId },
+      )
+      .leftJoinAndSelect('vocab_topic.language', 'language')
+      .loadRelationCountAndMap('vocab_topic.totalVocabs', 'vocab_topic.vocabs');
+
+    const total = await queryBuilder.getCount();
+
+    const results = await queryBuilder
+      .skip((page - 1) * limit)
+      .take(limit)
+      .orderBy('vocab_topic.topic', 'ASC')
+      .getMany();
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: results,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 }

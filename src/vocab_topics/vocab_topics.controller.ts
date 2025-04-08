@@ -34,6 +34,8 @@ import {
 import { AdminOnly } from '../auth/decorators/admin-only.decorator';
 import { VocabLevel } from './entities/vocab_topic.entity';
 import AppResponse from '../common/dto/api-response.dto';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 /**
  * Controller xử lý các thao tác liên quan đến chủ đề từ vựng
@@ -250,7 +252,7 @@ export class VocabTopicsController {
   @ApiOperation({
     summary: 'Lấy danh sách chủ đề từ vựng',
     description:
-      'Trả về danh sách các chủ đề từ vựng có phân trang và các tùy chọn lọc',
+      'Trả về danh sách các chủ đề từ vựng có phân trang và các tùy chọn lọc. Có thể tìm kiếm theo tên, lọc theo ngôn ngữ, cấp độ và sắp xếp ngẫu nhiên.',
   })
   @ApiQuery({
     name: 'page',
@@ -269,16 +271,34 @@ export class VocabTopicsController {
   @ApiQuery({
     name: 'topic',
     required: false,
-    description: 'Tìm kiếm theo tên chủ đề (tìm kiếm mờ)',
+    description:
+      'Tìm kiếm theo tên chủ đề (tìm kiếm mờ, không phân biệt hoa thường)',
     type: String,
     example: 'động vật',
   })
   @ApiQuery({
     name: 'languageId',
     required: false,
-    description: 'Lọc theo ID ngôn ngữ',
+    description:
+      'Lọc theo ID ngôn ngữ (ví dụ: 1 cho Tiếng Anh, 2 cho Tiếng Pháp)',
     type: Number,
     example: 1,
+  })
+  @ApiQuery({
+    name: 'level',
+    required: false,
+    description: 'Lọc theo cấp độ của chủ đề từ vựng',
+    enum: VocabLevel,
+    enumName: 'Cấp độ',
+    example: VocabLevel.BEGINNER,
+  })
+  @ApiQuery({
+    name: 'isRandom',
+    required: false,
+    description:
+      'Sắp xếp kết quả ngẫu nhiên (true) hoặc theo thứ tự bảng chữ cái (false hoặc không cung cấp)',
+    type: Boolean,
+    example: false,
   })
   @ApiResponse({
     status: 200,
@@ -380,20 +400,35 @@ export class VocabTopicsController {
     @Query() paginateDto: PaginateDto,
     @Query('topic') topic?: string,
     @Query('languageId') languageId?: number,
+    @Query('level') level?: VocabLevel,
+    @Query('isRandom') isRandom?: boolean,
   ) {
-    const result = await this.vocabTopicsService.findAll(
-      paginateDto,
-      topic,
-      languageId,
-    );
-    return AppResponse.successWithData({
-      data: result,
-    });
+    try {
+      const parsedLanguageId = languageId ? Number(languageId) : undefined;
+
+      const parsedIsRandom =
+        typeof isRandom === 'string' ? isRandom === 'true' : isRandom === true;
+
+      const result = await this.vocabTopicsService.findAll(
+        paginateDto,
+        topic,
+        parsedLanguageId,
+        level,
+        parsedIsRandom,
+      );
+
+      return AppResponse.successWithData({
+        data: result,
+        message: 'Lấy danh sách chủ đề từ vựng thành công',
+      });
+    } catch (error) {
+      return AppResponse.error(
+        error.message || 'Lỗi khi lấy danh sách chủ đề từ vựng',
+        error.status || 400,
+      );
+    }
   }
 
-  /**
-   * Lấy thông tin chi tiết một chủ đề từ vựng
-   */
   @Get(':id')
   @ApiOperation({
     summary: 'Lấy thông tin chi tiết một chủ đề từ vựng',
@@ -800,5 +835,175 @@ export class VocabTopicsController {
       data: null,
       message: 'Xóa chủ đề từ vựng thành công',
     });
+  }
+
+  @Get('learning')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Lấy danh sách chủ đề từ vựng đang học',
+    description:
+      'Trả về danh sách các chủ đề từ vựng mà người dùng hiện tại đang học, có phân trang. Yêu cầu người dùng đã đăng nhập.',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Số trang (bắt đầu từ 1)',
+    type: Number,
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Số lượng kết quả tối đa mỗi trang',
+    type: Number,
+    example: 10,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lấy danh sách chủ đề từ vựng đang học thành công',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(AppResponse) },
+        {
+          properties: {
+            data: {
+              type: 'object',
+              properties: {
+                data: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'number', example: 1 },
+                      topic: { type: 'string', example: 'Động vật' },
+                      imageUrl: {
+                        type: 'string',
+                        example: 'https://example.com/images/animals.jpg',
+                      },
+                      level: {
+                        type: 'string',
+                        enum: Object.values(VocabLevel),
+                        example: VocabLevel.BEGINNER,
+                      },
+                      language: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'number', example: 1 },
+                          name: { type: 'string', example: 'Tiếng Anh' },
+                          flagUrl: {
+                            type: 'string',
+                            example: 'https://example.com/flags/en.png',
+                          },
+                        },
+                      },
+                      totalVocabs: { type: 'number', example: 30 },
+                    },
+                  },
+                },
+                meta: {
+                  type: 'object',
+                  properties: {
+                    total: {
+                      type: 'number',
+                      description: 'Tổng số chủ đề đang học',
+                      example: 5,
+                    },
+                    page: {
+                      type: 'number',
+                      description: 'Trang hiện tại',
+                      example: 1,
+                    },
+                    limit: {
+                      type: 'number',
+                      description: 'Số bản ghi mỗi trang',
+                      example: 10,
+                    },
+                    totalPages: {
+                      type: 'number',
+                      description: 'Tổng số trang',
+                      example: 1,
+                    },
+                    hasNextPage: {
+                      type: 'boolean',
+                      description: 'Có trang tiếp theo không',
+                      example: false,
+                    },
+                    hasPreviousPage: {
+                      type: 'boolean',
+                      description: 'Có trang trước đó không',
+                      example: false,
+                    },
+                  },
+                },
+              },
+            },
+            statusCode: { type: 'number', example: 200 },
+            message: {
+              type: 'string',
+              example: 'Lấy danh sách chủ đề từ vựng đang học thành công',
+            },
+            success: { type: 'boolean', example: true },
+          },
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Không có quyền truy cập - Token không hợp lệ hoặc hết hạn',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(AppResponse) },
+        {
+          properties: {
+            data: { type: 'null', example: null },
+            statusCode: { type: 'number', example: 401 },
+            message: { type: 'string', example: 'Chưa xác thực' },
+            success: { type: 'boolean', example: false },
+          },
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Không tìm thấy chủ đề từ vựng đang học',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(AppResponse) },
+        {
+          properties: {
+            data: { type: 'null', example: null },
+            statusCode: { type: 'number', example: 404 },
+            message: {
+              type: 'string',
+              example: 'Không tìm thấy chủ đề từ vựng đang học',
+            },
+            success: { type: 'boolean', example: false },
+          },
+        },
+      ],
+    },
+  })
+  async findLearningTopics(
+    @Query() paginateDto: PaginateDto,
+    @GetUser('sub') userId: number,
+  ) {
+    try {
+      const topics = await this.vocabTopicsService.findLearningTopics(
+        userId,
+        paginateDto,
+      );
+      return AppResponse.successWithData({
+        data: topics,
+        message: 'Lấy danh sách chủ đề từ vựng đang học thành công',
+      });
+    } catch (error) {
+      return AppResponse.error(
+        error.message || 'Không tìm thấy chủ đề từ vựng đang học',
+        error.status || 404,
+      );
+    }
   }
 }
