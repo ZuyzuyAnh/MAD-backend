@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Language } from 'src/languages/entities/language.entity';
+import { Question } from 'src/questions/entities/question.entity';
 
 export enum ExerciseType {
   GRAMMAR = 'grammar',
@@ -68,6 +69,9 @@ export class Exercise {
     default: ExerciseDifficulty.BEGINNER,
   })
   difficulty: ExerciseDifficulty;
+
+  @OneToMany(() => Question, (question) => question.exercise)
+  questions: Question[];
 
   @ApiProperty({ description: 'ID ngôn ngữ', example: 1 })
   @Column({ name: 'language_id' })

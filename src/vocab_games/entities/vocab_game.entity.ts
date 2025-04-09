@@ -1,9 +1,11 @@
+import { VocabGameChallange } from 'src/vocab_game_challanges/entities/vocab_game_challange.entity';
 import { VocabTopic } from 'src/vocab_topics/entities/vocab_topic.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -18,6 +20,12 @@ export class VocabGame {
 
   @ManyToOne(() => VocabTopic)
   vocabTopic: VocabTopic;
+
+  @OneToMany(
+    () => VocabGameChallange,
+    (vocabGameChallange) => vocabGameChallange.vocabGame,
+  )
+  vocabGameChallanges: VocabGameChallange[];
 
   @CreateDateColumn()
   createdAt: Date;

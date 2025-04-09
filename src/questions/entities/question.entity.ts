@@ -1,7 +1,11 @@
+import { Exam } from 'src/exams/entities/exam.entity';
+import { Exercise } from 'src/exercises/entities/exercise.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -28,6 +32,14 @@ export class Question {
     nullable: true,
   })
   options: string[];
+
+  @ManyToOne(() => Exam, (exam) => exam.questions)
+  @JoinColumn({ name: 'exam_id' })
+  exam: Exam;
+
+  @ManyToOne(() => Exercise, (exercise) => exercise.questions)
+  @JoinColumn({ name: 'exercise_id' })
+  exercise: Exercise;
 
   @Column()
   answer: string;
