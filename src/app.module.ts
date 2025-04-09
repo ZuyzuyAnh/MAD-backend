@@ -13,6 +13,9 @@ import { ProgressModule } from './progress/progress.module';
 import { ExercisesModule } from './exercises/exercises.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VocabRepetitionsModule } from './vocab_repetitions/vocab_repetitions.module';
+import { QuestionsModule } from './questions/questions.module';
+import { ExamsModule } from './exams/exams.module';
+import { VocabGamesModule } from './vocab_games/vocab_games.module';
 
 @Module({
   imports: [
@@ -46,6 +49,9 @@ import { VocabRepetitionsModule } from './vocab_repetitions/vocab_repetitions.mo
     ProgressModule,
     ExercisesModule,
     VocabRepetitionsModule,
+    QuestionsModule,
+    ExamsModule,
+    VocabGamesModule,
   ],
   controllers: [],
   providers: [],
