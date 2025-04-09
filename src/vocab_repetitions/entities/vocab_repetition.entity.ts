@@ -25,6 +25,7 @@ export class VocabRepetition {
 
   @Column({
     default: 2.5,
+    type: 'float',
   })
   easinessFactor: number;
 
