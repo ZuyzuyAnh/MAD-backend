@@ -34,16 +34,6 @@ export class CreateUserDto {
   lastName: string;
 
   @ApiProperty({
-    description: 'Tên đăng nhập, phải là duy nhất',
-    example: 'nguyenvana',
-    minLength: 3,
-    maxLength: 50,
-  })
-  @IsString()
-  @Length(3, 50)
-  username: string;
-
-  @ApiProperty({
     description: 'Địa chỉ email của người dùng, phải là duy nhất',
     example: 'nguyenvana@example.com',
     minLength: 5,

@@ -21,27 +21,11 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     const existingUser = await this.userRepository.findOne({
-      where: [
-        { email: createUserDto.email },
-        { username: createUserDto.username },
-      ],
+      where: [{ email: createUserDto.email }],
     });
 
     if (existingUser) {
-      if (existingUser.email === createUserDto.email) {
-        throw new DuplicateEntityException(
-          'user',
-          'email',
-          createUserDto.email,
-        );
-      }
-      if (existingUser.username === createUserDto.username) {
-        throw new DuplicateEntityException(
-          'user',
-          'username',
-          createUserDto.username,
-        );
-      }
+      throw new DuplicateEntityException('user', 'email', createUserDto.email);
     }
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
@@ -55,9 +39,9 @@ export class UsersService {
     return createdUser;
   }
 
-  async findOneByUsername(username: string) {
+  async findOneByEmail(email: string) {
     const user = this.userRepository.findOne({
-      where: { username },
+      where: { email },
       relations: {
         progress: true,
       },
@@ -99,71 +83,5 @@ export class UsersService {
     Object.assign(existingUser, updateUserDto);
 
     return this.userRepository.save(existingUser);
-  }
-
-  async findAll(
-    paginateDto: PaginateDto,
-    username?: string,
-    email?: string,
-    role?: UserRole,
-  ) {
-    const { page, limit } = paginateDto;
-
-    const queryBuilder = this.userRepository.createQueryBuilder('user');
-
-    if (username) {
-      queryBuilder
-        .select([
-          'user.id',
-          'user.username',
-          'user.email',
-          'user.role',
-          'user.created_at',
-          'user.updated_at',
-        ])
-        .where('user.username LIKE :username', {
-          username: `%${username}%`,
-        });
-    }
-
-    if (email) {
-      if (username) {
-        queryBuilder.andWhere('user.email LIKE :email', {
-          email: `%${email}%`,
-        });
-      } else {
-        queryBuilder.where('user.email LIKE :email', { email: `%${email}%` });
-      }
-    }
-
-    if (role) {
-      if (username || email) {
-        queryBuilder.andWhere('user.role = :role', { role });
-      } else {
-        queryBuilder.where('user.role = :role', { role });
-      }
-    }
-
-    const total = await queryBuilder.getCount();
-
-    const results = await queryBuilder
-      .skip((page - 1) * limit)
-      .take(limit)
-      .orderBy('user.created_at', 'DESC')
-      .getMany();
-
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      data: results,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
-      },
-    };
   }
 }

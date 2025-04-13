@@ -29,10 +29,6 @@ export class User {
   @Column({ name: 'last_name', length: 50 })
   lastName: string;
 
-  @ApiProperty({ description: 'Tên đăng nhập', example: 'nguyenvana' })
-  @Column({ name: 'username', length: 50, unique: true })
-  username: string;
-
   @ApiProperty({ description: 'Email', example: 'nguyenvana@example.com' })
   @Column({ name: 'email', length: 100, unique: true })
   email: string;

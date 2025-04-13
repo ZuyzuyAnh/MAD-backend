@@ -25,7 +25,7 @@ export class AuthController {
     description: 'Thông tin đăng nhập người dùng',
     schema: {
       example: {
-        username: 'exampleUser',
+        email: 'exampleUser@email.com',
         password: 'examplePassword',
       },
     },
@@ -81,7 +81,6 @@ export class AuthController {
       example: {
         first_name: 'Nguyen',
         last_name: 'Van A',
-        username: 'nguyenvana',
         email: 'nguyenvana@example.com',
         password: 'Password123',
       },
@@ -112,7 +111,7 @@ export class AuthController {
     },
   })
   async register(@Body() createUserDto: CreateUserDto) {
-    const createdUser = await this.authService.register(createUserDto);
+    await this.authService.register(createUserDto);
 
     return AppResponse.success('Đăng ký người dùng thành công');
   }
