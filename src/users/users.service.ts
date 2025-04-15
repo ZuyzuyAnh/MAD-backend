@@ -58,17 +58,42 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    const user = this.userRepository
+    const user = this.userRepository.findOneBy({ id });
+
+    return user;
+  }
+
+  async getUserProfile(id: number) {
+    const query = this.userRepository
       .createQueryBuilder('user')
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'progress.id',
+        'progress.language',
+      ])
       .leftJoinAndSelect(
         'user.progress',
         'progress',
-        'progress.isCurrentActive = true',
+        'progress.is_current_active = true',
       )
-      .where('user.id = :id', { id })
-      .getOne();
+      .where('user.id = :id', { id });
 
-    return user;
+    const result = await query.getOne();
+
+    console.log(query.getSql());
+
+    if (!result) {
+      throw new EntityNotFoundException('user', 'id', id);
+    }
+
+    const { progress, ...user } = result;
+
+    return {
+      user,
+      progress,
+    };
   }
 
   async updateUser(

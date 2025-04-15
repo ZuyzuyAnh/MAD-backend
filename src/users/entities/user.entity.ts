@@ -8,6 +8,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 
 export enum UserRole {
   USER = 'user',
@@ -49,9 +50,11 @@ export class User {
   @OneToMany(() => Progress, (progress) => progress.user)
   progress: Progress[];
 
+  @Exclude()
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
+  @Exclude()
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }

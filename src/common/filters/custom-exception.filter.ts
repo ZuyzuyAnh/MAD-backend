@@ -10,8 +10,14 @@ import {
 import { Response } from 'express';
 import DuplicateEntityException from 'src/exception/duplicate-entity.exception';
 import EntityNotFoundException from 'src/exception/notfound.exception';
+import { QueryFailedError } from 'typeorm';
 
-@Catch(DuplicateEntityException, EntityNotFoundException, UnauthorizedException)
+@Catch(
+  DuplicateEntityException,
+  EntityNotFoundException,
+  UnauthorizedException,
+  QueryFailedError,
+)
 export class CustomException implements ExceptionFilter {
   catch(
     exception:
@@ -37,6 +43,14 @@ export class CustomException implements ExceptionFilter {
     if (exception instanceof UnauthorizedException) {
       status = HttpStatus.UNAUTHORIZED;
       message = 'Thông tin xác thực không hợp lệ';
+    }
+    if (exception instanceof QueryFailedError) {
+      const errorCode = 'code' in exception ? exception.code : undefined;
+
+      if (errorCode === '23505') {
+        status = HttpStatus.CONFLICT;
+        message = 'Dữ liệu đã tồn tại';
+      }
     }
 
     response.status(status).json({

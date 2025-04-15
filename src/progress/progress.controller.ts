@@ -20,6 +20,7 @@ import { CreateProgressDto } from './dto/create-progress.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import AppResponse from 'src/common/dto/api-response.dto';
 
 @ApiTags('Tiến độ học tập')
 @Controller('progress')
@@ -84,11 +85,13 @@ export class ProgressController {
       },
     },
   })
-  create(
+  async create(
     @Body() createProgressDto: CreateProgressDto,
     @GetUser('sub') id: number,
   ) {
-    return this.progressService.create(id, createProgressDto);
+    await this.progressService.create(id, createProgressDto);
+
+    return AppResponse.success();
   }
 
   @Get('user/:userId/language/:languageId')

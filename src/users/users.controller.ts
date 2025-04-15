@@ -9,6 +9,7 @@ import {
   Param,
   ParseIntPipe,
   Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -172,14 +173,16 @@ export class UsersController {
     },
   })
   async getProfile(@GetUser('sub') userId: number) {
-    const user = await this.usersService.findById(userId);
+    const data = await this.usersService.getUserProfile(userId);
 
-    if (!user) {
-      return AppResponse.error('Không tìm thấy người dùng', 404);
+    if (!data) {
+      throw new NotFoundException(
+        `Không tìm thấy người dùng với id: ${userId}`,
+      );
     }
 
     return AppResponse.successWithData({
-      data: user,
+      data,
     });
   }
 }
