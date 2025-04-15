@@ -17,6 +17,7 @@ import { QuestionsModule } from './questions/questions.module';
 import { ExamsModule } from './exams/exams.module';
 import { VocabGamesModule } from './vocab_games/vocab_games.module';
 import { VocabGameChallangesModule } from './vocab_game_challanges/vocab_game_challanges.module';
+import { UserSessionModule } from './user_session/user_session.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { VocabGameChallangesModule } from './vocab_game_challanges/vocab_game_ch
     ExamsModule,
     VocabGamesModule,
     VocabGameChallangesModule,
+    UserSessionModule,
   ],
   controllers: [],
   providers: [],

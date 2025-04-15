@@ -24,17 +24,12 @@ export class BootstrapService implements OnModuleInit {
 
   private async setupInitialData(): Promise<void> {
     this.logger.log('Đang thiết lập dữ liệu ban đầu...');
-    const users = await this.usersService.findAll(
-      { page: 1, limit: 1 },
-      'admin',
-      UserRole.ADMIN,
-    );
+    const users = await this.usersService.findAll(UserRole.ADMIN);
 
-    if (users.data.length === 0) {
+    if (users.length === 0) {
       await this.usersService.create({
         firstName: 'Admin',
         lastName: 'Admin',
-        username: 'admin',
         email: 'admin@learning.com',
         password: 'Admin@123',
         role: UserRole.ADMIN,

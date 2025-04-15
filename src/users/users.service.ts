@@ -4,10 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserRole } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import DuplicateEntityException from '../exception/duplicate-entity.exception';
-import NotfoundException from '../exception/notfound.exception';
 import * as bcrypt from 'bcryptjs';
 import { UploadFileService } from '../aws/uploadfile.s3.service';
-import { PaginateDto } from '../common/dto/paginate.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import EntityNotFoundException from '../exception/notfound.exception';
 
@@ -39,12 +37,21 @@ export class UsersService {
     return createdUser;
   }
 
+  async findAll(role?: UserRole) {
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+
+    if (role) {
+      queryBuilder.where('user.role = :role', { role });
+    }
+
+    const users = await queryBuilder.getMany();
+
+    return users;
+  }
+
   async findOneByEmail(email: string) {
     const user = this.userRepository.findOne({
       where: { email },
-      relations: {
-        progress: true,
-      },
     });
 
     return user;

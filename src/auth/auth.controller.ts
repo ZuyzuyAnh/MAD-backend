@@ -20,13 +20,24 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Xác thực người dùng và trả về token JWT' })
   @ApiBody({
     description: 'Thông tin đăng nhập người dùng',
     schema: {
-      example: {
-        email: 'exampleUser@email.com',
-        password: 'examplePassword',
+      type: 'object',
+      required: ['email', 'password'],
+      properties: {
+        email: {
+          type: 'string',
+          example: 'nguyenvana@example.com',
+          description: 'Địa chỉ email đăng nhập',
+        },
+        password: {
+          type: 'string',
+          example: 'Password123',
+          description: 'Mật khẩu đăng nhập',
+        },
       },
     },
   })
@@ -34,13 +45,30 @@ export class AuthController {
     status: 200,
     description: 'Đăng nhập thành công',
     schema: {
-      example: {
+      type: 'object',
+      properties: {
         data: {
-          token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+          type: 'object',
+          properties: {
+            token: {
+              type: 'string',
+              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+              description: 'JWT token để xác thực các yêu cầu tiếp theo',
+            },
+          },
         },
-        statusCode: 200,
-        message: 'Đăng nhập thành công',
-        success: true,
+        statusCode: {
+          type: 'number',
+          example: 200,
+        },
+        message: {
+          type: 'string',
+          example: 'Success',
+        },
+        success: {
+          type: 'boolean',
+          example: true,
+        },
       },
     },
   })
@@ -48,71 +76,129 @@ export class AuthController {
     status: 401,
     description: 'Thông tin đăng nhập không hợp lệ',
     schema: {
-      example: {
-        data: null,
-        statusCode: 401,
-        message: 'Thông tin đăng nhập không hợp lệ',
-        success: false,
+      type: 'object',
+      properties: {
+        data: {
+          type: 'null',
+          example: null,
+        },
+        statusCode: {
+          type: 'number',
+          example: 401,
+        },
+        message: {
+          type: 'string',
+          example: 'Thông tin đăng nhập không hợp lệ',
+        },
+        success: {
+          type: 'boolean',
+          example: false,
+        },
       },
     },
   })
   login(@Request() req: any) {
-    try {
-      const token = this.authService.login(req.user);
-      return AppResponse.successWithData({
-        data: {
-          token: token,
-        },
-        message: 'Đăng nhập thành công',
-      });
-    } catch {
-      return AppResponse.error(
-        'Thông tin đăng nhập không hợp lệ',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+    const token = this.authService.login(req.user);
+
+    return AppResponse.successWithData({
+      data: {
+        token: token,
+      },
+    });
   }
 
   @Post('register')
   @ApiOperation({ summary: 'Đăng ký người dùng mới' })
   @ApiBody({
     description: 'Thông tin đăng ký người dùng mới',
-    schema: {
-      example: {
-        first_name: 'Nguyen',
-        last_name: 'Van A',
-        email: 'nguyenvana@example.com',
-        password: 'Password123',
-      },
-    },
+    type: CreateUserDto,
   })
   @ApiResponse({
     status: 201,
     description: 'Đăng ký người dùng thành công',
     schema: {
-      example: {
-        data: null,
-        statusCode: 200,
-        message: 'Đăng ký người dùng thành công',
-        success: true,
+      type: 'object',
+      properties: {
+        data: {
+          type: 'null',
+          example: null,
+        },
+        statusCode: {
+          type: 'number',
+          example: 201,
+        },
+        message: {
+          type: 'string',
+          example: 'Success',
+        },
+        success: {
+          type: 'boolean',
+          example: true,
+        },
       },
     },
   })
   @ApiResponse({
     status: 400,
-    description: 'Lỗi xác thực hoặc thiếu thông tin',
+    description: 'Lỗi xác thực hoặc email đã tồn tại',
     schema: {
-      example: {
-        data: null,
-        statusCode: 400,
-        message: 'Xác thực thất bại',
-        success: false,
+      type: 'object',
+      properties: {
+        data: {
+          type: 'null',
+          example: null,
+        },
+        statusCode: {
+          type: 'number',
+          example: 400,
+        },
+        message: {
+          type: 'string',
+          example:
+            "Giá trị 'nguyenvana@example.com' cho trường 'email' đã tồn tại",
+        },
+        success: {
+          type: 'boolean',
+          example: false,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Dữ liệu đầu vào không hợp lệ',
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'null',
+          example: null,
+        },
+        statusCode: {
+          type: 'number',
+          example: 422,
+        },
+        message: {
+          type: 'string',
+          example: 'firstName không được để trống',
+        },
+        success: {
+          type: 'boolean',
+          example: false,
+        },
+        errors: {
+          type: 'object',
+          example: {
+            firstName: 'không được để trống',
+            password: 'phải chứa ít nhất 1 chữ hoa, 1 chữ thường và 1 số',
+          },
+        },
       },
     },
   })
   async register(@Body() createUserDto: CreateUserDto) {
     await this.authService.register(createUserDto);
 
-    return AppResponse.success('Đăng ký người dùng thành công');
+    return AppResponse.success(undefined, HttpStatus.CREATED);
   }
 }

@@ -1,4 +1,68 @@
-FROM ubuntu:latest
-LABEL authors="zuyanh"
+version: '3.8'
 
-ENTRYPOINT ["top", "-b"]
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: language-app-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-language_app}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-language_password}
+      POSTGRES_DB: ${DB_NAME:-language_db}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - '${DB_PORT:-5432}:5432'
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${DB_USERNAME:-language_app} -d ${DB_NAME:-language_db}',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - language-app-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.4
+    container_name: language-app-elasticsearch
+    environment:
+      - node.name=es01
+      - cluster.name=language-app-es-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - '${ELASTICSEARCH_PORT:-9200}:9200'
+      - '${ELASTICSEARCH_TRANSPORT_PORT:-9300}:9300'
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -s http://localhost:9200 || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - language-app-network
+
+volumes:
+  postgres-data:
+    name: language-app-postgres-data
+  elasticsearch-data:
+    name: language-app-elasticsearch-data
+
+networks:
+  language-app-network:
+    name: language-app-network
+    driver: bridge

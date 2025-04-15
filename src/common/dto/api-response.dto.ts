@@ -25,15 +25,20 @@ export default class AppResponse<T> {
     this.success = success;
   }
 
-  static success(message?: string): AppResponse<null> {
-    return new AppResponse<null>(null, 200, message || 'Success');
+  static success(message?: string, statusCode?: number): AppResponse<null> {
+    return new AppResponse<null>(null, statusCode || 200, message || 'Success');
   }
 
   static successWithData<T>(params: {
     data: T;
     message?: string;
+    statusCode?: number;
   }): AppResponse<T> {
-    return new AppResponse<T>(params.data, 200, params.message || 'Success');
+    return new AppResponse<T>(
+      params.data,
+      params.statusCode || 200,
+      params.message || 'Success',
+    );
   }
 
   static error(message: string, statusCode: number = 400): AppResponse<null> {

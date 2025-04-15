@@ -5,13 +5,13 @@ import {
   HttpException,
   HttpStatus,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Response } from 'express';
-import AppResponse from '../dto/api-response.dto';
 import DuplicateEntityException from 'src/exception/duplicate-entity.exception';
 import EntityNotFoundException from 'src/exception/notfound.exception';
 
-@Catch(Error)
+@Catch(DuplicateEntityException, EntityNotFoundException, UnauthorizedException)
 export class CustomException implements ExceptionFilter {
   catch(
     exception:
@@ -23,8 +23,8 @@ export class CustomException implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    let status: number = HttpStatus.BAD_REQUEST;
-    let message: string = 'Bad Request';
+    let status: number = HttpStatus.INTERNAL_SERVER_ERROR;
+    let message: string = 'Lỗi không xác định';
 
     if (exception instanceof DuplicateEntityException) {
       status = HttpStatus.CONFLICT;
