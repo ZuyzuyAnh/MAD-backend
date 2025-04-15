@@ -45,9 +45,6 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 export class VocabTopicsController {
   constructor(private readonly vocabTopicsService: VocabTopicsService) {}
 
-  /**
-   * Tạo chủ đề từ vựng mới
-   */
   @Post()
   @AdminOnly()
   @UseInterceptors(FileInterceptor('image'))
@@ -226,7 +223,7 @@ export class VocabTopicsController {
           fileType: /(jpg|jpeg|png)$/,
         })
         .addMaxSizeValidator({
-          maxSize: 5 * 1024 * 1024, // 5MB
+          maxSize: 5 * 1024 * 1024,
         })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
