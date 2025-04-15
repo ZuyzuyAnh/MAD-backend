@@ -8,6 +8,7 @@ import * as bcrypt from 'bcryptjs';
 import { UploadFileService } from '../aws/uploadfile.s3.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import EntityNotFoundException from '../exception/notfound.exception';
+import { ProgressService } from 'src/progress/progress.service';
 
 @Injectable()
 export class UsersService {
@@ -15,6 +16,7 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly fileService: UploadFileService,
+    private progressService: ProgressService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -64,34 +66,19 @@ export class UsersService {
   }
 
   async getUserProfile(id: number) {
-    const query = this.userRepository
-      .createQueryBuilder('user')
-      .select([
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-        'progress.id',
-        'progress.language',
-      ])
-      .leftJoinAndSelect(
-        'user.progress',
-        'progress',
-        'progress.is_current_active = true',
-      )
-      .where('user.id = :id', { id });
+    const user = await this.findById(id);
 
-    const result = await query.getOne();
-
-    console.log(query.getSql());
-
-    if (!result) {
+    if (!user) {
       throw new EntityNotFoundException('user', 'id', id);
     }
 
-    const { progress, ...user } = result;
+    const progress = await this.progressService.getExerciseStatisticForUser(id);
 
     return {
-      user,
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
       progress,
     };
   }

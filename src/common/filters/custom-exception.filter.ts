@@ -32,6 +32,8 @@ export class CustomException implements ExceptionFilter {
     let status: number = HttpStatus.INTERNAL_SERVER_ERROR;
     let message: string = 'Lỗi không xác định';
 
+    console.log(exception);
+
     if (exception instanceof DuplicateEntityException) {
       status = HttpStatus.CONFLICT;
       message = exception.message;

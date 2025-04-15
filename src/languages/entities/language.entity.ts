@@ -4,8 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { Progress } from 'src/progress/entities/progress.entity';
 
 @Entity('languages')
 export class Language {
@@ -26,6 +28,9 @@ export class Language {
   })
   @Column({ name: 'flag_url', nullable: true })
   flagUrl: string;
+
+  @OneToMany(() => Progress, (progress) => progress.language)
+  progress: Progress[];
 
   @ApiProperty({
     description: 'Thời gian tạo ngôn ngữ',

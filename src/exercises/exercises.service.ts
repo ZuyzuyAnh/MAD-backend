@@ -98,4 +98,26 @@ export class ExercisesService {
     const exercise = await this.findOne(id);
     await this.exerciseRepository.remove(exercise);
   }
+
+  async getNumberOfExercises(
+    languageId: number,
+    type?: string,
+    difficulty?: string,
+  ): Promise<number> {
+    const queryBuilder = this.exerciseRepository
+      .createQueryBuilder('exercise')
+      .where('exercise.language_id = :languageId', { languageId });
+
+    if (type) {
+      queryBuilder.andWhere('exercise.type = :type', { type });
+    }
+
+    if (difficulty) {
+      queryBuilder.andWhere('exercise.difficulty = :difficulty', {
+        difficulty,
+      });
+    }
+
+    return queryBuilder.getCount();
+  }
 }
