@@ -389,54 +389,54 @@ export class ExamsController {
     });
   }
 
-  @Delete(':id')
-  @AdminOnly()
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Xóa bài kiểm tra',
-    description:
-      'Xóa một bài kiểm tra dựa trên ID, nhưng không xóa các câu hỏi liên quan. Yêu cầu quyền ADMIN.',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'ID của bài kiểm tra cần xóa',
-    type: Number,
-    example: 1,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Xóa bài kiểm tra thành công',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(AppResponse) },
-        {
-          properties: {
-            data: { type: 'null', example: null },
-            statusCode: { type: 'number', example: 200 },
-            message: { type: 'string', example: 'Xóa bài kiểm tra thành công' },
-            success: { type: 'boolean', example: true },
-          },
-        },
-      ],
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Không tìm thấy bài kiểm tra',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Chưa xác thực',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Không có quyền truy cập',
-  })
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    await this.examsService.remove(id);
-    return AppResponse.successWithData({
-      data: null,
-      message: 'Xóa bài kiểm tra thành công',
-    });
-  }
+  // @Delete(':id')
+  // @AdminOnly()
+  // @ApiBearerAuth()
+  // @ApiOperation({
+  //   summary: 'Xóa bài kiểm tra',
+  //   description:
+  //     'Xóa một bài kiểm tra dựa trên ID, nhưng không xóa các câu hỏi liên quan. Yêu cầu quyền ADMIN.',
+  // })
+  // @ApiParam({
+  //   name: 'id',
+  //   description: 'ID của bài kiểm tra cần xóa',
+  //   type: Number,
+  //   example: 1,
+  // })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Xóa bài kiểm tra thành công',
+  //   schema: {
+  //     allOf: [
+  //       { $ref: getSchemaPath(AppResponse) },
+  //       {
+  //         properties: {
+  //           data: { type: 'null', example: null },
+  //           statusCode: { type: 'number', example: 200 },
+  //           message: { type: 'string', example: 'Xóa bài kiểm tra thành công' },
+  //           success: { type: 'boolean', example: true },
+  //         },
+  //       },
+  //     ],
+  //   },
+  // })
+  // @ApiResponse({
+  //   status: 404,
+  //   description: 'Không tìm thấy bài kiểm tra',
+  // })
+  // @ApiResponse({
+  //   status: 401,
+  //   description: 'Chưa xác thực',
+  // })
+  // @ApiResponse({
+  //   status: 403,
+  //   description: 'Không có quyền truy cập',
+  // })
+  // async remove(@Param('id', ParseIntPipe) id: number) {
+  //   await this.examsService.remove(id);
+  //   return AppResponse.successWithData({
+  //     data: null,
+  //     message: 'Xóa bài kiểm tra thành công',
+  //   });
+  // }
 }

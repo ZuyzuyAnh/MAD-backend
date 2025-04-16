@@ -61,14 +61,14 @@ export class CreateVocabDto {
     description: 'Độ khó của từ vựng',
     enum: VocabDifficulty,
     enumName: 'VocabDifficulty',
-    example: VocabDifficulty.BEGINNER,
-    default: VocabDifficulty.BEGINNER,
+    example: VocabDifficulty.EASY,
+    default: VocabDifficulty.EASY,
   })
   @IsEnum(VocabDifficulty, {
     message:
       'Độ khó phải là một trong các giá trị: beginner, intermediate, advanced',
   })
-  difficulty: VocabDifficulty = VocabDifficulty.BEGINNER;
+  difficulty: VocabDifficulty = VocabDifficulty.EASY;
 
   @ApiProperty({
     description: 'ID của chủ đề từ vựng',

@@ -30,7 +30,7 @@ export class Post {
   @Column({ name: 'tags' })
   tags: string;
 
-  @Column({ name: 'image_urls' })
+  @Column({ name: 'image_urls', type: 'simple-array', nullable: true })
   imageUrls: string[];
 
   @CreateDateColumn({ name: 'created_at' })

@@ -89,25 +89,4 @@ export class ExamsService {
 
     return this.examRepository.save(exam);
   }
-
-  async remove(id: number): Promise<void> {
-    const exam = await this.findOne(id);
-
-    // Lấy id của exam để sau này sử dụng
-    const examId = exam.id;
-
-    // Xóa liên kết với các câu hỏi nhưng không xóa câu hỏi
-    if (exam.questions && exam.questions.length > 0) {
-      // Sử dụng query builder để cập nhật các câu hỏi, đặt examId = null
-      await this.examRepository.manager
-        .createQueryBuilder()
-        .update('questions')
-        .set({ examId: null })
-        .where('examId = :examId', { examId })
-        .execute();
-    }
-
-    // Xóa bài kiểm tra
-    await this.examRepository.remove(exam);
-  }
 }

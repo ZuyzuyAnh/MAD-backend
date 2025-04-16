@@ -23,7 +23,7 @@ export class UpdateRepetitionDto {
     description: 'Mức độ khó đánh giá của người dùng về từ vựng',
     enum: VocabDifficulty,
     enumName: 'Mức độ khó',
-    example: VocabDifficulty.INTERMEDIATE,
+    example: VocabDifficulty.EASY,
     required: true,
   })
   @IsEnum(VocabDifficulty)

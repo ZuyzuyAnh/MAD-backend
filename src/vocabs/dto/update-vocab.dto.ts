@@ -64,7 +64,7 @@ export class UpdateVocabDto extends PartialType(CreateVocabDto) {
     description: 'Độ khó của từ vựng',
     enum: VocabDifficulty,
     enumName: 'VocabDifficulty',
-    example: VocabDifficulty.INTERMEDIATE,
+    example: VocabDifficulty.EASY,
     required: false,
   })
   @IsOptional()
