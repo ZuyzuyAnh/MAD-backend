@@ -63,6 +63,18 @@ export class LanguagesService {
     return language;
   }
 
+  async getLanguageIdForCurrentUser(userId: number) {
+    const queryBuilder = this.languageRepository
+      .createQueryBuilder('language')
+      .innerJoin('language.progress', 'progress')
+      .where('progress.user_id = :userId', { userId })
+      .select('language.id');
+
+    const language = await queryBuilder.getOne();
+
+    return language?.id;
+  }
+
   async update(
     id: number,
     updateLanguageDto: UpdateLanguageDto,

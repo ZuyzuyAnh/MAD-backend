@@ -11,6 +11,7 @@ import { VocabLevel, VocabTopic } from './entities/vocab_topic.entity';
 import NotfoundException from '../exception/notfound.exception';
 import { UploadFileService } from 'src/aws/uploadfile.s3.service';
 import { PaginateDto } from '../common/dto/paginate.dto';
+import { LanguagesService } from 'src/languages/languages.service';
 
 @Injectable()
 export class VocabTopicsService {
@@ -18,6 +19,7 @@ export class VocabTopicsService {
     @InjectRepository(VocabTopic)
     private readonly vocabTopicRepository: Repository<VocabTopic>,
     private readonly uploadFileService: UploadFileService,
+    private readonly languageService: LanguagesService,
   ) {}
 
   async create(
@@ -38,6 +40,18 @@ export class VocabTopicsService {
     }
 
     return this.vocabTopicRepository.save(vocabTopic);
+  }
+
+  async findAllForUser(
+    userId: number,
+    paginateDto: PaginateDto,
+    topic?: string,
+    level?: VocabLevel,
+  ) {
+    const languageId =
+      await this.languageService.getLanguageIdForCurrentUser(userId);
+
+    return this.findAll(paginateDto, topic, languageId, level);
   }
 
   async findAll(

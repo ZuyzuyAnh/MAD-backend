@@ -13,6 +13,7 @@ import {
   UseGuards,
   HttpStatus,
   ParseFilePipeBuilder,
+  ParseEnumPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
@@ -44,6 +45,25 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 @Controller('vocab-topics')
 export class VocabTopicsController {
   constructor(private readonly vocabTopicsService: VocabTopicsService) {}
+
+  @Get('for-user')
+  @UseGuards(JwtAuthGuard)
+  async getVocabTopicsForUser(
+    @Query() paginateDto: PaginateDto,
+    @GetUser('sub') userId: number,
+    @Query('level') level?: VocabLevel,
+  ) {
+    const topics = await this.vocabTopicsService.findAllForUser(
+      userId,
+      paginateDto,
+      level,
+    );
+
+    return AppResponse.successWithData({
+      data: topics,
+      message: 'Lấy danh sách chủ đề từ vựng cho người dùng thành công',
+    });
+  }
 
   @Post()
   @AdminOnly()
