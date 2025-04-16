@@ -4,7 +4,7 @@ import { UpdateVocabRepetitionDto } from './dto/update-vocab_repetition.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { VocabRepetition } from './entities/vocab_repetition.entity';
 import { Vocab, VocabDifficulty } from 'src/vocabs/entities/vocab.entity';
-import { VocabTopicProgress } from 'src/vocab_topics/entities/vocab_topic_progress.entity';
+import { VocabTopicProgress } from 'src/vocab_topic_progress/entities/vocab_topic_progress.entity';
 import { LessThanOrEqual, Repository } from 'typeorm';
 import EntityNotFoundException from 'src/exception/notfound.exception';
 

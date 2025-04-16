@@ -13,9 +13,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Vocab } from 'src/vocabs/entities/vocab.entity';
 
 export enum VocabLevel {
-  BEGINNER = 'beginner',
-  MEDIUM = 'medium',
-  ADVANCE = 'advance',
+  BEGINNER = 1,
+  MEDIUM = 2,
+  ADVANCE = 3,
 }
 
 @Entity('vocab_topics')

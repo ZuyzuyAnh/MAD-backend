@@ -19,6 +19,7 @@ import { VocabGamesModule } from './vocab_games/vocab_games.module';
 import { VocabGameChallangesModule } from './vocab_game_challanges/vocab_game_challanges.module';
 import { UserSessionModule } from './user_session/user_session.module';
 import { ExerciseResultsModule } from './exercise_results/exercise-results.module';
+import { VocabTopicProgressModule } from './vocab_topic_progress/vocab_topic_progress.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { ExerciseResultsModule } from './exercise_results/exercise-results.modul
     VocabGameChallangesModule,
     UserSessionModule,
     ExerciseResultsModule,
+    VocabTopicProgressModule,
   ],
   controllers: [],
   providers: [],

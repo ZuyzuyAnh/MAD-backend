@@ -7,7 +7,7 @@ import { UpdateVocabDto } from './dto/update-vocab.dto';
 import { UploadFileService } from '../aws/uploadfile.s3.service';
 import { PaginateDto } from '../common/dto/paginate.dto';
 import NotfoundException from '../exception/notfound.exception';
-import { VocabTopicProgress } from 'src/vocab_topics/entities/vocab_topic_progress.entity';
+import { VocabTopicProgress } from 'src/vocab_topic_progress/entities/vocab_topic_progress.entity';
 import EntityNotFoundException from '../exception/notfound.exception';
 
 /**

@@ -52,10 +52,12 @@ export class VocabTopicsController {
     @Query() paginateDto: PaginateDto,
     @GetUser('sub') userId: number,
     @Query('level') level?: VocabLevel,
+    @Query('topic') topic?: string,
   ) {
     const topics = await this.vocabTopicsService.findAllForUser(
       userId,
       paginateDto,
+      topic,
       level,
     );
 

@@ -1,5 +1,5 @@
 import { Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { VocabTopic } from './vocab_topic.entity';
+import { VocabTopic } from '../../vocab_topics/entities/vocab_topic.entity';
 import { Progress } from 'src/progress/entities/progress.entity';
 import { VocabRepetition } from 'src/vocab_repetitions/entities/vocab_repetition.entity';
 

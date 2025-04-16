@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { VocabTopicProgress } from 'src/vocab_topics/entities/vocab_topic_progress.entity';
+import { VocabTopicProgress } from 'src/vocab_topic_progress/entities/vocab_topic_progress.entity';
 import { Vocab, VocabDifficulty } from 'src/vocabs/entities/vocab.entity';
 
 @Entity('vocab_repetition')
