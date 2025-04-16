@@ -15,9 +15,9 @@ import { ApiProperty } from '@nestjs/swagger';
  * @enum {string}
  */
 export enum VocabDifficulty {
-  BEGINNER = 'beginner',
-  INTERMEDIATE = 'intermediate',
-  ADVANCED = 'advanced',
+  EASY = 'easy',
+  MEDIUM = 'medium',
+  HARD = 'hard',
 }
 
 /**
@@ -62,19 +62,6 @@ export class Vocab {
   })
   @Column({ type: 'text', nullable: true, name: 'example_translation' })
   exampleTranslation: string;
-
-  @ApiProperty({
-    description: 'Độ khó của từ vựng',
-    enum: VocabDifficulty,
-    enumName: 'VocabDifficulty',
-    example: VocabDifficulty.BEGINNER,
-  })
-  @Column({
-    type: 'enum',
-    enum: VocabDifficulty,
-    default: VocabDifficulty.BEGINNER,
-  })
-  difficulty: VocabDifficulty;
 
   @ApiProperty({
     description: 'URL hình ảnh minh họa cho từ vựng',

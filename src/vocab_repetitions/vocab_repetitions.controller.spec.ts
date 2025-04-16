@@ -11,7 +11,9 @@ describe('VocabRepetitionsController', () => {
       providers: [VocabRepetitionsService],
     }).compile();
 
-    controller = module.get<VocabRepetitionsController>(VocabRepetitionsController);
+    controller = module.get<VocabRepetitionsController>(
+      VocabRepetitionsController,
+    );
   });
 
   it('should be defined', () => {

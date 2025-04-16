@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateVocabRepetitionDto } from './dto/create-vocab_repetition.dto';
-import { UpdateVocabRepetitionDto } from './dto/update-vocab_repetition.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { VocabRepetition } from './entities/vocab_repetition.entity';
 import { Vocab, VocabDifficulty } from 'src/vocabs/entities/vocab.entity';
-import { VocabTopicProgress } from 'src/vocab_topic_progress/entities/vocab_topic_progress.entity';
-import { LessThanOrEqual, Repository } from 'typeorm';
+import { IsNull, LessThan, Not, Repository } from 'typeorm';
 import EntityNotFoundException from 'src/exception/notfound.exception';
+import { VocabTopicProgress } from 'src/vocab_topic_progress/entities/vocab_topic_progress.entity';
 
 @Injectable()
 export class VocabRepetitionsService {
@@ -19,9 +17,7 @@ export class VocabRepetitionsService {
     private vocabTopicProgressRepository: Repository<VocabTopicProgress>,
   ) {}
 
-  async getVocabsToReview(userId: number, topicId: number) {
-    const today = new Date();
-
+  async getVocabsToReview(userId: number, topicId: number, limit: number = 20) {
     const vocabTopicProgress = await this.vocabTopicProgressRepository.findOne({
       where: {
         progress: { user: { id: userId } },
@@ -33,15 +29,27 @@ export class VocabRepetitionsService {
       throw new EntityNotFoundException('Tiến độ chủ đề', 'id', topicId);
     }
 
+    const recentTimestamp = new Date();
+    recentTimestamp.setMinutes(recentTimestamp.getMinutes() - 5);
+
+    // Lấy danh sách từ vựng cần ôn tập, sắp xếp theo priority_score,
+    // loại bỏ các từ vừa ôn tập
     const repetitions = await this.vocabRepetitionRepository.find({
-      where: {
-        vocabTopicProgress: { id: vocabTopicProgress.id },
-        nextReviewDate: LessThanOrEqual(today),
-      },
+      where: [
+        {
+          vocabTopicProgress: { id: vocabTopicProgress.id },
+          lastReviewedAt: IsNull(),
+        },
+        {
+          vocabTopicProgress: { id: vocabTopicProgress.id },
+          lastReviewedAt: LessThan(recentTimestamp),
+        },
+      ],
       relations: ['vocab'],
       order: {
-        easinessFactor: 'ASC',
+        priorityScore: 'DESC',
       },
+      take: limit,
     });
 
     return repetitions.map((repetition) => repetition.vocab);
@@ -61,7 +69,7 @@ export class VocabRepetitionsService {
         topic: { id: topicId },
       });
 
-      await this.vocabRepetitionRepository.save(vocabTopicProgress);
+      await this.vocabTopicProgressRepository.save(vocabTopicProgress);
     }
 
     const vocabs = await this.vocabRepository.find({
@@ -82,13 +90,14 @@ export class VocabRepetitionsService {
 
     for (const vocab of vocabs) {
       if (!existingVocabIds.includes(vocab.id)) {
+        const randomFactor = Math.random();
+
         const repetition = this.vocabRepetitionRepository.create({
           vocab: vocab,
           vocabTopicProgress: vocabTopicProgress,
           easinessFactor: 2.5,
-          interval: 0,
           repetitionCount: 0,
-          nextReviewDate: new Date(),
+          priorityScore: 10 + randomFactor,
         });
 
         newRepetitions.push(repetition);
@@ -102,8 +111,8 @@ export class VocabRepetitionsService {
 
   async updateRepetition(
     userId: number,
-    vocabId: number,
     topicId: number,
+    vocabId: number,
     difficulty: VocabDifficulty,
   ) {
     const vocabTopicProgress = await this.vocabTopicProgressRepository.findOne({
@@ -129,35 +138,27 @@ export class VocabRepetitionsService {
     }
 
     const grade = this.mapDifficultyToGrade(difficulty);
-    const today = new Date();
+    const now = new Date();
 
-    if (grade >= 3) {
-      if (repetition.repetitionCount === 0) {
-        repetition.interval = 1;
-      } else if (repetition.repetitionCount === 1) {
-        repetition.interval = 6;
-      } else {
-        repetition.interval = Math.round(
-          repetition.interval * repetition.easinessFactor,
-        );
-      }
-
-      repetition.repetitionCount += 1;
-    } else {
-      repetition.repetitionCount = 0;
-      repetition.interval = 1;
-    }
-
+    // Cập nhật easiness_factor
     repetition.easinessFactor +=
       0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02);
     if (repetition.easinessFactor < 1.3) repetition.easinessFactor = 1.3;
 
-    repetition.lastReviewDate = today;
-    const nextDate = new Date();
+    // Tăng repetition_count
+    repetition.repetitionCount += 1;
 
-    nextDate.setDate(today.getDate() + repetition.interval);
-    repetition.nextReviewDate = nextDate;
+    // Cập nhật last_reviewed_at
+    repetition.lastReviewedAt = now;
     repetition.lastDifficulty = difficulty;
+
+    // Tính lại priority_score
+    const randomFactor = Math.random();
+    repetition.priorityScore =
+      10 -
+      repetition.easinessFactor * 2 +
+      (5 - Math.min(repetition.repetitionCount, 5)) +
+      randomFactor;
 
     await this.vocabRepetitionRepository.save(repetition);
   }
@@ -187,27 +188,69 @@ export class VocabRepetitionsService {
       (r) => r.repetitionCount === 0,
     ).length;
 
-    const dueToday = repetitions.filter((r) => {
-      const today = new Date();
-      return r.nextReviewDate && r.nextReviewDate <= today;
-    }).length;
+    // Thời gian "grace period" - 5 phút
+    const recentTimestamp = new Date();
+    recentTimestamp.setMinutes(recentTimestamp.getMinutes() - 5);
+
+    // Từ vựng có thể ôn tập (không nằm trong grace period)
+    const readyToReview = repetitions.filter(
+      (r) => !r.lastReviewedAt || r.lastReviewedAt < recentTimestamp,
+    ).length;
 
     return {
       totalVocabs,
       mastered,
       learning: learningCount,
       notStarted,
-      dueToday,
+      readyToReview,
     };
+  }
+
+  async getVocabsByStatus(
+    userId: number,
+    topicId: number,
+    status: 'mastered' | 'learning' | 'not_started' | 'all',
+  ) {
+    const vocabTopicProgress = await this.vocabTopicProgressRepository.findOne({
+      where: {
+        progress: { user: { id: userId } },
+        topic: { id: topicId },
+      },
+    });
+
+    if (!vocabTopicProgress) {
+      throw new EntityNotFoundException('Tiến độ chủ đề', 'id', topicId);
+    }
+
+    const queryBuilder = this.vocabRepetitionRepository
+      .createQueryBuilder('repetition')
+      .leftJoinAndSelect('repetition.vocab', 'vocab')
+      .where('repetition.vocabTopicProgressId = :progressId', {
+        progressId: vocabTopicProgress.id,
+      });
+
+    // Áp dụng bộ lọc theo trạng thái
+    if (status === 'mastered') {
+      queryBuilder.andWhere('repetition.repetitionCount >= 3');
+    } else if (status === 'learning') {
+      queryBuilder.andWhere(
+        'repetition.repetitionCount > 0 AND repetition.repetitionCount < 3',
+      );
+    } else if (status === 'not_started') {
+      queryBuilder.andWhere('repetition.repetitionCount = 0');
+    }
+
+    const repetitions = await queryBuilder.getMany();
+    return repetitions.map((repetition) => repetition.vocab);
   }
 
   private mapDifficultyToGrade(difficulty: VocabDifficulty): number {
     switch (difficulty) {
-      case VocabDifficulty.BEGINNER:
+      case VocabDifficulty.EASY:
         return 1;
-      case VocabDifficulty.INTERMEDIATE:
+      case VocabDifficulty.MEDIUM:
         return 3;
-      case VocabDifficulty.ADVANCED:
+      case VocabDifficulty.HARD:
         return 5;
       default:
         return 3;

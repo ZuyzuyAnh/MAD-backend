@@ -6,6 +6,8 @@ import {
   Param,
   ParseIntPipe,
   UseGuards,
+  Query,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { VocabRepetitionsService } from './vocab_repetitions.service';
 import AppResponse from 'src/common/dto/api-response.dto';
@@ -20,6 +22,7 @@ import {
   ApiBody,
   ApiBearerAuth,
   getSchemaPath,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { UpdateRepetitionDto } from './dto/vocab-repitition.dto';
 
@@ -32,23 +35,24 @@ export class VocabRepetitionsController {
     private readonly vocabRepetitionsService: VocabRepetitionsService,
   ) {}
 
-  @Get('review/:progressId/:topicId')
+  @Get('review/:topicId')
   @ApiOperation({
     summary: 'Lấy danh sách từ vựng cần ôn tập',
     description:
-      'Trả về danh sách các từ vựng cần ôn tập cho một chủ đề cụ thể dựa trên thuật toán khoảng cách thời gian.',
-  })
-  @ApiParam({
-    name: 'progressId',
-    type: 'number',
-    description: 'ID của tiến độ học tập',
-    example: 1,
+      'Trả về danh sách các từ vựng cần ôn tập cho một chủ đề cụ thể dựa trên độ ưu tiên.',
   })
   @ApiParam({
     name: 'topicId',
     type: 'number',
     description: 'ID của chủ đề từ vựng',
     example: 2,
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: 'number',
+    required: false,
+    description: 'Số lượng từ vựng tối đa',
+    example: 20,
   })
   @ApiResponse({
     status: 200,
@@ -85,7 +89,7 @@ export class VocabRepetitionsController {
                   difficulty: {
                     type: 'string',
                     enum: Object.values(VocabDifficulty),
-                    example: VocabDifficulty.BEGINNER,
+                    example: VocabDifficulty.EASY,
                   },
                 },
               },
@@ -121,21 +125,85 @@ export class VocabRepetitionsController {
   async getVocabsToReview(
     @GetUser('sub') userId: number,
     @Param('topicId', ParseIntPipe) topicId: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
   ) {
-    return this.vocabRepetitionsService.getVocabsToReview(userId, topicId);
+    const vocabs = await this.vocabRepetitionsService.getVocabsToReview(
+      userId,
+      topicId,
+      limit,
+    );
+    return AppResponse.successWithData({ data: vocabs });
   }
 
-  @Post('initialize/:progressId/:topicId')
+  @Get('by-status/:topicId')
+  @ApiOperation({
+    summary: 'Lấy danh sách từ vựng theo trạng thái học tập',
+    description:
+      'Trả về danh sách từ vựng được phân loại theo trạng thái: đã thành thạo, đang học, chưa học.',
+  })
+  @ApiParam({
+    name: 'topicId',
+    type: 'number',
+    description: 'ID của chủ đề từ vựng',
+    example: 2,
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['mastered', 'learning', 'not_started', 'all'],
+    description: 'Trạng thái học tập',
+    example: 'all',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Danh sách từ vựng theo trạng thái',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(AppResponse) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  id: { type: 'number', example: 1 },
+                  word: { type: 'string', example: 'cat' },
+                  definition: {
+                    type: 'string',
+                    example:
+                      'Con mèo, một loài động vật có vú nhỏ thường được nuôi làm thú cưng',
+                  },
+                },
+              },
+            },
+            statusCode: { type: 'number', example: 200 },
+            message: { type: 'string', example: 'Success' },
+            success: { type: 'boolean', example: true },
+          },
+        },
+      ],
+    },
+  })
+  async getVocabsByStatus(
+    @GetUser('sub') userId: number,
+    @Param('topicId', ParseIntPipe) topicId: number,
+    @Query('status')
+    status: 'mastered' | 'learning' | 'not_started' | 'all' = 'all',
+  ) {
+    const vocabs = await this.vocabRepetitionsService.getVocabsByStatus(
+      userId,
+      topicId,
+      status,
+    );
+    return AppResponse.successWithData({ data: vocabs });
+  }
+
+  @Post('initialize/:topicId')
   @ApiOperation({
     summary: 'Khởi tạo dữ liệu ôn tập cho một chủ đề',
     description:
       'Tạo dữ liệu ban đầu để theo dõi việc ôn tập các từ vựng trong một chủ đề cụ thể.',
-  })
-  @ApiParam({
-    name: 'progressId',
-    type: 'number',
-    description: 'ID của tiến độ học tập',
-    example: 1,
   })
   @ApiParam({
     name: 'topicId',
@@ -201,7 +269,7 @@ export class VocabRepetitionsController {
   @ApiOperation({
     summary: 'Cập nhật kết quả ôn tập từ vựng',
     description:
-      'Cập nhật thông tin ôn tập của một từ vựng dựa trên độ khó đánh giá của người dùng, để tính toán lịch ôn tập tiếp theo.',
+      'Cập nhật thông tin ôn tập của một từ vựng dựa trên độ khó đánh giá của người dùng.',
   })
   @ApiBody({
     type: UpdateRepetitionDto,
@@ -211,7 +279,7 @@ export class VocabRepetitionsController {
         value: {
           topicId: 2,
           vocabId: 3,
-          difficulty: VocabDifficulty.BEGINNER,
+          difficulty: VocabDifficulty.EASY,
         },
         summary: 'Ví dụ cập nhật ôn tập từ vựng',
       },
@@ -256,7 +324,6 @@ export class VocabRepetitionsController {
   })
   async updateRepetition(
     @GetUser('sub') userId: number,
-
     @Body()
     updateRepetitionDto: {
       topicId: number;
@@ -274,17 +341,11 @@ export class VocabRepetitionsController {
     return AppResponse.success('Cập nhật thành công');
   }
 
-  @Get('stats/:progressId/:topicId')
+  @Get('stats/:topicId')
   @ApiOperation({
     summary: 'Lấy thống kê ôn tập từ vựng',
     description:
       'Trả về thống kê về việc ôn tập từ vựng cho một chủ đề cụ thể, bao gồm số lượng từ đã thành thạo, đang học và chưa học.',
-  })
-  @ApiParam({
-    name: 'progressId',
-    type: 'number',
-    description: 'ID của tiến độ học tập',
-    example: 1,
   })
   @ApiParam({
     name: 'topicId',
@@ -324,10 +385,10 @@ export class VocabRepetitionsController {
                   description: 'Số từ vựng chưa bắt đầu học (lặp lại 0 lần)',
                   example: 5,
                 },
-                dueToday: {
+                readyToReview: {
                   type: 'number',
-                  description: 'Số từ vựng cần ôn tập trong hôm nay',
-                  example: 8,
+                  description: 'Số từ vựng sẵn sàng để ôn tập',
+                  example: 25,
                 },
               },
             },

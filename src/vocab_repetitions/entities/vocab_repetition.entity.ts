@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { VocabTopicProgress } from 'src/vocab_topic_progress/entities/vocab_topic_progress.entity';
 import { Vocab, VocabDifficulty } from 'src/vocabs/entities/vocab.entity';
+import { VocabTopicProgress } from 'src/vocab_topic_progress/entities/vocab_topic_progress.entity';
 
 @Entity('vocab_repetition')
 export class VocabRepetition {
@@ -29,19 +29,17 @@ export class VocabRepetition {
   })
   easinessFactor: number;
 
-  @Column({
-    default: 0,
-  })
-  interval: number;
-
   @Column({ default: 0 })
   repetitionCount: number;
 
-  @Column({ nullable: true })
-  lastReviewDate: Date;
+  @Column({
+    default: 10,
+    type: 'float',
+  })
+  priorityScore: number;
 
   @Column({ nullable: true })
-  nextReviewDate: Date;
+  lastReviewedAt: Date;
 
   @Column({
     type: 'enum',
