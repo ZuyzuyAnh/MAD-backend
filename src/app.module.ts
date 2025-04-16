@@ -20,6 +20,14 @@ import { VocabGameChallangesModule } from './vocab_game_challanges/vocab_game_ch
 import { UserSessionModule } from './user_session/user_session.module';
 import { ExerciseResultsModule } from './exercise_results/exercise-results.module';
 import { VocabTopicProgressModule } from './vocab_topic_progress/vocab_topic_progress.module';
+import { ExerciseQuestionsModule } from './exercise_questions/exercise_questions.module';
+import { ExamSectionsModule } from './exam_sections/exam_sections.module';
+import { ExamSectionItemsModule } from './exam_section_items/exam_section_items.module';
+import { ExamSingleQuestionsModule } from './exam_single_questions/exam_single_questions.module';
+import { ExamResultsModule } from './exam_results/exam_results.module';
+import { PostsModule } from './posts/posts.module';
+import { PostLikesModule } from './post_likes/post_likes.module';
+import { PostCommentsModule } from './post_comments/post_comments.module';
 
 @Module({
   imports: [
@@ -60,6 +68,14 @@ import { VocabTopicProgressModule } from './vocab_topic_progress/vocab_topic_pro
     UserSessionModule,
     ExerciseResultsModule,
     VocabTopicProgressModule,
+    ExerciseQuestionsModule,
+    ExamSectionsModule,
+    ExamSectionItemsModule,
+    ExamSingleQuestionsModule,
+    ExamResultsModule,
+    PostsModule,
+    PostLikesModule,
+    PostCommentsModule,
   ],
   controllers: [],
   providers: [],

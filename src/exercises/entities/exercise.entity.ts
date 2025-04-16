@@ -70,9 +70,6 @@ export class Exercise {
   })
   difficulty: ExerciseDifficulty;
 
-  @OneToMany(() => Question, (question) => question.exercise)
-  questions: Question[];
-
   @ApiProperty({ description: 'ID ngôn ngữ', example: 1 })
   @Column({ name: 'language_id' })
   languageId: number;

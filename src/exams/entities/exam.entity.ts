@@ -27,19 +27,14 @@ export class Exam {
   id: number;
 
   @ApiProperty({
-    description: 'Tuần của bài kiểm tra (đối với bài kiểm tra hàng tuần)',
-    example: 3,
-    nullable: true,
-  })
-  @Column({ nullable: true })
-  week: number;
-
-  @ApiProperty({
     description: 'Tiêu đề bài kiểm tra',
     example: 'Kiểm tra ngữ pháp tiếng Anh tuần 3',
   })
   @Column({ type: 'text' })
   title: string;
+
+  @Column({ name: 'description' })
+  description: string;
 
   @ApiProperty({
     description: 'Loại bài kiểm tra',
@@ -66,13 +61,6 @@ export class Exam {
   @ManyToOne(() => Language)
   @JoinColumn({ name: 'language_id' })
   language: Language;
-
-  @ApiProperty({
-    description: 'Danh sách câu hỏi trong bài kiểm tra',
-    type: () => [Question],
-  })
-  @OneToMany(() => Question, (question) => question.exam)
-  questions: Question[];
 
   @ApiProperty({
     description: 'Thời gian tạo bài kiểm tra',

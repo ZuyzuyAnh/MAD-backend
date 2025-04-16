@@ -67,54 +67,11 @@ export class Question {
   answer: string;
 
   @ApiProperty({
-    description: 'Điểm số cho câu hỏi này',
-    example: 1.0,
-  })
-  @Column({ type: 'float', default: 1 })
-  score: number;
-
-  @ApiProperty({
-    description: 'ID của bài tập (nếu có)',
-    example: 1,
-    nullable: true,
-  })
-  @Column({ nullable: true, name: 'exercise_id' })
-  exerciseId: number;
-
-  @ApiProperty({
-    description: 'ID của bài kiểm tra (nếu có)',
-    example: 1,
-    nullable: true,
-  })
-  @Column({ nullable: true, name: 'exam_id' })
-  examId: number;
-
-  @ApiProperty({
     description: 'ID của ngôn ngữ',
     example: 1,
   })
   @Column({ name: 'language_id' })
   languageId: number;
-
-  @ApiProperty({
-    description: 'Thông tin bài tập',
-    type: () => Exercise,
-    nullable: true,
-  })
-  @ManyToOne(() => Exercise, (exercise) => exercise.questions, {
-    nullable: true,
-  })
-  @JoinColumn({ name: 'exercise_id' })
-  exercise?: Exercise;
-
-  @ApiProperty({
-    description: 'Thông tin bài kiểm tra',
-    type: () => Exam,
-    nullable: true,
-  })
-  @ManyToOne(() => Exam, (exam) => exam.questions, { nullable: true })
-  @JoinColumn({ name: 'exam_id' })
-  exam?: Exam;
 
   @ApiProperty({
     description: 'Thông tin ngôn ngữ',
