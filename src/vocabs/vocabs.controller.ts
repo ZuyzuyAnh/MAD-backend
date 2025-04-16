@@ -32,6 +32,8 @@ import { PaginateDto } from '../common/dto/paginate.dto';
 import { VocabDifficulty } from './entities/vocab.entity';
 import { AdminOnly } from '../auth/decorators/admin-only.decorator';
 import AppResponse from '../common/dto/api-response.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
 
 @ApiTags('Từ vựng')
 @Controller('vocabs')
@@ -449,6 +451,16 @@ export class VocabsController {
     return AppResponse.successWithData({
       data: null,
       message: 'Xóa từ vựng thành công',
+    });
+  }
+
+  @Get('random')
+  @UseGuards(JwtAuthGuard)
+  async findRandomVocabsForUser(@GetUser('sub') userId: number) {
+    const vocabs = await this.vocabsService.findRandomVocabsForUser(userId);
+    return AppResponse.successWithData({
+      data: vocabs,
+      message: 'Lấy từ vựng ngẫu nhiên thành công',
     });
   }
 }
