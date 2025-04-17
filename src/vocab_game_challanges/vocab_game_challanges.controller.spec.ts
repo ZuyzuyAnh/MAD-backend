@@ -11,7 +11,9 @@ describe('VocabGameChallangesController', () => {
       providers: [VocabGameChallangesService],
     }).compile();
 
-    controller = module.get<VocabGameChallangesController>(VocabGameChallangesController);
+    controller = module.get<VocabGameChallangesController>(
+      VocabGameChallangesController,
+    );
   });
 
   it('should be defined', () => {

@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ExamSingleQuestionsService } from './exam_single_questions.service';
 import { CreateExamSingleQuestionDto } from './dto/create-exam_single_question.dto';
 import { UpdateExamSingleQuestionDto } from './dto/update-exam_single_question.dto';
 
 @Controller('exam-single-questions')
 export class ExamSingleQuestionsController {
-  constructor(private readonly examSingleQuestionsService: ExamSingleQuestionsService) {}
+  constructor(
+    private readonly examSingleQuestionsService: ExamSingleQuestionsService,
+  ) {}
 
   @Post()
   create(@Body() createExamSingleQuestionDto: CreateExamSingleQuestionDto) {
@@ -23,8 +33,14 @@ export class ExamSingleQuestionsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateExamSingleQuestionDto: UpdateExamSingleQuestionDto) {
-    return this.examSingleQuestionsService.update(+id, updateExamSingleQuestionDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateExamSingleQuestionDto: UpdateExamSingleQuestionDto,
+  ) {
+    return this.examSingleQuestionsService.update(
+      +id,
+      updateExamSingleQuestionDto,
+    );
   }
 
   @Delete(':id')

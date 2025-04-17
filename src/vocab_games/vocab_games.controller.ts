@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { VocabGamesService } from './vocab_games.service';
 import { CreateVocabGameDto } from './dto/create-vocab_game.dto';
 import { UpdateVocabGameDto } from './dto/update-vocab_game.dto';
@@ -23,7 +31,10 @@ export class VocabGamesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVocabGameDto: UpdateVocabGameDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateVocabGameDto: UpdateVocabGameDto,
+  ) {
     return this.vocabGamesService.update(+id, updateVocabGameDto);
   }
 

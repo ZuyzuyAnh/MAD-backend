@@ -1,26 +1,54 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateExerciseQuestionDto } from './dto/create-exercise_question.dto';
 import { UpdateExerciseQuestionDto } from './dto/update-exercise_question.dto';
+import { ExerciseQuestion } from './entities/exercise_question.entity';
 
 @Injectable()
 export class ExerciseQuestionsService {
-  create(createExerciseQuestionDto: CreateExerciseQuestionDto) {
-    return 'This action adds a new exerciseQuestion';
+  constructor(
+    @InjectRepository(ExerciseQuestion)
+    private readonly exerciseQuestionRepository: Repository<ExerciseQuestion>,
+  ) {}
+
+  async create(
+    createExerciseQuestionDto: CreateExerciseQuestionDto,
+  ): Promise<ExerciseQuestion> {
+    const exerciseQuestion = this.exerciseQuestionRepository.create(
+      createExerciseQuestionDto,
+    );
+    return this.exerciseQuestionRepository.save(exerciseQuestion);
   }
 
-  findAll() {
-    return `This action returns all exerciseQuestions`;
+  async findAll(): Promise<ExerciseQuestion[]> {
+    return this.exerciseQuestionRepository.find({
+      relations: ['exercise', 'question'],
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} exerciseQuestion`;
+  async findOne(id: number): Promise<ExerciseQuestion> {
+    const exerciseQuestion = await this.exerciseQuestionRepository.findOne({
+      where: { id },
+      relations: ['exercise', 'question'],
+    });
+    if (!exerciseQuestion) {
+      throw new NotFoundException(`ExerciseQuestion with ID ${id} not found`);
+    }
+    return exerciseQuestion;
   }
 
-  update(id: number, updateExerciseQuestionDto: UpdateExerciseQuestionDto) {
-    return `This action updates a #${id} exerciseQuestion`;
+  async update(
+    id: number,
+    updateExerciseQuestionDto: UpdateExerciseQuestionDto,
+  ): Promise<ExerciseQuestion> {
+    const exerciseQuestion = await this.findOne(id);
+    Object.assign(exerciseQuestion, updateExerciseQuestionDto);
+    return this.exerciseQuestionRepository.save(exerciseQuestion);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} exerciseQuestion`;
+  async remove(id: number): Promise<void> {
+    const exerciseQuestion = await this.findOne(id);
+    await this.exerciseQuestionRepository.remove(exerciseQuestion);
   }
 }

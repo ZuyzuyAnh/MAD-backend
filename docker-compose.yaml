@@ -1,6 +1,27 @@
 version: '3.8'
 
 services:
+  nest-app:
+    build: .
+    container_name: language-app-nest
+    restart: always
+    ports:
+      - '${APP_PORT:-3000}:3000'
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME:-language_app}
+      DB_PASSWORD: ${DB_PASSWORD:-language_password}
+      DB_NAME: ${DB_NAME:-language_db}
+      ELASTICSEARCH_NODE: http://elasticsearch:9200
+    depends_on:
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - language-app-network
+
   postgres:
     image: postgres:14-alpine
     container_name: language-app-postgres

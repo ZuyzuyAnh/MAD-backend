@@ -12,12 +12,10 @@ import {
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
-import { UserRole } from '../users/entities/user.entity';
 import AppResponse from '../common/dto/api-response.dto';
 import { PaginateDto } from '../common/dto/paginate.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { ExerciseDifficulty, ExerciseType } from './entities/exercise.entity';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { AdminOnly } from 'src/auth/decorators/admin-only.decorator';
 
 @ApiTags('Bài tập')
@@ -47,7 +45,6 @@ export class ExercisesController {
         statusCode: 201,
         message: 'Tạo bài tập thành công',
         success: true,
-        timestamp: '2023-08-01T12:00:00.000Z',
       },
     },
   })
@@ -105,11 +102,6 @@ export class ExercisesController {
             type: ExerciseType.GRAMMAR,
             difficulty: ExerciseDifficulty.BEGINNER,
             languageId: 1,
-            language: {
-              id: 1,
-              name: 'Tiếng Anh',
-              code: 'en',
-            },
             createdAt: '2023-08-01T12:00:00.000Z',
             updatedAt: '2023-08-01T12:00:00.000Z',
           },
@@ -125,7 +117,6 @@ export class ExercisesController {
         statusCode: 200,
         message: 'Success',
         success: true,
-        timestamp: '2023-08-01T12:00:00.000Z',
       },
     },
   })
@@ -161,18 +152,12 @@ export class ExercisesController {
           type: ExerciseType.GRAMMAR,
           difficulty: ExerciseDifficulty.BEGINNER,
           languageId: 1,
-          language: {
-            id: 1,
-            name: 'Tiếng Anh',
-            code: 'en',
-          },
           createdAt: '2023-08-01T12:00:00.000Z',
           updatedAt: '2023-08-01T12:00:00.000Z',
         },
         statusCode: 200,
         message: 'Success',
         success: true,
-        timestamp: '2023-08-01T12:00:00.000Z',
       },
     },
   })
@@ -205,7 +190,6 @@ export class ExercisesController {
         statusCode: 200,
         message: 'Cập nhật bài tập thành công',
         success: true,
-        timestamp: '2023-08-02T12:00:00.000Z',
       },
     },
   })
@@ -232,7 +216,6 @@ export class ExercisesController {
         statusCode: 200,
         message: 'Xóa bài tập thành công',
         success: true,
-        timestamp: '2023-08-02T12:00:00.000Z',
       },
     },
   })

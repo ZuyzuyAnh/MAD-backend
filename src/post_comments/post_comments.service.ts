@@ -1,26 +1,35 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PostComment } from './entities/post_comment.entity';
 import { CreatePostCommentDto } from './dto/create-post_comment.dto';
 import { UpdatePostCommentDto } from './dto/update-post_comment.dto';
 
 @Injectable()
 export class PostCommentsService {
+  constructor(
+    @InjectRepository(PostComment)
+    private readonly postCommentRepository: Repository<PostComment>,
+  ) {}
+
   create(createPostCommentDto: CreatePostCommentDto) {
-    return 'This action adds a new postComment';
+    const postComment = this.postCommentRepository.create(createPostCommentDto);
+    return this.postCommentRepository.save(postComment);
   }
 
   findAll() {
-    return `This action returns all postComments`;
+    return this.postCommentRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} postComment`;
+    return this.postCommentRepository.findOne({ where: { id } });
   }
 
   update(id: number, updatePostCommentDto: UpdatePostCommentDto) {
-    return `This action updates a #${id} postComment`;
+    return this.postCommentRepository.update(id, updatePostCommentDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} postComment`;
+    return this.postCommentRepository.delete(id);
   }
 }

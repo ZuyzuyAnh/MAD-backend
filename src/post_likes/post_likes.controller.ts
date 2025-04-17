@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { PostLikesService } from './post_likes.service';
 import { CreatePostLikeDto } from './dto/create-post_like.dto';
 import { UpdatePostLikeDto } from './dto/update-post_like.dto';
@@ -23,7 +31,10 @@ export class PostLikesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostLikeDto: UpdatePostLikeDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updatePostLikeDto: UpdatePostLikeDto,
+  ) {
     return this.postLikesService.update(+id, updatePostLikeDto);
   }
 

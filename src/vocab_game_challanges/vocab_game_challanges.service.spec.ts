@@ -9,7 +9,9 @@ describe('VocabGameChallangesService', () => {
       providers: [VocabGameChallangesService],
     }).compile();
 
-    service = module.get<VocabGameChallangesService>(VocabGameChallangesService);
+    service = module.get<VocabGameChallangesService>(
+      VocabGameChallangesService,
+    );
   });
 
   it('should be defined', () => {

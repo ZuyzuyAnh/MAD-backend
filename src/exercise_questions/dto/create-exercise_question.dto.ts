@@ -1,1 +1,4 @@
-export class CreateExerciseQuestionDto {}
+export class CreateExerciseQuestionDto {
+  exerciseId: number;
+  questionId: number;
+}

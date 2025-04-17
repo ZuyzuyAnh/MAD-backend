@@ -1,92 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
-import { Exam, ExamType } from './entities/exam.entity';
-import { PaginateDto } from '../common/dto/paginate.dto';
-import EntityNotFoundException from '../exception/notfound.exception';
+import { Exam } from './entities/exam.entity';
 
 @Injectable()
 export class ExamsService {
   constructor(
     @InjectRepository(Exam)
-    private examRepository: Repository<Exam>,
+    private readonly examRepository: Repository<Exam>,
   ) {}
 
   async create(createExamDto: CreateExamDto): Promise<Exam> {
-    const exam = this.examRepository.create({
-      ...createExamDto,
-    });
-
-    return await this.examRepository.save(exam);
+    const exam = this.examRepository.create(createExamDto);
+    return this.examRepository.save(exam);
   }
 
-  async findAll(
-    paginateDto: PaginateDto,
-    type?: ExamType,
-    languageId?: number,
-    week?: number,
-  ) {
-    const { page, limit } = paginateDto;
-
-    const queryBuilder = this.examRepository
-      .createQueryBuilder('exam')
-      .leftJoinAndSelect('exam.language', 'language');
-
-    if (type) {
-      queryBuilder.andWhere('exam.type = :type', { type });
-    }
-
-    if (languageId) {
-      queryBuilder.andWhere('exam.languageId = :languageId', { languageId });
-    }
-
-    if (week) {
-      queryBuilder.andWhere('exam.week = :week', { week });
-    }
-
-    const total = await queryBuilder.getCount();
-
-    const exams = await queryBuilder
-      .skip((page - 1) * limit)
-      .take(limit)
-      .orderBy('exam.createdAt', 'DESC')
-      .getMany();
-
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      data: exams,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
-      },
-    };
+  async findAll(): Promise<Exam[]> {
+    return this.examRepository.find({ relations: ['language'] });
   }
 
   async findOne(id: number): Promise<Exam> {
     const exam = await this.examRepository.findOne({
       where: { id },
-      relations: ['language', 'questions'],
+      relations: ['language'],
     });
-
     if (!exam) {
-      throw new EntityNotFoundException('exam', 'id', id);
+      throw new NotFoundException(`Exam with ID ${id} not found`);
     }
-
     return exam;
   }
 
   async update(id: number, updateExamDto: UpdateExamDto): Promise<Exam> {
     const exam = await this.findOne(id);
-
     Object.assign(exam, updateExamDto);
-
     return this.examRepository.save(exam);
+  }
+
+  async remove(id: number): Promise<void> {
+    const exam = await this.findOne(id);
+    await this.examRepository.remove(exam);
   }
 }

@@ -1,26 +1,49 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateVocabGameChallangeDto } from './dto/create-vocab_game_challange.dto';
 import { UpdateVocabGameChallangeDto } from './dto/update-vocab_game_challange.dto';
+import { VocabGameChallange } from './entities/vocab_game_challange.entity';
 
 @Injectable()
 export class VocabGameChallangesService {
-  create(createVocabGameChallangeDto: CreateVocabGameChallangeDto) {
-    return 'This action adds a new vocabGameChallange';
+  constructor(
+    @InjectRepository(VocabGameChallange)
+    private readonly vocabGameChallangeRepository: Repository<VocabGameChallange>,
+  ) {}
+
+  async create(
+    createVocabGameChallangeDto: CreateVocabGameChallangeDto,
+  ): Promise<VocabGameChallange> {
+    const challange = this.vocabGameChallangeRepository.create(
+      createVocabGameChallangeDto,
+    );
+    return this.vocabGameChallangeRepository.save(challange);
   }
 
-  findAll() {
-    return `This action returns all vocabGameChallanges`;
+  async findAll(): Promise<VocabGameChallange[]> {
+    return this.vocabGameChallangeRepository.find({ relations: ['vocabGame'] });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} vocabGameChallange`;
+  async findOne(id: number) {
+    return this.vocabGameChallangeRepository.findOne({
+      where: { id },
+      relations: ['vocabGame'],
+    });
   }
 
-  update(id: number, updateVocabGameChallangeDto: UpdateVocabGameChallangeDto) {
-    return `This action updates a #${id} vocabGameChallange`;
+  async update(
+    id: number,
+    updateVocabGameChallangeDto: UpdateVocabGameChallangeDto,
+  ) {
+    await this.vocabGameChallangeRepository.update(
+      id,
+      updateVocabGameChallangeDto,
+    );
+    return this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} vocabGameChallange`;
+  async remove(id: number): Promise<void> {
+    await this.vocabGameChallangeRepository.delete(id);
   }
 }

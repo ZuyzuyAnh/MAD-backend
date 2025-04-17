@@ -88,12 +88,8 @@ export class ExamsController {
     status: 403,
     description: 'Không có quyền truy cập',
   })
-  async create(@Body() createExamDto: CreateExamDto) {
-    const exam = await this.examsService.create(createExamDto);
-    return AppResponse.successWithData({
-      data: exam,
-      message: 'Tạo bài kiểm tra thành công',
-    });
+  create(@Body() createExamDto: CreateExamDto) {
+    return this.examsService.create(createExamDto);
   }
 
   @Get()
@@ -204,21 +200,8 @@ export class ExamsController {
     status: 401,
     description: 'Chưa xác thực',
   })
-  async findAll(
-    @Query() paginateDto: PaginateDto,
-    @Query('type') type?: ExamType,
-    @Query('languageId') languageId?: number,
-    @Query('week') week?: number,
-  ) {
-    const result = await this.examsService.findAll(
-      paginateDto,
-      type,
-      languageId,
-      week,
-    );
-    return AppResponse.successWithData({
-      data: result,
-    });
+  findAll() {
+    return this.examsService.findAll();
   }
 
   @Get(':id')
@@ -309,11 +292,8 @@ export class ExamsController {
     status: 401,
     description: 'Chưa xác thực',
   })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    const exam = await this.examsService.findOne(id);
-    return AppResponse.successWithData({
-      data: exam,
-    });
+  findOne(@Param('id') id: string) {
+    return this.examsService.findOne(+id);
   }
 
   @Patch(':id')
@@ -378,65 +358,54 @@ export class ExamsController {
     status: 403,
     description: 'Không có quyền truy cập',
   })
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateExamDto: UpdateExamDto,
-  ) {
-    const exam = await this.examsService.update(id, updateExamDto);
-    return AppResponse.successWithData({
-      data: exam,
-      message: 'Cập nhật bài kiểm tra thành công',
-    });
+  update(@Param('id') id: string, @Body() updateExamDto: UpdateExamDto) {
+    return this.examsService.update(+id, updateExamDto);
   }
 
-  // @Delete(':id')
-  // @AdminOnly()
-  // @ApiBearerAuth()
-  // @ApiOperation({
-  //   summary: 'Xóa bài kiểm tra',
-  //   description:
-  //     'Xóa một bài kiểm tra dựa trên ID, nhưng không xóa các câu hỏi liên quan. Yêu cầu quyền ADMIN.',
-  // })
-  // @ApiParam({
-  //   name: 'id',
-  //   description: 'ID của bài kiểm tra cần xóa',
-  //   type: Number,
-  //   example: 1,
-  // })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Xóa bài kiểm tra thành công',
-  //   schema: {
-  //     allOf: [
-  //       { $ref: getSchemaPath(AppResponse) },
-  //       {
-  //         properties: {
-  //           data: { type: 'null', example: null },
-  //           statusCode: { type: 'number', example: 200 },
-  //           message: { type: 'string', example: 'Xóa bài kiểm tra thành công' },
-  //           success: { type: 'boolean', example: true },
-  //         },
-  //       },
-  //     ],
-  //   },
-  // })
-  // @ApiResponse({
-  //   status: 404,
-  //   description: 'Không tìm thấy bài kiểm tra',
-  // })
-  // @ApiResponse({
-  //   status: 401,
-  //   description: 'Chưa xác thực',
-  // })
-  // @ApiResponse({
-  //   status: 403,
-  //   description: 'Không có quyền truy cập',
-  // })
-  // async remove(@Param('id', ParseIntPipe) id: number) {
-  //   await this.examsService.remove(id);
-  //   return AppResponse.successWithData({
-  //     data: null,
-  //     message: 'Xóa bài kiểm tra thành công',
-  //   });
-  // }
+  @Delete(':id')
+  @AdminOnly()
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Xóa bài kiểm tra',
+    description:
+      'Xóa một bài kiểm tra dựa trên ID, nhưng không xóa các câu hỏi liên quan. Yêu cầu quyền ADMIN.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của bài kiểm tra cần xóa',
+    type: Number,
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Xóa bài kiểm tra thành công',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(AppResponse) },
+        {
+          properties: {
+            data: { type: 'null', example: null },
+            statusCode: { type: 'number', example: 200 },
+            message: { type: 'string', example: 'Xóa bài kiểm tra thành công' },
+            success: { type: 'boolean', example: true },
+          },
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Không tìm thấy bài kiểm tra',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Chưa xác thực',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Không có quyền truy cập',
+  })
+  remove(@Param('id') id: string) {
+    return this.examsService.remove(+id);
+  }
 }

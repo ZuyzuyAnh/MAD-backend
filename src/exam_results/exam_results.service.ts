@@ -1,26 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateExamResultDto } from './dto/create-exam_result.dto';
 import { UpdateExamResultDto } from './dto/update-exam_result.dto';
+import { ExamResult } from './entities/exam_result.entity';
 
 @Injectable()
 export class ExamResultsService {
-  create(createExamResultDto: CreateExamResultDto) {
-    return 'This action adds a new examResult';
+  constructor(
+    @InjectRepository(ExamResult)
+    private readonly examResultRepository: Repository<ExamResult>,
+  ) {}
+
+  async create(createExamResultDto: CreateExamResultDto): Promise<ExamResult> {
+    const examResult = this.examResultRepository.create(createExamResultDto);
+    return this.examResultRepository.save(examResult);
   }
 
-  findAll() {
-    return `This action returns all examResults`;
+  async findAll(): Promise<ExamResult[]> {
+    return this.examResultRepository.find({ relations: ['exam', 'progress'] });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} examResult`;
+  async findOne(id: number): Promise<ExamResult> {
+    const examResult = await this.examResultRepository.findOne({
+      where: { id },
+      relations: ['exam', 'progress'],
+    });
+    if (!examResult) {
+      throw new NotFoundException(`ExamResult with ID ${id} not found`);
+    }
+    return examResult;
   }
 
-  update(id: number, updateExamResultDto: UpdateExamResultDto) {
-    return `This action updates a #${id} examResult`;
+  async update(
+    id: number,
+    updateExamResultDto: UpdateExamResultDto,
+  ): Promise<ExamResult> {
+    const examResult = await this.findOne(id);
+    Object.assign(examResult, updateExamResultDto);
+    return this.examResultRepository.save(examResult);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} examResult`;
+  async remove(id: number): Promise<void> {
+    const examResult = await this.findOne(id);
+    await this.examResultRepository.remove(examResult);
   }
 }

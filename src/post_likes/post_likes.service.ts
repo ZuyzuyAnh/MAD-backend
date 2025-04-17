@@ -1,26 +1,36 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreatePostLikeDto } from './dto/create-post_like.dto';
 import { UpdatePostLikeDto } from './dto/update-post_like.dto';
+import { PostLike } from './entities/post_like.entity';
 
 @Injectable()
 export class PostLikesService {
-  create(createPostLikeDto: CreatePostLikeDto) {
-    return 'This action adds a new postLike';
+  constructor(
+    @InjectRepository(PostLike)
+    private readonly postLikeRepository: Repository<PostLike>,
+  ) {}
+
+  async create(createPostLikeDto: CreatePostLikeDto): Promise<PostLike> {
+    const postLike = this.postLikeRepository.create(createPostLikeDto);
+    return this.postLikeRepository.save(postLike);
   }
 
-  findAll() {
-    return `This action returns all postLikes`;
+  async findAll(): Promise<PostLike[]> {
+    return this.postLikeRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} postLike`;
+  async findOne(id: number) {
+    return this.postLikeRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updatePostLikeDto: UpdatePostLikeDto) {
-    return `This action updates a #${id} postLike`;
+  async update(id: number, updatePostLikeDto: UpdatePostLikeDto) {
+    await this.postLikeRepository.update(id, updatePostLikeDto);
+    return this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} postLike`;
+  async remove(id: number): Promise<void> {
+    await this.postLikeRepository.delete(id);
   }
 }

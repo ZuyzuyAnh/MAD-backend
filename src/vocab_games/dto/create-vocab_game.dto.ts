@@ -1,1 +1,4 @@
-export class CreateVocabGameDto {}
+export class CreateVocabGameDto {
+  title: string;
+  vocabTopicId: number;
+}

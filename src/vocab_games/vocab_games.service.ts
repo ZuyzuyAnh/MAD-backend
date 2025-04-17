@@ -1,26 +1,41 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateVocabGameDto } from './dto/create-vocab_game.dto';
 import { UpdateVocabGameDto } from './dto/update-vocab_game.dto';
+import { VocabGame } from './entities/vocab_game.entity';
 
 @Injectable()
 export class VocabGamesService {
-  create(createVocabGameDto: CreateVocabGameDto) {
-    return 'This action adds a new vocabGame';
+  constructor(
+    @InjectRepository(VocabGame)
+    private readonly vocabGameRepository: Repository<VocabGame>,
+  ) {}
+
+  async create(createVocabGameDto: CreateVocabGameDto): Promise<VocabGame> {
+    const vocabGame = this.vocabGameRepository.create(createVocabGameDto);
+    return this.vocabGameRepository.save(vocabGame);
   }
 
-  findAll() {
-    return `This action returns all vocabGames`;
+  async findAll(): Promise<VocabGame[]> {
+    return this.vocabGameRepository.find({
+      relations: ['vocabTopic', 'vocabGameChallanges'],
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} vocabGame`;
+  async findOne(id: number) {
+    return this.vocabGameRepository.findOne({
+      where: { id },
+      relations: ['vocabTopic', 'vocabGameChallanges'],
+    });
   }
 
-  update(id: number, updateVocabGameDto: UpdateVocabGameDto) {
-    return `This action updates a #${id} vocabGame`;
+  async update(id: number, updateVocabGameDto: UpdateVocabGameDto) {
+    await this.vocabGameRepository.update(id, updateVocabGameDto);
+    return this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} vocabGame`;
+  async remove(id: number): Promise<void> {
+    await this.vocabGameRepository.delete(id);
   }
 }

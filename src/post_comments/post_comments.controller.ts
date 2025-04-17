@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { PostCommentsService } from './post_comments.service';
 import { CreatePostCommentDto } from './dto/create-post_comment.dto';
 import { UpdatePostCommentDto } from './dto/update-post_comment.dto';
@@ -23,7 +31,10 @@ export class PostCommentsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostCommentDto: UpdatePostCommentDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updatePostCommentDto: UpdatePostCommentDto,
+  ) {
     return this.postCommentsService.update(+id, updatePostCommentDto);
   }
 

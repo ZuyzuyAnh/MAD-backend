@@ -51,4 +51,12 @@ export class CreateExamDto {
   @IsInt()
   @IsNotEmpty()
   languageId: number;
+
+  @ApiProperty({
+    description: 'Mô tả bài kiểm tra',
+    example: 'Bài kiểm tra ngữ pháp cơ bản',
+  })
+  @IsString()
+  @IsNotEmpty()
+  description: string;
 }
