@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
@@ -17,6 +18,8 @@ import { PaginateDto } from '../common/dto/paginate.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { ExerciseDifficulty, ExerciseType } from './entities/exercise.entity';
 import { AdminOnly } from 'src/auth/decorators/admin-only.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
 
 @ApiTags('Bài tập')
 @Controller('exercises')
@@ -224,6 +227,15 @@ export class ExercisesController {
     return AppResponse.successWithData({
       data: null,
       message: 'Xóa bài tập thành công',
+    });
+  }
+
+  @Get('overview')
+  @UseGuards(JwtAuthGuard)
+  async getOverview(@GetUser('sub') userId: number) {
+    const overview = await this.exercisesService.getExerciseOverView(userId);
+    return AppResponse.successWithData({
+      data: overview,
     });
   }
 }

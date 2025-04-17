@@ -3,15 +3,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
-import { Exercise } from './entities/exercise.entity';
+import { Exercise, ExerciseType } from './entities/exercise.entity';
 import NotfoundException from '../exception/notfound.exception';
 import { PaginateDto } from '../common/dto/paginate.dto';
+import { ExerciseResultsService } from 'src/exercise_results/exercise-results.service';
+import { LanguagesService } from 'src/languages/languages.service';
 
 @Injectable()
 export class ExercisesService {
   constructor(
     @InjectRepository(Exercise)
     private readonly exerciseRepository: Repository<Exercise>,
+    private readonly exerciseResultService: ExerciseResultsService,
+    private readonly languageService: LanguagesService,
   ) {}
 
   async create(createExerciseDto: CreateExerciseDto): Promise<Exercise> {
@@ -119,5 +123,64 @@ export class ExercisesService {
     }
 
     return queryBuilder.getCount();
+  }
+
+  async countNumberOfExercises(type: ExerciseType) {
+    const count = await this.exerciseRepository
+      .createQueryBuilder('exercise')
+      .where('exercise.type = :type', { type })
+      .getCount();
+
+    return count;
+  }
+
+  async getExerciseOverView(userId: number) {
+    const languageId =
+      await this.languageService.getLanguageIdForCurrentUser(userId);
+
+    const numberOfGrammar = await this.countNumberOfExercises(
+      ExerciseType.GRAMMAR,
+    );
+    const numberOfListening = await this.countNumberOfExercises(
+      ExerciseType.LISTENING,
+    );
+    const numberOfSpeaking = await this.countNumberOfExercises(
+      ExerciseType.SPEAKING,
+    );
+
+    const completedGrammar =
+      await this.exerciseResultService.getNumberOfExerciseCompleted(
+        userId,
+        ExerciseType.GRAMMAR,
+      );
+
+    const completedListening =
+      await this.exerciseResultService.getNumberOfExerciseCompleted(
+        userId,
+        ExerciseType.LISTENING,
+      );
+
+    const completedSpeaking =
+      await this.exerciseResultService.getNumberOfExerciseCompleted(
+        userId,
+        ExerciseType.SPEAKING,
+      );
+
+    return {
+      progress: {
+        grammar: {
+          completed: completedGrammar,
+          total: numberOfGrammar,
+        },
+        listening: {
+          completed: completedListening,
+          total: numberOfListening,
+        },
+        speaking: {
+          completed: completedSpeaking,
+          total: numberOfSpeaking,
+        },
+      },
+    };
   }
 }
