@@ -460,7 +460,24 @@ export class VocabsController {
     const vocabs = await this.vocabsService.findRandomVocabsForUser(userId);
     return AppResponse.successWithData({
       data: vocabs,
-      message: 'Lấy từ vựng ngẫu nhiên thành công',
+    });
+  }
+
+  @Get('search')
+  @UseGuards(JwtAuthGuard)
+  async searchForKeyword(
+    @GetUser('sub') userId: number,
+    @Query('keyword') keyword: string,
+    @Query() paginateDto: PaginateDto,
+  ) {
+    const vocabs = await this.vocabsService.findVocabsByKeyword(
+      userId,
+      keyword,
+      paginateDto,
+    );
+
+    return AppResponse.successWithData({
+      data: vocabs,
     });
   }
 }

@@ -152,4 +152,43 @@ export class VocabsService {
     // Xóa từ vựng
     await this.vocabRepository.remove(vocab);
   }
+
+  async findVocabsByKeyword(
+    userId: number,
+    keyword: string,
+    paginateDto: PaginateDto,
+  ) {
+    const languageId =
+      await this.languageService.getLanguageIdForCurrentUser(userId);
+
+    const { page, limit } = paginateDto;
+
+    const queryBuilder = this.vocabRepository
+      .createQueryBuilder('vocab')
+      .where('vocab.word LIKE :keyword', { keyword: `%${keyword}%` })
+      .andWhere('vocab.languageId = :languageId', { languageId })
+      .orWhere('vocab.definition LIKE :keyword', { keyword: `%${keyword}%` });
+
+    const total = await queryBuilder.getCount();
+
+    const results = await queryBuilder
+      .skip((page - 1) * limit)
+      .take(limit)
+      .orderBy('vocab.createdAt', 'DESC')
+      .getMany();
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: results,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
 }

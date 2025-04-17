@@ -57,7 +57,7 @@ import { PostCommentsModule } from './post_comments/post_comments.module';
     AwsModule,
     VocabTopicsModule,
     VocabsModule,
-    BootstrapModule,
+    // BootstrapModule,
     ProgressModule,
     ExercisesModule,
     VocabRepetitionsModule,
