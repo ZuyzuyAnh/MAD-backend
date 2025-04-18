@@ -7,6 +7,8 @@ import { VocabGame } from './entities/vocab_game.entity';
 import { LanguagesService } from 'src/languages/languages.service';
 import { ProgressService } from 'src/progress/progress.service';
 import { PaginateDto } from 'src/common/dto/paginate.dto';
+import { VocabGameChallangeType } from 'src/vocab_game_challanges/entities/vocab_game_challange.entity';
+import { VocabGameChallangesService } from 'src/vocab_game_challanges/vocab_game_challanges.service';
 
 @Injectable()
 export class VocabGamesService {
@@ -15,11 +17,22 @@ export class VocabGamesService {
     private readonly vocabGameRepository: Repository<VocabGame>,
     private readonly languagesService: LanguagesService,
     private readonly progressService: ProgressService,
+    private readonly vocabGameChallangesService: VocabGameChallangesService,
   ) {}
 
   async create(createVocabGameDto: CreateVocabGameDto): Promise<VocabGame> {
     const vocabGame = this.vocabGameRepository.create(createVocabGameDto);
     return this.vocabGameRepository.save(vocabGame);
+  }
+
+  async findVocabGameChallangeByVocabGameAndType(
+    vocabGameId: number,
+    type: VocabGameChallangeType,
+  ) {
+    return this.vocabGameChallangesService.findChallangeByGameIdAndType(
+      vocabGameId,
+      type,
+    );
   }
 
   async findAll(paginateDto: PaginateDto, userId: number) {

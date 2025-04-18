@@ -1,1 +1,4 @@
-export class CreateExamResultDto {}
+export class CreateExamResultDto {
+  examId: number;
+  score: number;
+}

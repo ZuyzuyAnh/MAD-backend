@@ -3,7 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateVocabGameChallangeDto } from './dto/create-vocab_game_challange.dto';
 import { UpdateVocabGameChallangeDto } from './dto/update-vocab_game_challange.dto';
-import { VocabGameChallange } from './entities/vocab_game_challange.entity';
+import {
+  VocabGameChallange,
+  VocabGameChallangeType,
+} from './entities/vocab_game_challange.entity';
 
 @Injectable()
 export class VocabGameChallangesService {
@@ -19,6 +22,20 @@ export class VocabGameChallangesService {
       createVocabGameChallangeDto,
     );
     return this.vocabGameChallangeRepository.save(challange);
+  }
+
+  async findChallangeByGameIdAndType(
+    vocabGameId: number,
+    type: VocabGameChallangeType,
+  ) {
+    return this.vocabGameChallangeRepository.find({
+      where: {
+        vocabGame: {
+          id: vocabGameId,
+        },
+        type,
+      },
+    });
   }
 
   async findAll(): Promise<VocabGameChallange[]> {

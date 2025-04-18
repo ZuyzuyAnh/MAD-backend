@@ -4,16 +4,27 @@ import { Repository } from 'typeorm';
 import { CreateExamResultDto } from './dto/create-exam_result.dto';
 import { UpdateExamResultDto } from './dto/update-exam_result.dto';
 import { ExamResult } from './entities/exam_result.entity';
+import { ProgressService } from 'src/progress/progress.service';
 
 @Injectable()
 export class ExamResultsService {
   constructor(
     @InjectRepository(ExamResult)
     private readonly examResultRepository: Repository<ExamResult>,
+    private readonly progressService: ProgressService,
   ) {}
 
-  async create(createExamResultDto: CreateExamResultDto): Promise<ExamResult> {
-    const examResult = this.examResultRepository.create(createExamResultDto);
+  async create(
+    userId: number,
+    createExamResultDto: CreateExamResultDto,
+  ): Promise<ExamResult> {
+    const progress =
+      await this.progressService.findCurrentActiveProgress(userId);
+
+    const examResult = this.examResultRepository.create({
+      ...createExamResultDto,
+      progressId: progress.id,
+    });
     return this.examResultRepository.save(examResult);
   }
 

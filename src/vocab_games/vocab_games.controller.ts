@@ -15,6 +15,7 @@ import { UpdateVocabGameDto } from './dto/update-vocab_game.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PaginateDto } from 'src/common/dto/paginate.dto';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { VocabGameChallangeType } from 'src/vocab_game_challanges/entities/vocab_game_challange.entity';
 
 @Controller('vocab-games')
 export class VocabGamesController {
@@ -23,6 +24,18 @@ export class VocabGamesController {
   @Post()
   create(@Body() createVocabGameDto: CreateVocabGameDto) {
     return this.vocabGamesService.create(createVocabGameDto);
+  }
+
+  @Get(':id/challanges')
+  @UseGuards(JwtAuthGuard)
+  findChallangeByGameIdAndType(
+    @Param('id') vocabGameId: number,
+    @Query('type') type: VocabGameChallangeType,
+  ) {
+    return this.vocabGamesService.findVocabGameChallangeByVocabGameAndType(
+      vocabGameId,
+      type,
+    );
   }
 
   @Get()

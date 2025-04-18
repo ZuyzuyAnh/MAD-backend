@@ -10,6 +10,7 @@ import {
 import { VocabGameChallangesService } from './vocab_game_challanges.service';
 import { CreateVocabGameChallangeDto } from './dto/create-vocab_game_challange.dto';
 import { UpdateVocabGameChallangeDto } from './dto/update-vocab_game_challange.dto';
+import { VocabGameChallangeType } from './entities/vocab_game_challange.entity';
 
 @Controller('vocab-game-challanges')
 export class VocabGameChallangesController {
@@ -20,6 +21,17 @@ export class VocabGameChallangesController {
   @Post()
   create(@Body() createVocabGameChallangeDto: CreateVocabGameChallangeDto) {
     return this.vocabGameChallangesService.create(createVocabGameChallangeDto);
+  }
+
+  @Get('for-game')
+  findChallangeByGameIdAndType(
+    @Param() vocabGameId: number,
+    @Param() type: VocabGameChallangeType,
+  ) {
+    return this.vocabGameChallangesService.findChallangeByGameIdAndType(
+      vocabGameId,
+      type,
+    );
   }
 
   @Get()
