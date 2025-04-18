@@ -72,14 +72,11 @@ export class UsersService {
       throw new EntityNotFoundException('user', 'id', id);
     }
 
-    const progress = await this.progressService.getExerciseStatisticForUser(id);
-
     return {
       user: {
         firstName: user.firstName,
         lastName: user.lastName,
       },
-      progress,
     };
   }
 

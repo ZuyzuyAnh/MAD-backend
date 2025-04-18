@@ -26,6 +26,15 @@ import { GetUser } from 'src/auth/decorators/get-user.decorator';
 export class ExercisesController {
   constructor(private readonly exercisesService: ExercisesService) {}
 
+  @Get('overview')
+  @UseGuards(JwtAuthGuard)
+  async getOverview(@GetUser('sub') userId: number) {
+    const overview = await this.exercisesService.getExerciseOverView(userId);
+    return AppResponse.successWithData({
+      data: overview,
+    });
+  }
+
   @Post()
   @AdminOnly()
   @ApiOperation({ summary: 'Tạo bài tập mới' })
@@ -123,15 +132,16 @@ export class ExercisesController {
       },
     },
   })
+  @UseGuards(JwtAuthGuard)
   async findAll(
+    @GetUser('sub') userId: number,
     @Query() paginateDto: PaginateDto,
-    @Query('languageId') languageId?: number,
-    @Query('type') type?: string,
+    @Query('type') type: string,
     @Query('difficulty') difficulty?: string,
   ) {
     const exercises = await this.exercisesService.findAll(
       paginateDto,
-      languageId,
+      userId,
       type,
       difficulty,
     );
@@ -227,15 +237,6 @@ export class ExercisesController {
     return AppResponse.successWithData({
       data: null,
       message: 'Xóa bài tập thành công',
-    });
-  }
-
-  @Get('overview')
-  @UseGuards(JwtAuthGuard)
-  async getOverview(@GetUser('sub') userId: number) {
-    const overview = await this.exercisesService.getExerciseOverView(userId);
-    return AppResponse.successWithData({
-      data: overview,
     });
   }
 }

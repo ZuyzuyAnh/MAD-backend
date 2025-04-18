@@ -25,25 +25,27 @@ export class ExercisesService {
 
   async findAll(
     paginateDto: PaginateDto,
-    languageId?: number,
-    type?: string,
+    userId: number,
+    type: string,
     difficulty?: string,
   ) {
+    const languageId =
+      await this.languageService.getLanguageIdForCurrentUser(userId);
+
     const { page, limit } = paginateDto;
 
     const queryBuilder = this.exerciseRepository
       .createQueryBuilder('exercise')
-      .leftJoinAndSelect('exercise.language', 'language');
-
-    if (languageId) {
-      queryBuilder.andWhere('exercise.language_id = :languageId', {
-        languageId,
-      });
-    }
-
-    if (type) {
-      queryBuilder.andWhere('exercise.type = :type', { type });
-    }
+      .select([
+        'exercise.id',
+        'exercise.title',
+        'exerciseResult.score',
+        'exercise.difficulty',
+      ])
+      .innerJoin('exercise.language', 'language')
+      .leftJoinAndSelect('exercise.exerciseResults', 'exerciseResult')
+      .andWhere('exercise.language_id = :languageId', { languageId })
+      .andWhere('exercise.type = :type', { type });
 
     if (difficulty) {
       queryBuilder.andWhere('exercise.difficulty = :difficulty', {
@@ -56,7 +58,6 @@ export class ExercisesService {
     const exercises = await queryBuilder
       .skip((page - 1) * limit)
       .take(limit)
-      .orderBy('exercise.created_at', 'DESC')
       .getMany();
 
     const totalPages = Math.ceil(total / limit);
@@ -77,7 +78,7 @@ export class ExercisesService {
   async findOne(id: number): Promise<Exercise> {
     const exercise = await this.exerciseRepository.findOne({
       where: { id },
-      relations: ['language'],
+      relations: ['questions'],
     });
 
     if (!exercise) {
@@ -135,9 +136,6 @@ export class ExercisesService {
   }
 
   async getExerciseOverView(userId: number) {
-    const languageId =
-      await this.languageService.getLanguageIdForCurrentUser(userId);
-
     const numberOfGrammar = await this.countNumberOfExercises(
       ExerciseType.GRAMMAR,
     );

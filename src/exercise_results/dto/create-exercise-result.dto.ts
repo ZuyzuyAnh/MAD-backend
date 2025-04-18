@@ -3,15 +3,6 @@ import { IsNumber, IsNotEmpty, Min, Max, IsOptional } from 'class-validator';
 
 export class CreateExerciseResultDto {
   @ApiProperty({
-    description: 'ID của tiến độ học tập',
-    example: 1,
-    required: true,
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  progressId: number;
-
-  @ApiProperty({
     description: 'ID của bài tập',
     example: 1,
     required: true,

@@ -7,19 +7,25 @@ import { ExerciseResult } from './entities/exercise-result.entity';
 import { CreateExerciseResultDto } from './dto/create-exercise-result.dto';
 import { UpdateExerciseResultDto } from './dto/update-exercise-result.dto';
 import { ExerciseType } from 'src/exercises/entities/exercise.entity';
+import { ProgressService } from 'src/progress/progress.service';
 
 @Injectable()
 export class ExerciseResultsService {
   constructor(
     @InjectRepository(ExerciseResult)
     private exerciseResultRepository: Repository<ExerciseResult>,
+    private progressService: ProgressService,
   ) {}
 
   async create(
+    userId: number,
     createExerciseResultDto: CreateExerciseResultDto,
   ): Promise<ExerciseResult> {
+    const progress =
+      await this.progressService.findCurrentActiveProgress(userId);
+
     const exerciseResult = this.exerciseResultRepository.create({
-      progressId: createExerciseResultDto.progressId,
+      progressId: progress.id,
       exerciseId: createExerciseResultDto.exerciseId,
       score: createExerciseResultDto.score || 0,
     });

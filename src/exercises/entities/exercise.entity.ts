@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -11,6 +12,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Language } from 'src/languages/entities/language.entity';
 import { Question } from 'src/questions/entities/question.entity';
+import { ExerciseResult } from 'src/exercise_results/entities/exercise-result.entity';
 
 export enum ExerciseType {
   GRAMMAR = 'grammar',
@@ -78,6 +80,16 @@ export class Exercise {
   @ManyToOne(() => Language, { eager: true })
   @JoinColumn({ name: 'language_id' })
   language: Language;
+
+  @OneToMany(() => ExerciseResult, (exerciseResult) => exerciseResult.exercise)
+  exerciseResults: ExerciseResult[];
+
+  @ManyToMany(() => Question, (question) => question.exercises, {
+    eager: true,
+    cascade: true,
+  })
+  @JoinColumn({ name: 'question_id' })
+  questions: Question[];
 
   @ApiProperty({
     description: 'Thời gian tạo bài tập',

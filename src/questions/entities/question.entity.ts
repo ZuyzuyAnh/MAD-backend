@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -72,6 +73,9 @@ export class Question {
   })
   @Column({ name: 'language_id' })
   languageId: number;
+
+  @ManyToMany(() => Exercise, (exercise) => exercise.questions)
+  exercises: Exercise[];
 
   @ApiProperty({
     description: 'Thông tin ngôn ngữ',

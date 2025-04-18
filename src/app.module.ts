@@ -20,7 +20,6 @@ import { VocabGameChallangesModule } from './vocab_game_challanges/vocab_game_ch
 import { UserSessionModule } from './user_session/user_session.module';
 import { ExerciseResultsModule } from './exercise_results/exercise-results.module';
 import { VocabTopicProgressModule } from './vocab_topic_progress/vocab_topic_progress.module';
-import { ExerciseQuestionsModule } from './exercise_questions/exercise_questions.module';
 import { ExamSectionsModule } from './exam_sections/exam_sections.module';
 import { ExamSectionItemsModule } from './exam_section_items/exam_section_items.module';
 import { ExamSingleQuestionsModule } from './exam_single_questions/exam_single_questions.module';
@@ -68,7 +67,6 @@ import { PostCommentsModule } from './post_comments/post_comments.module';
     UserSessionModule,
     ExerciseResultsModule,
     VocabTopicProgressModule,
-    ExerciseQuestionsModule,
     ExamSectionsModule,
     ExamSectionItemsModule,
     ExamSingleQuestionsModule,
