@@ -62,11 +62,18 @@ export class ExamsService {
   async findOne(id: number): Promise<Exam> {
     const exam = await this.examRepository.findOne({
       where: { id },
-      relations: ['language'],
+      relations: [
+        'questions',
+        'examSections',
+        'examSections.examSectionItems',
+        'examSections.examSectionItems.question',
+      ],
     });
+
     if (!exam) {
       throw new NotFoundException(`Exam with ID ${id} not found`);
     }
+
     return exam;
   }
 
