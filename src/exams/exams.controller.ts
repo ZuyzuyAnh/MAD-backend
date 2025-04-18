@@ -28,11 +28,21 @@ import AppResponse from '../common/dto/api-response.dto';
 import { AdminOnly } from '../auth/decorators/admin-only.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ExamType } from './entities/exam.entity';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
 
 @ApiTags('Bài kiểm tra')
 @Controller('exams')
 export class ExamsController {
   constructor(private readonly examsService: ExamsService) {}
+
+  @Get('overview')
+  @UseGuards(JwtAuthGuard)
+  async getExamsOverview(@GetUser('sub') userId: number) {
+    const overview = await this.examsService.getExamsOverview(userId);
+    return AppResponse.successWithData({
+      data: overview,
+    });
+  }
 
   @Post()
   @AdminOnly()
@@ -200,8 +210,13 @@ export class ExamsController {
     status: 401,
     description: 'Chưa xác thực',
   })
-  findAll() {
-    return this.examsService.findAll();
+  @UseGuards(JwtAuthGuard)
+  findAll(
+    @Query() paginateDto: PaginateDto,
+    @Query('type') type: ExamType,
+    @GetUser('sub') userId: number,
+  ) {
+    return this.examsService.findAll(paginateDto, userId, type);
   }
 
   @Get(':id')

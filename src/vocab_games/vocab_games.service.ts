@@ -5,13 +5,16 @@ import { CreateVocabGameDto } from './dto/create-vocab_game.dto';
 import { UpdateVocabGameDto } from './dto/update-vocab_game.dto';
 import { VocabGame } from './entities/vocab_game.entity';
 import { LanguagesService } from 'src/languages/languages.service';
+import { ProgressService } from 'src/progress/progress.service';
+import { PaginateDto } from 'src/common/dto/paginate.dto';
 
 @Injectable()
 export class VocabGamesService {
   constructor(
     @InjectRepository(VocabGame)
     private readonly vocabGameRepository: Repository<VocabGame>,
-    private readonly LanguagesService: LanguagesService,
+    private readonly languagesService: LanguagesService,
+    private readonly progressService: ProgressService,
   ) {}
 
   async create(createVocabGameDto: CreateVocabGameDto): Promise<VocabGame> {
@@ -19,10 +22,36 @@ export class VocabGamesService {
     return this.vocabGameRepository.save(vocabGame);
   }
 
-  async findAll(): Promise<VocabGame[]> {
-    return this.vocabGameRepository.find({
-      relations: ['vocabTopic', 'vocabGameChallanges'],
-    });
+  async findAll(paginateDto: PaginateDto, userId: number) {
+    const languageId =
+      await this.languagesService.getLanguageIdForCurrentUser(userId);
+
+    const { page, limit } = paginateDto;
+
+    const queryBuilder = this.vocabGameRepository
+      .createQueryBuilder('vocabGame')
+      .select(['vocabGame.id', 'vocabGame.title', 'vocabTopic.name'])
+      .innerJoin('vocabGame.vocabTopic', 'vocabTopic')
+      .where('vocabTopic.languageId = :languageId', { languageId });
+
+    const total = await queryBuilder.getCount();
+    const vocabGames = await queryBuilder
+      .skip((page - 1) * limit)
+      .take(limit)
+      .orderBy('vocabGame.createdAt', 'DESC')
+      .getMany();
+    const totalPages = Math.ceil(total / limit);
+    return {
+      data: vocabGames,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 
   async findOne(id: number) {
@@ -34,15 +63,36 @@ export class VocabGamesService {
 
   async getVocabGameOverview(userId: number) {
     const languageId =
-      await this.LanguagesService.getLanguageIdForCurrentUser(userId);
+      await this.languagesService.getLanguageIdForCurrentUser(userId);
+
+    const completed = await this.countCompletedGames(userId);
+    const total = await this.countGameByLanguage(languageId);
+
+    return {
+      completed,
+      total,
+    };
   }
 
-  async countCompletedGames(userId: number, languageId: number) {
+  async countCompletedGames(userId: number) {
+    const progress =
+      await this.progressService.findCurrentActiveProgress(userId);
+
     const count = await this.vocabGameRepository
       .createQueryBuilder('vocabGame')
-      .innerJoin('vocabGame.vocabGameChallanges', 'vocabGameChallange')
-      .where('vocabGameChallange.userId = :userId', { userId })
-      .andWhere('vocabGame.languageId = :languageId', { languageId })
+      .innerJoin('vocabGame.vocabGameResults', 'vocabGameResult')
+      .innerJoin('vocabGameResult.progress', 'progress')
+      .where('progress.id = :progressId', { progressId: progress.id })
+      .getCount();
+
+    return count;
+  }
+
+  async countGameByLanguage(languageId: number) {
+    const count = await this.vocabGameRepository
+      .createQueryBuilder('vocabGame')
+      .innerJoin('vocabGame.vocabTopic', 'vocabTopic')
+      .where('vocabTopic.languageId = :languageId', { languageId })
       .getCount();
 
     return count;

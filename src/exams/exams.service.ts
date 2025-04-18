@@ -6,6 +6,7 @@ import { UpdateExamDto } from './dto/update-exam.dto';
 import { Exam, ExamType } from './entities/exam.entity';
 import { LanguagesService } from 'src/languages/languages.service';
 import { VocabGamesService } from 'src/vocab_games/vocab_games.service';
+import { PaginateDto } from 'src/common/dto/paginate.dto';
 
 @Injectable()
 export class ExamsService {
@@ -21,8 +22,41 @@ export class ExamsService {
     return this.examRepository.save(exam);
   }
 
-  async findAll(): Promise<Exam[]> {
-    return this.examRepository.find({ relations: ['language'] });
+  async findAll(paginateDto: PaginateDto, userId: number, type: ExamType) {
+    const languageId =
+      await this.languageService.getLanguageIdForCurrentUser(userId);
+
+    const { page, limit } = paginateDto;
+
+    const queryBuilder = this.examRepository
+      .createQueryBuilder('exam')
+      .select(['exam.id', 'exam.title', 'exam.type', 'exerciseResult.score'])
+      .innerJoin('exam.language', 'language')
+      .leftJoinAndSelect('exam.exerciseResults', 'exerciseResult')
+      .where('exam.languageId = :languageId', { languageId })
+      .andWhere('exam.type = :type', { type });
+
+    const total = await queryBuilder.getCount();
+
+    const exams = await queryBuilder
+      .skip((page - 1) * limit)
+      .take(limit)
+      .orderBy('exam.createdAt', 'DESC')
+      .getMany();
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: exams,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 
   async findOne(id: number): Promise<Exam> {
@@ -62,6 +96,8 @@ export class ExamsService {
       ExamType.COMPREHENSIVE,
     );
 
+    const vocabGames = await this.vocabGameService.getVocabGameOverview(userId);
+
     return {
       weeklyExams: {
         total: numberOfWeeklyExams,
@@ -71,6 +107,7 @@ export class ExamsService {
         total: numberOfComprehensiveExams,
         completed: numberOfCompletedComprehensiveExams,
       },
+      vocabGames,
     };
   }
 

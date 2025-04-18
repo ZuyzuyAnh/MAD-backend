@@ -6,10 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Query,
 } from '@nestjs/common';
 import { VocabGamesService } from './vocab_games.service';
 import { CreateVocabGameDto } from './dto/create-vocab_game.dto';
 import { UpdateVocabGameDto } from './dto/update-vocab_game.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { PaginateDto } from 'src/common/dto/paginate.dto';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
 
 @Controller('vocab-games')
 export class VocabGamesController {
@@ -21,8 +26,9 @@ export class VocabGamesController {
   }
 
   @Get()
-  findAll() {
-    return this.vocabGamesService.findAll();
+  @UseGuards(JwtAuthGuard)
+  findAll(@Query() paginateDto: PaginateDto, @GetUser('sub') userId: number) {
+    return this.vocabGamesService.findAll(paginateDto, userId);
   }
 
   @Get(':id')
