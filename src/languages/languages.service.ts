@@ -72,7 +72,11 @@ export class LanguagesService {
 
     const language = await queryBuilder.getOne();
 
-    return language?.id;
+    if (!language) {
+      throw new NotfoundException('language', 'userId', userId);
+    }
+
+    return language.id;
   }
 
   async update(

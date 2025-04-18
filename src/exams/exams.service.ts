@@ -3,13 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
-import { Exam } from './entities/exam.entity';
+import { Exam, ExamType } from './entities/exam.entity';
+import { LanguagesService } from 'src/languages/languages.service';
+import { VocabGamesService } from 'src/vocab_games/vocab_games.service';
 
 @Injectable()
 export class ExamsService {
   constructor(
     @InjectRepository(Exam)
     private readonly examRepository: Repository<Exam>,
+    private readonly languageService: LanguagesService,
+    private readonly vocabGameService: VocabGamesService,
   ) {}
 
   async create(createExamDto: CreateExamDto): Promise<Exam> {
@@ -30,6 +34,71 @@ export class ExamsService {
       throw new NotFoundException(`Exam with ID ${id} not found`);
     }
     return exam;
+  }
+
+  async getExamsOverview(userId: number) {
+    const languageId =
+      await this.languageService.getLanguageIdForCurrentUser(userId);
+
+    const numberOfWeeklyExams = await this.countExamsByType(
+      languageId,
+      ExamType.WEEKLY,
+    );
+
+    const numberOfComprehensiveExams = await this.countExamsByType(
+      languageId,
+      ExamType.COMPREHENSIVE,
+    );
+
+    const numberOfCompletedWeeklyExams = await this.countCompletedExams(
+      userId,
+      languageId,
+      ExamType.WEEKLY,
+    );
+
+    const numberOfCompletedComprehensiveExams = await this.countCompletedExams(
+      userId,
+      languageId,
+      ExamType.COMPREHENSIVE,
+    );
+
+    return {
+      weeklyExams: {
+        total: numberOfWeeklyExams,
+        completed: numberOfCompletedWeeklyExams,
+      },
+      comprehensiveExams: {
+        total: numberOfComprehensiveExams,
+        completed: numberOfCompletedComprehensiveExams,
+      },
+    };
+  }
+
+  async countCompletedExams(
+    userId: number,
+    languageId: number,
+    type: ExamType,
+  ) {
+    const count = await this.examRepository
+      .createQueryBuilder('exam')
+      .innerJoinAndSelect('exam.language', 'language')
+      .leftJoinAndSelect('exam.exerciseResults', 'exerciseResult')
+      .where('exam.languageId = :languageId', { languageId })
+      .andWhere('exerciseResult.userId = :userId', { userId })
+      .andWhere('exam.type = :type', { type })
+      .getCount();
+
+    return count;
+  }
+
+  async countExamsByType(languageId: number, type: ExamType) {
+    const count = await this.examRepository
+      .createQueryBuilder('exam')
+      .where('exam.languageId = :languageId', { languageId })
+      .andWhere('exam.type = :type', { type })
+      .getCount();
+
+    return count;
   }
 
   async update(id: number, updateExamDto: UpdateExamDto): Promise<Exam> {

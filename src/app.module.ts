@@ -27,6 +27,7 @@ import { ExamResultsModule } from './exam_results/exam_results.module';
 import { PostsModule } from './posts/posts.module';
 import { PostLikesModule } from './post_likes/post_likes.module';
 import { PostCommentsModule } from './post_comments/post_comments.module';
+import { VocabGameResultsModule } from './vocab_game_results/vocab_game_results.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { PostCommentsModule } from './post_comments/post_comments.module';
     PostsModule,
     PostLikesModule,
     PostCommentsModule,
+    VocabGameResultsModule,
   ],
   controllers: [],
   providers: [],

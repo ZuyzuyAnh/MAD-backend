@@ -4,12 +4,14 @@ import { Repository } from 'typeorm';
 import { CreateVocabGameDto } from './dto/create-vocab_game.dto';
 import { UpdateVocabGameDto } from './dto/update-vocab_game.dto';
 import { VocabGame } from './entities/vocab_game.entity';
+import { LanguagesService } from 'src/languages/languages.service';
 
 @Injectable()
 export class VocabGamesService {
   constructor(
     @InjectRepository(VocabGame)
     private readonly vocabGameRepository: Repository<VocabGame>,
+    private readonly LanguagesService: LanguagesService,
   ) {}
 
   async create(createVocabGameDto: CreateVocabGameDto): Promise<VocabGame> {
@@ -28,6 +30,22 @@ export class VocabGamesService {
       where: { id },
       relations: ['vocabTopic', 'vocabGameChallanges'],
     });
+  }
+
+  async getVocabGameOverview(userId: number) {
+    const languageId =
+      await this.LanguagesService.getLanguageIdForCurrentUser(userId);
+  }
+
+  async countCompletedGames(userId: number, languageId: number) {
+    const count = await this.vocabGameRepository
+      .createQueryBuilder('vocabGame')
+      .innerJoin('vocabGame.vocabGameChallanges', 'vocabGameChallange')
+      .where('vocabGameChallange.userId = :userId', { userId })
+      .andWhere('vocabGame.languageId = :languageId', { languageId })
+      .getCount();
+
+    return count;
   }
 
   async update(id: number, updateVocabGameDto: UpdateVocabGameDto) {
