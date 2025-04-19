@@ -6,10 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PaginateDto } from 'src/common/dto/paginate.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -21,8 +23,14 @@ export class PostsController {
   }
 
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  findAll(
+    @Query() paginateDto: PaginateDto,
+    @Query('languageId') languageId?: number,
+  ) {
+    return this.postsService.findAll(
+      paginateDto,
+      languageId ? Number(languageId) : undefined,
+    );
   }
 
   @Get(':id')
