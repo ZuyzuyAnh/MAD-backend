@@ -35,6 +35,16 @@ import { GetUser } from 'src/auth/decorators/get-user.decorator';
 export class ExamsController {
   constructor(private readonly examsService: ExamsService) {}
 
+  @Get('completed')
+  @UseGuards(JwtAuthGuard)
+  async countCompletedExams(@GetUser('sub') userId: number) {
+    const data = await this.examsService.getCompletedAmount(userId);
+
+    return AppResponse.successWithData({
+      data,
+    });
+  }
+
   @Get('overview')
   @UseGuards(JwtAuthGuard)
   async getExamsOverview(@GetUser('sub') userId: number) {

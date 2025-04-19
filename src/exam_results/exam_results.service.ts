@@ -56,4 +56,10 @@ export class ExamResultsService {
     const examResult = await this.findOne(id);
     await this.examResultRepository.remove(examResult);
   }
+
+  async countCompletedExams(progressId: number) {
+    return this.examResultRepository.countBy({
+      progressId: progressId,
+    });
+  }
 }

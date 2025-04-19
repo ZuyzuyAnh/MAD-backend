@@ -7,6 +7,8 @@ import { Exam, ExamType } from './entities/exam.entity';
 import { LanguagesService } from 'src/languages/languages.service';
 import { VocabGamesService } from 'src/vocab_games/vocab_games.service';
 import { PaginateDto } from 'src/common/dto/paginate.dto';
+import { ProgressService } from 'src/progress/progress.service';
+import { ExerciseResultsService } from 'src/exercise_results/exercise-results.service';
 
 @Injectable()
 export class ExamsService {
@@ -15,6 +17,8 @@ export class ExamsService {
     private readonly examRepository: Repository<Exam>,
     private readonly languageService: LanguagesService,
     private readonly vocabGameService: VocabGamesService,
+    private readonly progressService: ProgressService,
+    private readonly exerciseResultService: ExerciseResultsService,
   ) {}
 
   async create(createExamDto: CreateExamDto): Promise<Exam> {
@@ -143,6 +147,25 @@ export class ExamsService {
       .getCount();
 
     return count;
+  }
+
+  async getCompletedAmount(userId: number) {
+    const progress =
+      await this.progressService.findCurrentActiveProgress(userId);
+
+    const total = await this.examRepository.countBy({
+      languageId: progress.language.id,
+    });
+
+    const completed =
+      await this.exerciseResultService.getNumberOfExerciseCompleted(
+        progress.id,
+      );
+
+    return {
+      total,
+      completed,
+    };
   }
 
   async update(id: number, updateExamDto: UpdateExamDto): Promise<Exam> {
