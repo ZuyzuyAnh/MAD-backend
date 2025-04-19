@@ -12,6 +12,8 @@ import NotfoundException from '../exception/notfound.exception';
 import { UploadFileService } from 'src/aws/uploadfile.s3.service';
 import { PaginateDto } from '../common/dto/paginate.dto';
 import { LanguagesService } from 'src/languages/languages.service';
+import { ProgressService } from 'src/progress/progress.service';
+import { VocabTopicProgressService } from 'src/vocab_topic_progress/vocab_topic_progress.service';
 
 @Injectable()
 export class VocabTopicsService {
@@ -20,6 +22,8 @@ export class VocabTopicsService {
     private readonly vocabTopicRepository: Repository<VocabTopic>,
     private readonly uploadFileService: UploadFileService,
     private readonly languageService: LanguagesService,
+    private readonly progressService: ProgressService,
+    private readonly vocabTopicProgressService: VocabTopicProgressService,
   ) {}
 
   async create(
@@ -150,6 +154,24 @@ export class VocabTopicsService {
     Object.assign(vocabTopic, updateVocabTopicDto);
 
     return this.vocabTopicRepository.save(vocabTopic);
+  }
+
+  async countCompletedVocabTopics(userId: number) {
+    const progress =
+      await this.progressService.findCurrentActiveProgress(userId);
+
+    const totalCount = await this.vocabTopicRepository.countBy({
+      language: { id: progress.language.id },
+    });
+
+    const completedCount = await this.vocabTopicProgressService.countByProgress(
+      progress.id,
+    );
+
+    return {
+      total: totalCount,
+      completed: completedCount,
+    };
   }
 
   async remove(id: number): Promise<VocabTopic> {

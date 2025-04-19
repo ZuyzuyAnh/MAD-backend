@@ -46,6 +46,17 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 export class VocabTopicsController {
   constructor(private readonly vocabTopicsService: VocabTopicsService) {}
 
+  @Get('completed')
+  @UseGuards(JwtAuthGuard)
+  async getCompletedVocabTopics(@GetUser('sub') userId: number) {
+    const data =
+      await this.vocabTopicsService.countCompletedVocabTopics(userId);
+
+    return AppResponse.successWithData({
+      data,
+    });
+  }
+
   @Get('for-user')
   @UseGuards(JwtAuthGuard)
   async getVocabTopicsForUser(

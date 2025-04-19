@@ -43,4 +43,10 @@ export class VocabTopicProgressService {
 
     return queryBuilder.getCount();
   }
+
+  async countByProgress(progressId: number) {
+    return this.vocabTopicProgressRepository.countBy({
+      progress: { id: progressId },
+    });
+  }
 }
