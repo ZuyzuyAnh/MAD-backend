@@ -12,8 +12,12 @@ export class PostCommentsService {
     private readonly postCommentRepository: Repository<PostComment>,
   ) {}
 
-  create(createPostCommentDto: CreatePostCommentDto) {
-    const postComment = this.postCommentRepository.create(createPostCommentDto);
+  create(createPostCommentDto: CreatePostCommentDto, userId: number) {
+    const postComment = this.postCommentRepository.create({
+      ...createPostCommentDto,
+      user: { id: userId },
+    });
+
     return this.postCommentRepository.save(postComment);
   }
 

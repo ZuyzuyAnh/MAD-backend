@@ -6,18 +6,25 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { PostLikesService } from './post_likes.service';
 import { CreatePostLikeDto } from './dto/create-post_like.dto';
 import { UpdatePostLikeDto } from './dto/update-post_like.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
 
 @Controller('post-likes')
 export class PostLikesController {
   constructor(private readonly postLikesService: PostLikesService) {}
 
   @Post()
-  create(@Body() createPostLikeDto: CreatePostLikeDto) {
-    return this.postLikesService.create(createPostLikeDto);
+  @UseGuards(JwtAuthGuard)
+  create(
+    @Body() createPostLikeDto: CreatePostLikeDto,
+    @GetUser('sub') userId: number,
+  ) {
+    return this.postLikesService.create(userId, createPostLikeDto);
   }
 
   @Get()

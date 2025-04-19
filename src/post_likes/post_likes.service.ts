@@ -12,8 +12,14 @@ export class PostLikesService {
     private readonly postLikeRepository: Repository<PostLike>,
   ) {}
 
-  async create(createPostLikeDto: CreatePostLikeDto): Promise<PostLike> {
-    const postLike = this.postLikeRepository.create(createPostLikeDto);
+  async create(
+    userId: number,
+    createPostLikeDto: CreatePostLikeDto,
+  ): Promise<PostLike> {
+    const postLike = this.postLikeRepository.create({
+      ...createPostLikeDto,
+      user: { id: userId },
+    });
     return this.postLikeRepository.save(postLike);
   }
 
