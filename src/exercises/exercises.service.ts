@@ -8,6 +8,7 @@ import NotfoundException from '../exception/notfound.exception';
 import { PaginateDto } from '../common/dto/paginate.dto';
 import { ExerciseResultsService } from 'src/exercise_results/exercise-results.service';
 import { LanguagesService } from 'src/languages/languages.service';
+import { ProgressService } from 'src/progress/progress.service';
 
 @Injectable()
 export class ExercisesService {
@@ -16,6 +17,7 @@ export class ExercisesService {
     private readonly exerciseRepository: Repository<Exercise>,
     private readonly exerciseResultService: ExerciseResultsService,
     private readonly languageService: LanguagesService,
+    private readonly progressServicce: ProgressService,
   ) {}
 
   async create(createExerciseDto: CreateExerciseDto): Promise<Exercise> {
@@ -78,7 +80,7 @@ export class ExercisesService {
   async findOne(id: number): Promise<Exercise> {
     const exercise = await this.exerciseRepository.findOne({
       where: { id },
-      relations: ['questions'],
+      relations: ['questions', ''],
     });
 
     if (!exercise) {
@@ -133,6 +135,25 @@ export class ExercisesService {
       .getCount();
 
     return count;
+  }
+
+  async countCompletedExercises(userId: number) {
+    const progress =
+      await this.progressServicce.findCurrentActiveProgress(userId);
+
+    const total = await this.exerciseRepository.countBy({
+      languageId: progress.language.id,
+    });
+
+    const completed =
+      await this.exerciseResultService.getNumberOfExerciseCompleted(
+        progress.id,
+      );
+
+    return {
+      total,
+      completed,
+    };
   }
 
   async getExerciseOverView(userId: number) {
