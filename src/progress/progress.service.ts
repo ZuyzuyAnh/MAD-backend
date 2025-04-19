@@ -77,4 +77,36 @@ export class ProgressService {
 
     return progress;
   }
+
+  async createOrUpdateProgress(userId: number, languageId: number) {
+    let progress = await this.progressRepository.findOne({
+      where: {
+        user: { id: userId },
+        language: { id: languageId },
+      },
+      relations: ['user', 'language'],
+    });
+
+    if (progress) {
+      progress.isCurrentActive = true;
+
+      await this.progressRepository
+        .createQueryBuilder()
+        .update(Progress)
+        .set({ isCurrentActive: false })
+        .where('userId = :userId AND id != :progressId', {
+          userId: userId,
+          progressId: progress.id,
+        })
+        .execute();
+    } else {
+      progress = this.progressRepository.create({
+        user: { id: userId },
+        language: { id: languageId },
+        isCurrentActive: true,
+      });
+    }
+
+    return this.progressRepository.save(progress);
+  }
 }

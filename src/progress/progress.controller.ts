@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -203,5 +204,21 @@ export class ProgressController {
     @Body() updateProgressDto: UpdateProgressDto,
   ) {
     return this.progressService.update(+id, updateProgressDto);
+  }
+
+  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  async createOrUpdateProgress(
+    @Param('id') id: number,
+    @GetUser('sub') userId: number,
+  ) {
+    const progress = await this.progressService.createOrUpdateProgress(
+      userId,
+      id,
+    );
+
+    return AppResponse.successWithData({
+      data: progress,
+    });
   }
 }
