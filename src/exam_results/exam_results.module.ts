@@ -9,5 +9,6 @@ import { ProgressModule } from 'src/progress/progress.module';
   imports: [TypeOrmModule.forFeature([ExamResult]), ProgressModule],
   controllers: [ExamResultsController],
   providers: [ExamResultsService],
+  exports: [ExamResultsService],
 })
 export class ExamResultsModule {}

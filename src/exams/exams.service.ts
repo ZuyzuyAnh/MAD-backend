@@ -8,7 +8,7 @@ import { LanguagesService } from 'src/languages/languages.service';
 import { VocabGamesService } from 'src/vocab_games/vocab_games.service';
 import { PaginateDto } from 'src/common/dto/paginate.dto';
 import { ProgressService } from 'src/progress/progress.service';
-import { ExerciseResultsService } from 'src/exercise_results/exercise-results.service';
+import { ExamResultsService } from 'src/exam_results/exam_results.service';
 
 @Injectable()
 export class ExamsService {
@@ -18,7 +18,7 @@ export class ExamsService {
     private readonly languageService: LanguagesService,
     private readonly vocabGameService: VocabGamesService,
     private readonly progressService: ProgressService,
-    private readonly exerciseResultService: ExerciseResultsService,
+    private readonly examResultService: ExamResultsService,
   ) {}
 
   async create(createExamDto: CreateExamDto): Promise<Exam> {
@@ -157,10 +157,9 @@ export class ExamsService {
       languageId: progress.language.id,
     });
 
-    const completed =
-      await this.exerciseResultService.getNumberOfExerciseCompleted(
-        progress.id,
-      );
+    const completed = await this.examResultService.countCompletedExams(
+      progress.id,
+    );
 
     return {
       total,

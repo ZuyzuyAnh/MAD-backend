@@ -8,5 +8,6 @@ import { VocabGameChallange } from './entities/vocab_game_challange.entity';
   imports: [TypeOrmModule.forFeature([VocabGameChallange])],
   controllers: [VocabGameChallangesController],
   providers: [VocabGameChallangesService],
+  exports: [VocabGameChallangesService],
 })
 export class VocabGameChallangesModule {}

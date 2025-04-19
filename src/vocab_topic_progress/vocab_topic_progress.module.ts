@@ -8,5 +8,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forFeature([VocabTopicProgress])],
   controllers: [VocabTopicProgressController],
   providers: [VocabTopicProgressService],
+  exports: [VocabTopicProgressService],
 })
 export class VocabTopicProgressModule {}

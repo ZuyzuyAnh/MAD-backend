@@ -5,12 +5,15 @@ import { VocabGamesController } from './vocab_games.controller';
 import { VocabGame } from './entities/vocab_game.entity';
 import { LanguagesModule } from 'src/languages/languages.module';
 import { ProgressModule } from 'src/progress/progress.module';
+import { VocabGameChallange } from 'src/vocab_game_challanges/entities/vocab_game_challange.entity';
+import { VocabGameChallangesModule } from 'src/vocab_game_challanges/vocab_game_challanges.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([VocabGame]),
     LanguagesModule,
     ProgressModule,
+    VocabGameChallangesModule,
   ],
   controllers: [VocabGamesController],
   providers: [VocabGamesService],
