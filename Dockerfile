@@ -3,6 +3,9 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
+# Install pnpm
+RUN npm install -g pnpm
+
 # Copy package files
 COPY package*.json ./
 
@@ -19,6 +22,9 @@ RUN pnpm run build
 FROM node:18-alpine
 
 WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm
 
 # Copy package files
 COPY package*.json ./
