@@ -1,45 +1,20 @@
-# Build stage
-FROM node:18-alpine AS builder
-
-WORKDIR /app
-
-# Install pnpm
-RUN npm install -g pnpm
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN pnpm ci
-
-# Copy source code
-COPY . .
-
-# Build the application
-RUN pnpm run build
-
 # Production stage
 FROM node:18-alpine
 
 WORKDIR /app
 
-# Install pnpm
+# Cài pnpm toàn cục
 RUN npm install -g pnpm
 
-# Copy package files
+# Copy chỉ package files để cache layer
 COPY package*.json ./
 
-# Install production dependencies only
-RUN pnpm ci --only=production
+# Cài tất cả dependencies (dev + prod)
+RUN pnpm install
 
-# Copy built application from builder stage
+# Copy mã nguồn đã build từ builder
 COPY --from=builder /app/dist ./dist
 
-# Set environment to production
 ENV NODE_ENV=production
-
-# Expose port
 EXPOSE 3000
-
-# Start the application
 CMD ["pnpm", "run", "start:prod"]
