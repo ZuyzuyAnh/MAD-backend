@@ -1,21 +1,39 @@
-# Dockerfile
+# Build stage
+FROM node:18-alpine AS builder
 
-FROM node:22-alpine
-
-# Tạo thư mục app
 WORKDIR /app
 
-# Copy các file
+# Copy package files
 COPY package*.json ./
-RUN npm install
 
+# Install dependencies
+RUN npm ci
+
+# Copy source code
 COPY . .
 
-# Build app NestJS
+# Build the application
 RUN npm run build
 
-# Expose port (ví dụ app chạy ở port 3000)
+# Production stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies only
+RUN npm ci --only=production
+
+# Copy built application from builder stage
+COPY --from=builder /app/dist ./dist
+
+# Set environment to production
+ENV NODE_ENV=production
+
+# Expose port
 EXPOSE 3000
 
-# Start app
-CMD ["node", "dist/main"]
+# Start the application
+CMD ["npm", "run", "start:prod"]
