@@ -7,13 +7,13 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN pnpm ci
 
 # Copy source code
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN pnpm run build
 
 # Production stage
 FROM node:18-alpine
@@ -24,7 +24,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install production dependencies only
-RUN npm ci --only=production
+RUN pnpm ci --only=production
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
@@ -36,4 +36,4 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 # Start the application
-CMD ["npm", "run", "start:prod"]
+CMD ["pnpm", "run", "start:prod"]
