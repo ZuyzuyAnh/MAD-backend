@@ -29,7 +29,6 @@ import { VocabsService } from './vocabs.service';
 import { CreateVocabDto } from './dto/create-vocab.dto';
 import { UpdateVocabDto } from './dto/update-vocab.dto';
 import { PaginateDto } from '../common/dto/paginate.dto';
-import { VocabDifficulty } from './entities/vocab.entity';
 import { AdminOnly } from '../auth/decorators/admin-only.decorator';
 import AppResponse from '../common/dto/api-response.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -43,7 +42,6 @@ export class VocabsController {
   @Post()
   @AdminOnly()
   @UseInterceptors(FileInterceptor('image'))
-  @ApiConsumes('multipart/form-data')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Tạo từ vựng mới' })
   @ApiBody({
@@ -72,12 +70,7 @@ export class VocabsController {
           description: 'Bản dịch của ví dụ',
           example: 'Tôi có một con mèo cưng ở nhà.',
         },
-        difficulty: {
-          type: 'string',
-          enum: Object.values(VocabDifficulty),
-          description: 'Độ khó của từ vựng',
-          example: VocabDifficulty.EASY,
-        },
+
         topicId: {
           type: 'integer',
           description: 'ID của chủ đề từ vựng',
@@ -109,7 +102,6 @@ export class VocabsController {
             'Con mèo, một loại động vật có lông, thường được nuôi làm thú cưng',
           example: 'I have a pet cat at home.',
           exampleTranslation: 'Tôi có một con mèo cưng ở nhà.',
-          difficulty: VocabDifficulty.EASY,
           topicId: 1,
           imageUrl: 'https://example.com/images/cat.jpg',
           createdAt: '2023-08-01T12:00:00.000Z',
@@ -130,24 +122,8 @@ export class VocabsController {
     status: 422,
     description: 'File không hợp lệ (kích thước, định dạng)',
   })
-  async create(
-    @Body() createVocabDto: CreateVocabDto,
-    @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: /(jpg|jpeg|png)$/,
-        })
-        .addMaxSizeValidator({
-          maxSize: 5 * 1024 * 1024, // 5MB
-        })
-        .build({
-          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-          fileIsRequired: false,
-        }),
-    )
-    image?: Express.Multer.File,
-  ) {
-    const vocab = await this.vocabsService.create(createVocabDto, image);
+  async create(@Body() createVocabDto: CreateVocabDto) {
+    const vocab = await this.vocabsService.create(createVocabDto);
     return AppResponse.successWithData({
       data: vocab,
       message: 'Tạo từ vựng thành công',
@@ -184,7 +160,6 @@ export class VocabsController {
     name: 'difficulty',
     required: false,
     description: 'Lọc theo độ khó',
-    enum: VocabDifficulty,
   })
   @ApiResponse({
     status: 200,
@@ -200,7 +175,6 @@ export class VocabsController {
                 'Con mèo, một loại động vật có lông, thường được nuôi làm thú cưng',
               example: 'I have a pet cat at home.',
               exampleTranslation: 'Tôi có một con mèo cưng ở nhà.',
-              difficulty: VocabDifficulty.EASY,
               topicId: 1,
               imageUrl: 'https://example.com/images/cat.jpg',
               createdAt: '2023-08-01T12:00:00.000Z',
@@ -232,14 +206,8 @@ export class VocabsController {
     @Query() paginateDto: PaginateDto,
     @Query('word') word?: string,
     @Query('topicId') topicId?: number,
-    @Query('difficulty') difficulty?: VocabDifficulty,
   ) {
-    const result = await this.vocabsService.findAll(
-      paginateDto,
-      word,
-      topicId,
-      difficulty,
-    );
+    const result = await this.vocabsService.findAll(paginateDto, word, topicId);
     return AppResponse.successWithData({
       data: result,
     });
@@ -264,7 +232,6 @@ export class VocabsController {
             'Con mèo, một loại động vật có lông, thường được nuôi làm thú cưng',
           example: 'I have a pet cat at home.',
           exampleTranslation: 'Tôi có một con mèo cưng ở nhà.',
-          difficulty: VocabDifficulty.EASY,
           topicId: 1,
           imageUrl: 'https://example.com/images/cat.jpg',
           createdAt: '2023-08-01T12:00:00.000Z',
@@ -334,12 +301,6 @@ export class VocabsController {
           description: 'Bản dịch của ví dụ',
           example: 'Con mèo đang ngủ trên ghế sofa.',
         },
-        difficulty: {
-          type: 'string',
-          enum: Object.values(VocabDifficulty),
-          description: 'Độ khó của từ vựng',
-          example: VocabDifficulty.EASY,
-        },
         topicId: {
           type: 'integer',
           description: 'ID của chủ đề từ vựng',
@@ -370,7 +331,6 @@ export class VocabsController {
             'Con mèo, một loại động vật có lông, thường được nuôi làm thú cưng',
           example: 'The cat is sleeping on the sofa.',
           exampleTranslation: 'Con mèo đang ngủ trên ghế sofa.',
-          difficulty: VocabDifficulty.EASY,
           topicId: 1,
           imageUrl: 'https://example.com/images/cat_updated.jpg',
           createdAt: '2023-08-01T12:00:00.000Z',
@@ -394,26 +354,8 @@ export class VocabsController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateVocabDto: UpdateVocabDto,
-    @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: /(jpg|jpeg|png)$/,
-        })
-        .addMaxSizeValidator({
-          maxSize: 5 * 1024 * 1024, // 5MB
-        })
-        .build({
-          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-          fileIsRequired: false,
-        }),
-    )
-    image?: Express.Multer.File,
   ) {
-    if (updateVocabDto.topicId && typeof updateVocabDto.topicId === 'string') {
-      updateVocabDto.topicId = parseInt(updateVocabDto.topicId, 10);
-    }
-
-    const vocab = await this.vocabsService.update(id, updateVocabDto, image);
+    const vocab = await this.vocabsService.update(id, updateVocabDto);
     return AppResponse.successWithData({
       data: vocab,
       message: 'Cập nhật từ vựng thành công',

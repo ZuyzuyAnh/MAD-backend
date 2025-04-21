@@ -7,7 +7,6 @@ import {
   Length,
   Min,
 } from 'class-validator';
-import { VocabDifficulty } from '../entities/vocab.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
@@ -56,19 +55,6 @@ export class CreateVocabDto {
   @IsOptional()
   @IsString()
   exampleTranslation?: string;
-
-  @ApiProperty({
-    description: 'Độ khó của từ vựng',
-    enum: VocabDifficulty,
-    enumName: 'VocabDifficulty',
-    example: VocabDifficulty.EASY,
-    default: VocabDifficulty.EASY,
-  })
-  @IsEnum(VocabDifficulty, {
-    message:
-      'Độ khó phải là một trong các giá trị: beginner, intermediate, advanced',
-  })
-  difficulty: VocabDifficulty = VocabDifficulty.EASY;
 
   @ApiProperty({
     description: 'ID của chủ đề từ vựng',

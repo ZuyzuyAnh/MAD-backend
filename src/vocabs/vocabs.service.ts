@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, LessThanOrEqual, Repository } from 'typeorm';
-import { Vocab, VocabDifficulty } from './entities/vocab.entity';
+import { Vocab } from './entities/vocab.entity';
 import { CreateVocabDto } from './dto/create-vocab.dto';
 import { UpdateVocabDto } from './dto/update-vocab.dto';
-import { UploadFileService } from '../aws/uploadfile.s3.service';
 import { PaginateDto } from '../common/dto/paginate.dto';
 import NotfoundException from '../exception/notfound.exception';
 import { VocabTopicProgress } from 'src/vocab_topic_progress/entities/vocab_topic_progress.entity';
@@ -20,35 +19,19 @@ export class VocabsService {
   constructor(
     @InjectRepository(Vocab)
     private vocabRepository: Repository<Vocab>,
-    private uploadFileService: UploadFileService,
     private languageService: LanguagesService,
   ) {}
 
-  async create(
-    createVocabDto: CreateVocabDto,
-    image?: Express.Multer.File,
-  ): Promise<Vocab> {
+  async create(createVocabDto: CreateVocabDto): Promise<Vocab> {
     const vocab = this.vocabRepository.create({
       ...createVocabDto,
       topic: { id: createVocabDto.topicId },
     });
 
-    if (image) {
-      vocab.imageUrl =
-        await this.uploadFileService.uploadFileToPublicBucket(image);
-    } else if (createVocabDto.imageUrl) {
-      vocab.imageUrl = createVocabDto.imageUrl;
-    }
-
     return this.vocabRepository.save(vocab);
   }
 
-  async findAll(
-    paginateDto: PaginateDto,
-    word?: string,
-    topicId?: number,
-    difficulty?: VocabDifficulty,
-  ) {
+  async findAll(paginateDto: PaginateDto, word?: string, topicId?: number) {
     const { page, limit } = paginateDto;
 
     const queryBuilder = this.vocabRepository.createQueryBuilder('vocab');
@@ -62,14 +45,6 @@ export class VocabsService {
         queryBuilder.andWhere('vocab.topicId = :topicId', { topicId });
       } else {
         queryBuilder.where('vocab.topicId = :topicId', { topicId });
-      }
-    }
-
-    if (difficulty) {
-      if (word || topicId) {
-        queryBuilder.andWhere('vocab.difficulty = :difficulty', { difficulty });
-      } else {
-        queryBuilder.where('vocab.difficulty = :difficulty', { difficulty });
       }
     }
 
@@ -124,32 +99,17 @@ export class VocabsService {
     return vocab;
   }
 
-  async update(
-    id: number,
-    updateVocabDto: UpdateVocabDto,
-    image?: Express.Multer.File,
-  ): Promise<Vocab> {
-    // Tìm từ vựng cần cập nhật
+  async update(id: number, updateVocabDto: UpdateVocabDto): Promise<Vocab> {
     const vocab = await this.findOne(id);
 
-    // Xử lý hình ảnh nếu có
-    if (image) {
-      updateVocabDto.imageUrl =
-        await this.uploadFileService.uploadFileToPublicBucket(image);
-    }
-
-    // Cập nhật thông tin
     Object.assign(vocab, updateVocabDto);
 
-    // Lưu và trả về kết quả
     return this.vocabRepository.save(vocab);
   }
 
   async remove(id: number): Promise<void> {
-    // Tìm từ vựng cần xóa
     const vocab = await this.findOne(id);
 
-    // Xóa từ vựng
     await this.vocabRepository.remove(vocab);
   }
 
@@ -190,5 +150,11 @@ export class VocabsService {
         hasPreviousPage: page > 1,
       },
     };
+  }
+
+  async findAllByTopic(topicId: number) {
+    return this.vocabRepository.find({
+      where: { topic: { id: topicId } },
+    });
   }
 }

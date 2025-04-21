@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -84,11 +85,10 @@ export class Exercise {
   @OneToMany(() => ExerciseResult, (exerciseResult) => exerciseResult.exercise)
   exerciseResults: ExerciseResult[];
 
-  @ManyToMany(() => Question, (question) => question.exercises, {
-    eager: true,
-    cascade: true,
+  @ManyToMany(() => Question, (question) => question.exercises)
+  @JoinTable({
+    name: 'exercise_questions',
   })
-  @JoinColumn({ name: 'question_id' })
   questions: Question[];
 
   @ApiProperty({

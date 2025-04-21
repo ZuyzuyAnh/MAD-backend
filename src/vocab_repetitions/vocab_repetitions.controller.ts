@@ -324,12 +324,7 @@ export class VocabRepetitionsController {
   })
   async updateRepetition(
     @GetUser('sub') userId: number,
-    @Body()
-    updateRepetitionDto: {
-      topicId: number;
-      vocabId: number;
-      difficulty: VocabDifficulty;
-    },
+    @Body() updateRepetitionDto: UpdateRepetitionDto,
   ) {
     await this.vocabRepetitionsService.updateRepetition(
       userId,

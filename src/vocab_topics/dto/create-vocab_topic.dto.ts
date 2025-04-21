@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsInt, IsOptional, IsString, Length } from 'class-validator';
 import { VocabLevel } from '../entities/vocab_topic.entity';
+import { Type } from 'class-transformer';
 
 export class CreateVocabTopicDto {
   @ApiProperty({
@@ -18,6 +19,7 @@ export class CreateVocabTopicDto {
     example: 1,
   })
   @IsInt()
+  @Type(() => Number)
   languageId: number;
 
   @ApiProperty({
@@ -26,8 +28,7 @@ export class CreateVocabTopicDto {
     required: false,
   })
   @IsString()
-  @IsOptional()
-  imageUrl?: string;
+  imageUrl: string;
 
   @ApiProperty({
     description: 'Cấp độ của chủ đề từ vựng',

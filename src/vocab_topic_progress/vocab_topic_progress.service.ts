@@ -4,6 +4,7 @@ import { UpdateVocabTopicProgressDto } from './dto/update-vocab_topic_progress.d
 import { InjectRepository } from '@nestjs/typeorm';
 import { VocabTopicProgress } from './entities/vocab_topic_progress.entity';
 import { Repository } from 'typeorm';
+import { ProgressService } from 'src/progress/progress.service';
 
 @Injectable()
 export class VocabTopicProgressService {
@@ -13,7 +14,25 @@ export class VocabTopicProgressService {
   ) {}
 
   create(createVocabTopicProgressDto: CreateVocabTopicProgressDto) {
-    return 'This action adds a new vocabTopicProgress';
+    const vocabTopicProgress = this.vocabTopicProgressRepository.create({
+      topic: {
+        id: createVocabTopicProgressDto.topicId,
+      },
+      progress: {
+        id: createVocabTopicProgressDto.progressId,
+      },
+    });
+
+    return this.vocabTopicProgressRepository.save(vocabTopicProgress);
+  }
+
+  async findOneByProgressAndTopic(progressId: number, topicId: number) {
+    return this.vocabTopicProgressRepository.findOne({
+      where: {
+        progress: { id: progressId },
+        topic: { id: topicId },
+      },
+    });
   }
 
   findAll() {

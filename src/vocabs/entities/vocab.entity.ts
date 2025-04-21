@@ -10,19 +10,12 @@ import {
 import { VocabTopic } from '../../vocab_topics/entities/vocab_topic.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
-/**
- * Độ khó của từ vựng
- * @enum {string}
- */
 export enum VocabDifficulty {
-  EASY = 'easy',
-  MEDIUM = 'medium',
-  HARD = 'hard',
+  EASY = 'EASY',
+  MEDIUM = 'MEDIUM',
+  HARD = 'HARD',
 }
 
-/**
- * Entity đại diện cho từ vựng trong hệ thống.
- */
 @Entity('vocabs')
 export class Vocab {
   @ApiProperty({

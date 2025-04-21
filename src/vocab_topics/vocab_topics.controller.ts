@@ -38,9 +38,6 @@ import AppResponse from '../common/dto/api-response.dto';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
-/**
- * Controller xử lý các thao tác liên quan đến chủ đề từ vựng
- */
 @ApiTags('Chủ đề từ vựng')
 @Controller('vocab-topics')
 export class VocabTopicsController {
@@ -86,7 +83,6 @@ export class VocabTopicsController {
     description:
       'Tạo chủ đề từ vựng mới với thông tin cơ bản và hình ảnh minh họa. Yêu cầu quyền ADMIN.',
   })
-  @ApiConsumes('multipart/form-data')
   @ApiBearerAuth()
   @ApiBody({
     description: 'Thông tin chi tiết của chủ đề từ vựng và hình ảnh minh họa',
@@ -248,27 +244,8 @@ export class VocabTopicsController {
       ],
     },
   })
-  async create(
-    @Body() createVocabTopicDto: CreateVocabTopicDto,
-    @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: /(jpg|jpeg|png)$/,
-        })
-        .addMaxSizeValidator({
-          maxSize: 5 * 1024 * 1024,
-        })
-        .build({
-          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-          fileIsRequired: false,
-        }),
-    )
-    image?: Express.Multer.File,
-  ) {
-    const topic = await this.vocabTopicsService.create(
-      createVocabTopicDto,
-      image,
-    );
+  async create(@Body() createVocabTopicDto: CreateVocabTopicDto) {
+    const topic = await this.vocabTopicsService.create(createVocabTopicDto);
     return AppResponse.successWithData({
       data: topic,
       message: 'Tạo chủ đề từ vựng thành công',

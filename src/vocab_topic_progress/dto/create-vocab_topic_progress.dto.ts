@@ -1,1 +1,4 @@
-export class CreateVocabTopicProgressDto {}
+export class CreateVocabTopicProgressDto {
+  topicId: number;
+  progressId: number;
+}

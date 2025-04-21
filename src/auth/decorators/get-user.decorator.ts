@@ -11,6 +11,8 @@ export const GetUser = createParamDecorator(
 
     const user = request.user;
 
+    console.log(user);
+
     if (data) {
       if (data in user) {
         return user[data as keyof TokenPayloadDto];

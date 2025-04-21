@@ -9,7 +9,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { VocabLevel, VocabTopic } from './entities/vocab_topic.entity';
 import NotfoundException from '../exception/notfound.exception';
-import { UploadFileService } from 'src/aws/uploadfile.s3.service';
 import { PaginateDto } from '../common/dto/paginate.dto';
 import { LanguagesService } from 'src/languages/languages.service';
 import { ProgressService } from 'src/progress/progress.service';
@@ -20,28 +19,18 @@ export class VocabTopicsService {
   constructor(
     @InjectRepository(VocabTopic)
     private readonly vocabTopicRepository: Repository<VocabTopic>,
-    private readonly uploadFileService: UploadFileService,
     private readonly languageService: LanguagesService,
     private readonly progressService: ProgressService,
     private readonly vocabTopicProgressService: VocabTopicProgressService,
   ) {}
 
-  async create(
-    createVocabTopicDto: CreateVocabTopicDto,
-    image?: Express.Multer.File,
-  ): Promise<VocabTopic> {
+  async create(createVocabTopicDto: CreateVocabTopicDto): Promise<VocabTopic> {
     const vocabTopic = this.vocabTopicRepository.create({
-      topic: createVocabTopicDto.topic,
-      level: createVocabTopicDto.level,
-      language: { id: createVocabTopicDto.languageId },
+      ...createVocabTopicDto,
+      language: {
+        id: createVocabTopicDto.languageId,
+      },
     });
-
-    if (image) {
-      vocabTopic.imageUrl =
-        await this.uploadFileService.uploadFileToPublicBucket(image);
-    } else if (createVocabTopicDto.imageUrl) {
-      vocabTopic.imageUrl = createVocabTopicDto.imageUrl;
-    }
 
     return this.vocabTopicRepository.save(vocabTopic);
   }
@@ -145,11 +134,6 @@ export class VocabTopicsService {
     image?: Express.Multer.File,
   ): Promise<VocabTopic> {
     const vocabTopic = await this.findOne(id);
-
-    if (image) {
-      updateVocabTopicDto.imageUrl =
-        await this.uploadFileService.uploadFileToPublicBucket(image);
-    }
 
     Object.assign(vocabTopic, updateVocabTopicDto);
 

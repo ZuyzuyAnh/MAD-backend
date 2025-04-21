@@ -5,25 +5,32 @@ import { Vocab, VocabDifficulty } from 'src/vocabs/entities/vocab.entity';
 import { IsNull, LessThan, Not, Repository } from 'typeorm';
 import EntityNotFoundException from 'src/exception/notfound.exception';
 import { VocabTopicProgress } from 'src/vocab_topic_progress/entities/vocab_topic_progress.entity';
+import { VocabTopicProgressService } from 'src/vocab_topic_progress/vocab_topic_progress.service';
+import { ProgressService } from 'src/progress/progress.service';
+import { VocabsService } from 'src/vocabs/vocabs.service';
 
 @Injectable()
 export class VocabRepetitionsService {
   constructor(
     @InjectRepository(VocabRepetition)
     private vocabRepetitionRepository: Repository<VocabRepetition>,
-    @InjectRepository(Vocab)
-    private vocabRepository: Repository<Vocab>,
     @InjectRepository(VocabTopicProgress)
     private vocabTopicProgressRepository: Repository<VocabTopicProgress>,
+
+    private vocabTopicProgressService: VocabTopicProgressService,
+    private progressService: ProgressService,
+    private vocabService: VocabsService,
   ) {}
 
   async getVocabsToReview(userId: number, topicId: number, limit: number = 20) {
-    const vocabTopicProgress = await this.vocabTopicProgressRepository.findOne({
-      where: {
-        progress: { user: { id: userId } },
-        topic: { id: topicId },
-      },
-    });
+    const progress =
+      await this.progressService.findCurrentActiveProgress(userId);
+
+    const vocabTopicProgress =
+      await this.vocabTopicProgressService.findOneByProgressAndTopic(
+        progress.id,
+        topicId,
+      );
 
     if (!vocabTopicProgress) {
       throw new EntityNotFoundException('Tiến độ chủ đề', 'id', topicId);
@@ -32,8 +39,6 @@ export class VocabRepetitionsService {
     const recentTimestamp = new Date();
     recentTimestamp.setMinutes(recentTimestamp.getMinutes() - 5);
 
-    // Lấy danh sách từ vựng cần ôn tập, sắp xếp theo priority_score,
-    // loại bỏ các từ vừa ôn tập
     const repetitions = await this.vocabRepetitionRepository.find({
       where: [
         {
@@ -56,25 +61,23 @@ export class VocabRepetitionsService {
   }
 
   async initializeRepetitionsForTopic(userId: number, topicId: number) {
-    let vocabTopicProgress = await this.vocabTopicProgressRepository.findOne({
-      where: {
-        progress: { user: { id: userId } },
-        topic: { id: topicId },
-      },
-    });
+    const progress =
+      await this.progressService.findCurrentActiveProgress(userId);
+
+    let vocabTopicProgress =
+      await this.vocabTopicProgressService.findOneByProgressAndTopic(
+        progress.id,
+        topicId,
+      );
 
     if (!vocabTopicProgress) {
-      vocabTopicProgress = this.vocabTopicProgressRepository.create({
-        progress: { user: { id: userId } },
-        topic: { id: topicId },
+      vocabTopicProgress = await this.vocabTopicProgressService.create({
+        topicId: topicId,
+        progressId: progress.id,
       });
-
-      await this.vocabTopicProgressRepository.save(vocabTopicProgress);
     }
 
-    const vocabs = await this.vocabRepository.find({
-      where: { topic: { id: topicId } },
-    });
+    const vocabs = await this.vocabService.findAllByTopic(topicId);
 
     const existingRepetitions = await this.vocabRepetitionRepository.find({
       where: {

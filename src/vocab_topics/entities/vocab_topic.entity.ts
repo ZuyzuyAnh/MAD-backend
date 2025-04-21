@@ -38,7 +38,7 @@ export class VocabTopic {
     description: 'URL hình ảnh đại diện cho chủ đề',
     example: 'https://example.com/images/animals.jpg',
   })
-  @Column({ name: 'image_url', nullable: true })
+  @Column({ name: 'image_url' })
   imageUrl: string;
 
   @ApiProperty({
@@ -47,7 +47,7 @@ export class VocabTopic {
     example: VocabLevel.BEGINNER,
   })
   @Column({
-    type: 'text',
+    type: 'enum',
     enum: VocabLevel,
     default: VocabLevel.BEGINNER,
   })

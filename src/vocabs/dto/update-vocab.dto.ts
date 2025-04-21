@@ -8,7 +8,6 @@ import {
   Length,
   Min,
 } from 'class-validator';
-import { VocabDifficulty } from '../entities/vocab.entity';
 
 /**
  * DTO for updating an existing vocabulary
@@ -59,20 +58,6 @@ export class UpdateVocabDto extends PartialType(CreateVocabDto) {
   @IsOptional()
   @IsString()
   exampleTranslation?: string;
-
-  @ApiProperty({
-    description: 'Độ khó của từ vựng',
-    enum: VocabDifficulty,
-    enumName: 'VocabDifficulty',
-    example: VocabDifficulty.EASY,
-    required: false,
-  })
-  @IsOptional()
-  @IsEnum(VocabDifficulty, {
-    message:
-      'Độ khó phải là một trong các giá trị: beginner, intermediate, advanced',
-  })
-  difficulty?: VocabDifficulty;
 
   @ApiProperty({
     description: 'ID của chủ đề từ vựng',
