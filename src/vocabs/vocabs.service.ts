@@ -113,43 +113,19 @@ export class VocabsService {
     await this.vocabRepository.remove(vocab);
   }
 
-  async findVocabsByKeyword(
-    userId: number,
-    keyword: string,
-    paginateDto: PaginateDto,
-  ) {
+  async findVocabsByKeyword(userId: number, keyword: string) {
     const languageId =
       await this.languageService.getLanguageIdForCurrentUser(userId);
 
-    const { page, limit } = paginateDto;
-
-    const queryBuilder = this.vocabRepository
+    const vocabs = await this.vocabRepository
       .createQueryBuilder('vocab')
-      .where('vocab.word LIKE :keyword', { keyword: `%${keyword}%` })
-      .andWhere('vocab.languageId = :languageId', { languageId })
-      .orWhere('vocab.definition LIKE :keyword', { keyword: `%${keyword}%` });
-
-    const total = await queryBuilder.getCount();
-
-    const results = await queryBuilder
-      .skip((page - 1) * limit)
-      .take(limit)
-      .orderBy('vocab.createdAt', 'DESC')
+      .innerJoin('vocab.topic', 'topic')
+      .innerJoin('topic.language', 'language')
+      .where('language.id = :languageId', { languageId })
+      .andWhere('vocab.word LIKE :keyword', { keyword: `%${keyword}%` })
       .getMany();
 
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      data: results,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
-      },
-    };
+    return vocabs;
   }
 
   async findAllByTopic(topicId: number) {
