@@ -11,7 +11,7 @@ import {
 import { Language } from '../../languages/entities/language.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Vocab } from 'src/vocabs/entities/vocab.entity';
-import { VocabGame } from 'src/vocab_games/entities/vocab_game.entity';
+import { VocabGameResult } from 'src/vocab_game_results/entities/vocab_game_result.entity';
 
 export enum VocabLevel {
   BEGINNER = 1,
@@ -82,6 +82,6 @@ export class VocabTopic {
   @OneToMany(() => Vocab, (vocab) => vocab.topic)
   vocabs: Vocab[];
 
-  @OneToMany(() => VocabGame, (vocabGame) => vocabGame.vocabTopic)
-  vocabGames: VocabGame[];
+  @OneToMany(() => VocabGameResult, (result) => result.vocabTopic)
+  vocabGameResult: VocabGameResult[];
 }

@@ -128,4 +128,61 @@ export class VocabsService {
       where: { topic: { id: topicId } },
     });
   }
+
+  async getWordLinkChallange(topicId: number) {
+    const vocabs = await this.vocabRepository
+      .createQueryBuilder('vocab')
+      .where('vocab.vocabTopicId = :topicId', { topicId })
+      .orderBy('RANDOM()')
+      .limit(8)
+      .getMany();
+
+    return {
+      type: 'word-link',
+      data: vocabs.map((vocab) => ({
+        word: vocab.word,
+        translation: vocab.definition,
+      })),
+    };
+  }
+
+  async getScrambleChallange(topicId: number) {
+    const vocabs = await this.vocabRepository
+      .createQueryBuilder('vocab')
+      .where('vocab.vocabTopicId = :topicId', { topicId })
+      .orderBy('RANDOM()')
+      .limit(5)
+      .getMany();
+
+    const scrambledVocabs = vocabs.map((vocab) => {
+      const scrambledWord = vocab.word
+        .split('')
+        .sort(() => Math.random() - 0.5)
+        .join('');
+
+      return {
+        word: vocab,
+        scrambled: scrambledWord,
+      };
+    });
+
+    return {
+      type: 'scramble',
+      data: scrambledVocabs,
+    };
+  }
+
+  async getListeningChallange(topicId: number) {
+    const vocabs = await this.vocabRepository
+      .createQueryBuilder('vocab')
+      .where('vocab.vocabTopicId = :topicId', { topicId })
+      .orderBy('RANDOM()')
+      .limit(5)
+      .getMany();
+
+    return {
+      type: 'listening',
+      data: vocabs,
+    };
+  }
 }

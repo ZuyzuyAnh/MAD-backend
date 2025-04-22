@@ -15,8 +15,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { VocabRepetitionsModule } from './vocab_repetitions/vocab_repetitions.module';
 import { QuestionsModule } from './questions/questions.module';
 import { ExamsModule } from './exams/exams.module';
-import { VocabGamesModule } from './vocab_games/vocab_games.module';
-import { VocabGameChallangesModule } from './vocab_game_challanges/vocab_game_challanges.module';
 import { UserSessionModule } from './user_session/user_session.module';
 import { ExerciseResultsModule } from './exercise_results/exercise-results.module';
 import { VocabTopicProgressModule } from './vocab_topic_progress/vocab_topic_progress.module';
@@ -63,8 +61,6 @@ import { VocabGameResultsModule } from './vocab_game_results/vocab_game_results.
     VocabRepetitionsModule,
     QuestionsModule,
     ExamsModule,
-    VocabGamesModule,
-    VocabGameChallangesModule,
     UserSessionModule,
     ExerciseResultsModule,
     VocabTopicProgressModule,

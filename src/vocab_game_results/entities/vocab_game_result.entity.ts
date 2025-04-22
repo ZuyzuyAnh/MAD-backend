@@ -1,5 +1,5 @@
 import { Progress } from 'src/progress/entities/progress.entity';
-import { VocabGame } from 'src/vocab_games/entities/vocab_game.entity';
+import { VocabTopic } from 'src/vocab_topics/entities/vocab_topic.entity';
 import {
   Column,
   Entity,
@@ -16,15 +16,15 @@ export class VocabGameResult {
   @Column({ name: 'progress_id' })
   progressId: number;
 
-  @Column({ name: 'vocab_game_id' })
-  vocabGameId: number;
+  @Column({ name: 'vocab_topic_id' })
+  vocabTopicId: number;
 
   @Column({ type: 'float', default: 0 })
   time: number;
 
-  @ManyToOne(() => VocabGame, (vocabGame) => vocabGame.id)
-  @JoinColumn({ name: 'vocab_game_id' })
-  vocabGame: VocabGame;
+  @ManyToOne(() => VocabTopic, (vocabTopic) => vocabTopic.id)
+  @JoinColumn({ name: 'vocab_topic_id' })
+  vocabTopic: VocabTopic;
 
   @ManyToOne(() => Progress, (progress) => progress.id)
   @JoinColumn({ name: 'progress_id' })

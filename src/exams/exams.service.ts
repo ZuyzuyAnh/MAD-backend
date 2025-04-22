@@ -5,10 +5,10 @@ import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
 import { Exam, ExamType } from './entities/exam.entity';
 import { LanguagesService } from 'src/languages/languages.service';
-import { VocabGamesService } from 'src/vocab_games/vocab_games.service';
 import { PaginateDto } from 'src/common/dto/paginate.dto';
 import { ProgressService } from 'src/progress/progress.service';
 import { ExamResultsService } from 'src/exam_results/exam_results.service';
+import { VocabTopicsService } from 'src/vocab_topics/vocab_topics.service';
 
 @Injectable()
 export class ExamsService {
@@ -16,9 +16,9 @@ export class ExamsService {
     @InjectRepository(Exam)
     private readonly examRepository: Repository<Exam>,
     private readonly languageService: LanguagesService,
-    private readonly vocabGameService: VocabGamesService,
     private readonly progressService: ProgressService,
     private readonly examResultService: ExamResultsService,
+    private readonly vocabTopicService: VocabTopicsService,
   ) {}
 
   async create(createExamDto: CreateExamDto): Promise<Exam> {
@@ -106,7 +106,8 @@ export class ExamsService {
       ExamType.COMPREHENSIVE,
     );
 
-    const vocabGames = await this.vocabGameService.getVocabGameOverview(userId);
+    const vocabGameData =
+      await this.vocabTopicService.countCompletedAndTotalOfGame(userId);
 
     return {
       weeklyExams: {
@@ -117,7 +118,7 @@ export class ExamsService {
         total: numberOfComprehensiveExams,
         completed: numberOfCompletedComprehensiveExams,
       },
-      vocabGames,
+      vocabGames: vocabGameData,
     };
   }
 

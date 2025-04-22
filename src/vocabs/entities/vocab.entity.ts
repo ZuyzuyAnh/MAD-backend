@@ -40,6 +40,9 @@ export class Vocab {
   @Column({ length: 255 })
   definition: string;
 
+  @Column({ name: 'vocab_topic_id' })
+  vocabTopicId: number;
+
   @ApiProperty({
     description: 'Ví dụ sử dụng từ vựng',
     example: 'I have a pet cat at home.',
@@ -69,7 +72,7 @@ export class Vocab {
     type: () => VocabTopic,
   })
   @ManyToOne(() => VocabTopic)
-  @JoinColumn({ name: 'topic_id' })
+  @JoinColumn({ name: 'vocab_topic_id' })
   topic: VocabTopic;
 
   @ApiProperty({

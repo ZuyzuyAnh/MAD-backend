@@ -43,6 +43,36 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 export class VocabTopicsController {
   constructor(private readonly vocabTopicsService: VocabTopicsService) {}
 
+  @Get(':id/vocab-games/word-link')
+  @UseGuards(JwtAuthGuard)
+  async getWordLinkGame(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.vocabTopicsService.getWordLinkByTopic(id);
+
+    return AppResponse.successWithData({
+      data,
+    });
+  }
+
+  @Get(':id/vocab-games/scramble')
+  @UseGuards(JwtAuthGuard)
+  async getScrambleGame(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.vocabTopicsService.getScrambleByTopic(id);
+
+    return AppResponse.successWithData({
+      data,
+    });
+  }
+
+  @Get(':id/vocab-games/listening')
+  @UseGuards(JwtAuthGuard)
+  async getListeningGame(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.vocabTopicsService.getListeningByTopic(id);
+
+    return AppResponse.successWithData({
+      data,
+    });
+  }
+
   @Get('completed')
   @UseGuards(JwtAuthGuard)
   async getCompletedVocabTopics(@GetUser('sub') userId: number) {

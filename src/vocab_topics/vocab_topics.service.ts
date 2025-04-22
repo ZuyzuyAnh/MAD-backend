@@ -13,6 +13,8 @@ import { PaginateDto } from '../common/dto/paginate.dto';
 import { LanguagesService } from 'src/languages/languages.service';
 import { ProgressService } from 'src/progress/progress.service';
 import { VocabTopicProgressService } from 'src/vocab_topic_progress/vocab_topic_progress.service';
+import { VocabsService } from 'src/vocabs/vocabs.service';
+import { VocabGameResultsService } from 'src/vocab_game_results/vocab_game_results.service';
 
 @Injectable()
 export class VocabTopicsService {
@@ -22,6 +24,8 @@ export class VocabTopicsService {
     private readonly languageService: LanguagesService,
     private readonly progressService: ProgressService,
     private readonly vocabTopicProgressService: VocabTopicProgressService,
+    private readonly vocabService: VocabsService,
+    private readonly vocabGameResultService: VocabGameResultsService,
   ) {}
 
   async create(createVocabTopicDto: CreateVocabTopicDto): Promise<VocabTopic> {
@@ -209,6 +213,36 @@ export class VocabTopicsService {
         hasNextPage: page < totalPages,
         hasPreviousPage: page > 1,
       },
+    };
+  }
+
+  async getWordLinkByTopic(topicId: number) {
+    return this.vocabService.getWordLinkChallange(topicId);
+  }
+
+  async getScrambleByTopic(topicId: number) {
+    return this.vocabService.getScrambleChallange(topicId);
+  }
+
+  async getListeningByTopic(topicId: number) {
+    return this.vocabService.getListeningChallange(topicId);
+  }
+
+  async countCompletedAndTotalOfGame(userId: number) {
+    const progress =
+      await this.progressService.findCurrentActiveProgress(userId);
+
+    const totalCount = await this.vocabTopicRepository.countBy({
+      languageId: progress.language.id,
+    });
+
+    const completedCount = await this.vocabGameResultService.countByProgress(
+      progress.id,
+    );
+
+    return {
+      total: totalCount,
+      completed: completedCount,
     };
   }
 }

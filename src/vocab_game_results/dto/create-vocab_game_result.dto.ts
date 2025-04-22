@@ -1,4 +1,11 @@
+import { IsInt, IsPositive } from 'class-validator';
+
 export class CreateVocabGameResultDto {
-  vocabGameId: number;
+  @IsInt()
+  @IsPositive()
+  topicId: number;
+
+  @IsInt()
+  @IsPositive()
   time: number;
 }

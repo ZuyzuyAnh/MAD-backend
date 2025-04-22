@@ -22,11 +22,18 @@ export class VocabGameResultsService {
       await this.progressService.findCurrentActiveProgress(userId);
 
     const vocabGameResult = this.vocabGameResultRepository.create({
-      ...createVocabGameResultDto,
+      vocabTopicId: createVocabGameResultDto.topicId,
+      time: createVocabGameResultDto.time,
       progress,
     });
 
     return this.vocabGameResultRepository.save(vocabGameResult);
+  }
+
+  async countByProgress(progressId: number) {
+    return this.vocabGameResultRepository.count({
+      where: { progressId: progressId },
+    });
   }
 
   findAll() {
