@@ -22,13 +22,13 @@ export class UserAchievement {
   @Column({ name: 'achievement_id' })
   achievementId: number;
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
-
   @ManyToOne(() => Achievement)
-  @JoinColumn({ name: 'achievement_id' })
+  @JoinColumn({ name: 'achievementId' })
   achievement: Achievement;
+
+  @ManyToOne(() => User, (user) => user.userAchievements)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
   @CreateDateColumn()
   unlockedAt: Date;

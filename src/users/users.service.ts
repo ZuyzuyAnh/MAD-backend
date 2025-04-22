@@ -62,7 +62,7 @@ export class UsersService {
   async findById(id: number) {
     const user = this.userRepository.findOne({
       where: { id },
-      relations: ['profile', 'roles'],
+      relations: ['progress', 'achievements'],
     });
 
     return user;

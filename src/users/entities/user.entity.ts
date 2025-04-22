@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+import { UserAchievement } from 'src/achievements/entities/user_achievements.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -49,6 +50,9 @@ export class User {
 
   @OneToMany(() => Progress, (progress) => progress.user)
   progress: Progress[];
+
+  @OneToMany(() => UserAchievement, (userAchievement) => userAchievement.user)
+  userAchievements: UserAchievement[];
 
   @Exclude()
   @CreateDateColumn({ name: 'created_at' })

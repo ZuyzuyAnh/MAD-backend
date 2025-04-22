@@ -3,5 +3,5 @@ export class CreateUserSessionDto {
 
   loginTime: Date;
 
-  logoutTime: Date;
+  logoutTime?: Date;
 }
