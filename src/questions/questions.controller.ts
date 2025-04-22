@@ -21,11 +21,19 @@ import {
   ApiQuery,
   ApiBearerAuth,
   getSchemaPath,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+  ApiForbiddenResponse,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { PaginateDto } from '../common/dto/paginate.dto';
 import AppResponse from '../common/dto/api-response.dto';
 import { AdminOnly } from '../auth/decorators/admin-only.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Question, QuestionType } from './entities/question.entity';
 
 @ApiTags('Câu hỏi')
 @Controller('questions')
@@ -34,63 +42,24 @@ export class QuestionsController {
 
   @Post()
   @AdminOnly()
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Tạo câu hỏi mới',
     description:
       'Tạo một câu hỏi mới cho bài tập hoặc bài kiểm tra. Yêu cầu quyền ADMIN.',
   })
-  @ApiResponse({
-    status: 201,
-    description: 'Tạo câu hỏi thành công',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(AppResponse) },
-        {
-          properties: {
-            data: {
-              type: 'object',
-              properties: {
-                id: { type: 'number', example: 1 },
-                type: { type: 'string', example: 'multiple_choice' },
-                question: {
-                  type: 'string',
-                  example: 'What is the capital of France?',
-                },
-                options: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  example: ['Paris', 'London', 'Berlin', 'Rome'],
-                },
-                answer: { type: 'string', example: 'Paris' },
-                score: { type: 'number', example: 1.0 },
-                languageId: { type: 'number', example: 1 },
-                exerciseId: { type: 'number', example: 1, nullable: true },
-                examId: { type: 'number', example: null, nullable: true },
-                createdAt: { type: 'string', format: 'date-time' },
-                updatedAt: { type: 'string', format: 'date-time' },
-              },
-            },
-            statusCode: { type: 'number', example: 201 },
-            message: { type: 'string', example: 'Tạo câu hỏi thành công' },
-            success: { type: 'boolean', example: true },
-          },
-        },
-      ],
-    },
+  @ApiBody({
+    type: CreateQuestionDto,
+    description: 'Dữ liệu để tạo câu hỏi mới',
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Dữ liệu không hợp lệ',
+  @ApiCreatedResponse({
+    description: 'Câu hỏi đã được tạo thành công',
+    type: Question,
   })
-  @ApiResponse({
-    status: 401,
-    description: 'Chưa xác thực',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Không có quyền truy cập',
-  })
+  @ApiUnauthorizedResponse({ description: 'Người dùng chưa đăng nhập' })
+  @ApiForbiddenResponse({ description: 'Người dùng không có quyền Admin' })
+  @ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
   async create(@Body() createQuestionDto: CreateQuestionDto) {
     const question = await this.questionsService.create(createQuestionDto);
     return AppResponse.successWithData({
@@ -133,84 +102,21 @@ export class QuestionsController {
     description: 'ID của bài kiểm tra cần lọc',
     type: Number,
   })
-  @ApiResponse({
-    status: 200,
-    description: 'Danh sách câu hỏi',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(AppResponse) },
-        {
-          properties: {
-            data: {
-              type: 'object',
-              properties: {
-                data: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      id: { type: 'number', example: 1 },
-                      type: { type: 'string', example: 'multiple_choice' },
-                      question: {
-                        type: 'string',
-                        example: 'What is the capital of France?',
-                      },
-                      options: {
-                        type: 'array',
-                        items: { type: 'string' },
-                        example: ['Paris', 'London', 'Berlin', 'Rome'],
-                      },
-                      answer: { type: 'string', example: 'Paris' },
-                      score: { type: 'number', example: 1.0 },
-                      language: {
-                        type: 'object',
-                        properties: {
-                          id: { type: 'number', example: 1 },
-                          name: { type: 'string', example: 'Tiếng Anh' },
-                        },
-                      },
-                      exercise: {
-                        type: 'object',
-                        nullable: true,
-                        properties: {
-                          id: { type: 'number', example: 1 },
-                          title: {
-                            type: 'string',
-                            example: 'Bài tập ngữ pháp cơ bản',
-                          },
-                        },
-                      },
-                      exam: {
-                        type: 'object',
-                        nullable: true,
-                        properties: {
-                          id: { type: 'number', example: null },
-                          title: { type: 'string', example: null },
-                        },
-                      },
-                    },
-                  },
-                },
-                meta: {
-                  type: 'object',
-                  properties: {
-                    total: { type: 'number', example: 30 },
-                    page: { type: 'number', example: 1 },
-                    limit: { type: 'number', example: 10 },
-                    totalPages: { type: 'number', example: 3 },
-                    hasNextPage: { type: 'boolean', example: true },
-                    hasPreviousPage: { type: 'boolean', example: false },
-                  },
-                },
-              },
-            },
-            statusCode: { type: 'number', example: 200 },
-            message: { type: 'string', example: 'Success' },
-            success: { type: 'boolean', example: true },
-          },
-        },
-      ],
-    },
+  @ApiQuery({
+    name: 'languageId',
+    description: 'ID của ngôn ngữ cần lọc',
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'type',
+    description: 'Loại câu hỏi cần lọc',
+    enum: QuestionType,
+    required: false,
+  })
+  @ApiOkResponse({
+    description: 'Danh sách câu hỏi đã được tìm thấy',
+    type: [Question],
   })
   @ApiResponse({
     status: 401,
@@ -244,66 +150,11 @@ export class QuestionsController {
     type: Number,
     example: 1,
   })
-  @ApiResponse({
-    status: 200,
-    description: 'Thông tin câu hỏi',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(AppResponse) },
-        {
-          properties: {
-            data: {
-              type: 'object',
-              properties: {
-                id: { type: 'number', example: 1 },
-                type: { type: 'string', example: 'multiple_choice' },
-                question: {
-                  type: 'string',
-                  example: 'What is the capital of France?',
-                },
-                options: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  example: ['Paris', 'London', 'Berlin', 'Rome'],
-                },
-                answer: { type: 'string', example: 'Paris' },
-                score: { type: 'number', example: 1.0 },
-                language: {
-                  type: 'object',
-                  properties: {
-                    id: { type: 'number', example: 1 },
-                    name: { type: 'string', example: 'Tiếng Anh' },
-                  },
-                },
-                exercise: {
-                  type: 'object',
-                  nullable: true,
-                  properties: {
-                    id: { type: 'number', example: 1 },
-                    title: {
-                      type: 'string',
-                      example: 'Bài tập ngữ pháp cơ bản',
-                    },
-                  },
-                },
-                exam: {
-                  type: 'object',
-                  nullable: true,
-                  properties: {
-                    id: { type: 'number', example: null },
-                    title: { type: 'string', example: null },
-                  },
-                },
-              },
-            },
-            statusCode: { type: 'number', example: 200 },
-            message: { type: 'string', example: 'Success' },
-            success: { type: 'boolean', example: true },
-          },
-        },
-      ],
-    },
+  @ApiOkResponse({
+    description: 'Câu hỏi đã được tìm thấy',
+    type: Question,
   })
+  @ApiNotFoundResponse({ description: 'Không tìm thấy câu hỏi' })
   @ApiResponse({
     status: 404,
     description: 'Không tìm thấy câu hỏi',
@@ -321,6 +172,7 @@ export class QuestionsController {
 
   @Patch(':id')
   @AdminOnly()
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Cập nhật thông tin câu hỏi',
@@ -333,43 +185,18 @@ export class QuestionsController {
     type: Number,
     example: 1,
   })
-  @ApiResponse({
-    status: 200,
-    description: 'Cập nhật câu hỏi thành công',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(AppResponse) },
-        {
-          properties: {
-            data: {
-              type: 'object',
-              properties: {
-                id: { type: 'number', example: 1 },
-                type: { type: 'string', example: 'multiple_choice' },
-                question: {
-                  type: 'string',
-                  example: 'What is the capital of France?',
-                },
-                options: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  example: ['Paris', 'London', 'Berlin', 'Rome'],
-                },
-                answer: { type: 'string', example: 'Paris' },
-                score: { type: 'number', example: 1.5 },
-                languageId: { type: 'number', example: 1 },
-                exerciseId: { type: 'number', example: 1, nullable: true },
-                examId: { type: 'number', example: null, nullable: true },
-              },
-            },
-            statusCode: { type: 'number', example: 200 },
-            message: { type: 'string', example: 'Cập nhật câu hỏi thành công' },
-            success: { type: 'boolean', example: true },
-          },
-        },
-      ],
-    },
+  @ApiBody({
+    type: UpdateQuestionDto,
+    description: 'Dữ liệu cập nhật cho câu hỏi',
   })
+  @ApiOkResponse({
+    description: 'Câu hỏi đã được cập nhật thành công',
+    type: Question,
+  })
+  @ApiUnauthorizedResponse({ description: 'Người dùng chưa đăng nhập' })
+  @ApiForbiddenResponse({ description: 'Người dùng không có quyền Admin' })
+  @ApiBadRequestResponse({ description: 'Dữ liệu không hợp lệ' })
+  @ApiNotFoundResponse({ description: 'Không tìm thấy câu hỏi' })
   @ApiResponse({
     status: 404,
     description: 'Không tìm thấy câu hỏi',
@@ -395,6 +222,7 @@ export class QuestionsController {
 
   @Delete(':id')
   @AdminOnly()
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Xóa câu hỏi',
@@ -406,6 +234,10 @@ export class QuestionsController {
     type: Number,
     example: 1,
   })
+  @ApiOkResponse({ description: 'Câu hỏi đã được xóa thành công' })
+  @ApiUnauthorizedResponse({ description: 'Người dùng chưa đăng nhập' })
+  @ApiForbiddenResponse({ description: 'Người dùng không có quyền Admin' })
+  @ApiNotFoundResponse({ description: 'Không tìm thấy câu hỏi' })
   @ApiResponse({
     status: 200,
     description: 'Xóa câu hỏi thành công',
