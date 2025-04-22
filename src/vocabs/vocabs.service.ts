@@ -11,9 +11,6 @@ import EntityNotFoundException from '../exception/notfound.exception';
 import { Language } from 'src/languages/entities/language.entity';
 import { LanguagesService } from 'src/languages/languages.service';
 
-/**
- * Service xử lý các thao tác với từ vựng
- */
 @Injectable()
 export class VocabsService {
   constructor(
@@ -81,17 +78,15 @@ export class VocabsService {
       .innerJoin('topic.language', 'language')
       .where('language.id = :languageId', { languageId })
       .limit(20)
-      .orderBy('RAND()')
+      .orderBy('RANDOM()')
       .getMany();
 
     return randomVocabs;
   }
 
   async findOne(id: number): Promise<Vocab> {
-    // Tìm từ vựng theo ID
     const vocab = await this.vocabRepository.findOneBy({ id });
 
-    // Kiểm tra nếu không tìm thấy
     if (!vocab) {
       throw new NotfoundException('vocabulary', 'id', id);
     }

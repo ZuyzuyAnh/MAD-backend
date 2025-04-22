@@ -78,7 +78,7 @@ export class Exercise {
   languageId: number;
 
   @ApiProperty({ description: 'Thông tin ngôn ngữ của bài tập' })
-  @ManyToOne(() => Language, { eager: true })
+  @ManyToOne(() => Language)
   @JoinColumn({ name: 'language_id' })
   language: Language;
 

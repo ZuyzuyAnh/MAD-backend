@@ -22,6 +22,7 @@ export class ExercisesService {
 
   async create(createExerciseDto: CreateExerciseDto): Promise<Exercise> {
     const exercise = this.exerciseRepository.create(createExerciseDto);
+
     return this.exerciseRepository.save(exercise);
   }
 
@@ -80,7 +81,7 @@ export class ExercisesService {
   async findOne(id: number): Promise<Exercise> {
     const exercise = await this.exerciseRepository.findOne({
       where: { id },
-      relations: ['questions', ''],
+      relations: ['questions'],
     });
 
     if (!exercise) {
@@ -154,6 +155,19 @@ export class ExercisesService {
       total,
       completed,
     };
+  }
+
+  async countNumberOfQuestions(exerciseId: number) {
+    const exercise = await this.exerciseRepository.findOne({
+      where: { id: exerciseId },
+      relations: ['questions'],
+    });
+
+    if (!exercise) {
+      throw new NotfoundException('exercise', 'id', exerciseId);
+    }
+
+    return exercise.questions.length;
   }
 
   async getExerciseOverView(userId: number) {

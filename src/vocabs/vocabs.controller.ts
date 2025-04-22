@@ -39,6 +39,15 @@ import { GetUser } from 'src/auth/decorators/get-user.decorator';
 export class VocabsController {
   constructor(private readonly vocabsService: VocabsService) {}
 
+  @Get('random')
+  @UseGuards(JwtAuthGuard)
+  async findRandomVocabsForUser(@GetUser('sub') userId: number) {
+    const vocabs = await this.vocabsService.findRandomVocabsForUser(userId);
+    return AppResponse.successWithData({
+      data: vocabs,
+    });
+  }
+
   @Get('search')
   @UseGuards(JwtAuthGuard)
   async searchForKeyword(
@@ -408,15 +417,6 @@ export class VocabsController {
     return AppResponse.successWithData({
       data: null,
       message: 'Xóa từ vựng thành công',
-    });
-  }
-
-  @Get('random')
-  @UseGuards(JwtAuthGuard)
-  async findRandomVocabsForUser(@GetUser('sub') userId: number) {
-    const vocabs = await this.vocabsService.findRandomVocabsForUser(userId);
-    return AppResponse.successWithData({
-      data: vocabs,
     });
   }
 }

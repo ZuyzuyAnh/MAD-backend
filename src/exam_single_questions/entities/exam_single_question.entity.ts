@@ -5,9 +5,12 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 
 @Entity('exam_single_questions')
+@Unique(['examId', 'questionId'])
+@Unique(['examId', 'sequence'])
 export class ExamSingleQuestion {
   @PrimaryGeneratedColumn()
   id: number;
