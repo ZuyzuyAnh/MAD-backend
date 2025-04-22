@@ -60,7 +60,10 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    const user = this.userRepository.findOneBy({ id });
+    const user = this.userRepository.findOne({
+      where: { id },
+      relations: ['profile', 'roles'],
+    });
 
     return user;
   }
@@ -72,12 +75,7 @@ export class UsersService {
       throw new EntityNotFoundException('user', 'id', id);
     }
 
-    return {
-      user: {
-        firstName: user.firstName,
-        lastName: user.lastName,
-      },
-    };
+    return user;
   }
 
   async updateUser(

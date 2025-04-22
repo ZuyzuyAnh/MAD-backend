@@ -8,6 +8,7 @@ import { CreateExerciseResultDto } from './dto/create-exercise-result.dto';
 import { UpdateExerciseResultDto } from './dto/update-exercise-result.dto';
 import { ExerciseType } from 'src/exercises/entities/exercise.entity';
 import { ProgressService } from 'src/progress/progress.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ExerciseResultsService {
@@ -15,6 +16,7 @@ export class ExerciseResultsService {
     @InjectRepository(ExerciseResult)
     private exerciseResultRepository: Repository<ExerciseResult>,
     private progressService: ProgressService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async create(
@@ -30,7 +32,12 @@ export class ExerciseResultsService {
       score: createExerciseResultDto.score || 0,
     });
 
-    return await this.exerciseResultRepository.save(exerciseResult);
+    this.eventEmitter.emit('exercise.completed', {
+      userId,
+      exerciseId: createExerciseResultDto.exerciseId,
+    });
+
+    return this.exerciseResultRepository.save(exerciseResult);
   }
 
   async findAll(

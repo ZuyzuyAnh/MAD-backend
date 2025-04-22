@@ -26,6 +26,8 @@ import { PostsModule } from './posts/posts.module';
 import { PostLikesModule } from './post_likes/post_likes.module';
 import { PostCommentsModule } from './post_comments/post_comments.module';
 import { VocabGameResultsModule } from './vocab_game_results/vocab_game_results.module';
+import { AchievementsModule } from './achievements/achievements.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -48,6 +50,7 @@ import { VocabGameResultsModule } from './vocab_game_results/vocab_game_results.
         abortEarly: true,
       },
     }),
+    EventEmitterModule.forRoot(),
     DatabaseModule,
     UsersModule,
     AuthModule,
@@ -72,6 +75,7 @@ import { VocabGameResultsModule } from './vocab_game_results/vocab_game_results.
     PostLikesModule,
     PostCommentsModule,
     VocabGameResultsModule,
+    AchievementsModule,
   ],
   controllers: [],
   providers: [],
