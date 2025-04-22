@@ -1,3 +1,4 @@
+import { ExamSectionItem } from 'src/exam_section_items/entities/exam_section_item.entity';
 import { Exam } from 'src/exams/entities/exam.entity';
 import {
   Column,
@@ -5,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -43,4 +45,10 @@ export class ExamSection {
   @ManyToOne(() => Exam)
   @JoinColumn({ name: 'exam_id' })
   exam: Exam;
+
+  @OneToMany(
+    () => ExamSectionItem,
+    (examSectionItem) => examSectionItem.examSection,
+  )
+  examSectionItems: ExamSectionItem[];
 }

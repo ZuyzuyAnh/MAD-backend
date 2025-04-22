@@ -11,6 +11,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { ExamResult } from 'src/exam_results/entities/exam_result.entity';
+import { ExamSingleQuestion } from 'src/exam_single_questions/entities/exam_single_question.entity';
+import { ExamSection } from 'src/exam_sections/entities/exam_section.entity';
 
 export enum ExamType {
   WEEKLY = 'weekly',
@@ -75,4 +78,16 @@ export class Exam {
   })
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @OneToMany(() => ExamResult, (result) => result.exam)
+  examResults: ExamResult[];
+
+  @OneToMany(
+    () => ExamSingleQuestion,
+    (examSingleQuestion) => examSingleQuestion.exam,
+  )
+  examSingleQuestions: ExamSingleQuestion[];
+
+  @OneToMany(() => ExamSection, (examSection) => examSection.exam)
+  examSections: ExamSection[];
 }

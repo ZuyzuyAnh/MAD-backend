@@ -1,10 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { VocabGameChallange } from 'src/vocab_game_challanges/entities/vocab_game_challange.entity';
+import { VocabGameResult } from 'src/vocab_game_results/entities/vocab_game_result.entity';
 import { VocabTopic } from 'src/vocab_topics/entities/vocab_topic.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -32,6 +34,7 @@ export class VocabGame {
     type: () => VocabTopic,
   })
   @ManyToOne(() => VocabTopic)
+  @JoinColumn({ name: 'vocab_topic_id' })
   vocabTopic: VocabTopic;
 
   @ApiProperty({
@@ -44,11 +47,17 @@ export class VocabGame {
   )
   vocabGameChallanges: VocabGameChallange[];
 
+  @OneToMany(
+    () => VocabGameResult,
+    (vocabGameResult) => vocabGameResult.vocabGame,
+  )
+  vocabGameResults: VocabGameResult[];
+
   @ApiProperty({
     description: 'Thời gian tạo trò chơi',
     example: '2023-08-15T12:00:00Z',
   })
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
   @ApiProperty({

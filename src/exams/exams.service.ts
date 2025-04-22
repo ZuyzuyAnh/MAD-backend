@@ -34,9 +34,9 @@ export class ExamsService {
 
     const queryBuilder = this.examRepository
       .createQueryBuilder('exam')
-      .select(['exam.id', 'exam.title', 'exam.type', 'exerciseResult.score'])
+      .select(['exam.id', 'exam.title', 'exam.type', 'examResults.score'])
       .innerJoin('exam.language', 'language')
-      .leftJoinAndSelect('exam.exerciseResults', 'exerciseResult')
+      .leftJoinAndSelect('exam.examResults', 'examResults')
       .where('exam.languageId = :languageId', { languageId })
       .andWhere('exam.type = :type', { type });
 
@@ -45,7 +45,6 @@ export class ExamsService {
     const exams = await queryBuilder
       .skip((page - 1) * limit)
       .take(limit)
-      .orderBy('exam.createdAt', 'DESC')
       .getMany();
 
     const totalPages = Math.ceil(total / limit);
@@ -67,7 +66,7 @@ export class ExamsService {
     const exam = await this.examRepository.findOne({
       where: { id },
       relations: [
-        'questions',
+        'examSingleQuestions.question',
         'examSections',
         'examSections.examSectionItems',
         'examSections.examSectionItems.question',
@@ -127,16 +126,22 @@ export class ExamsService {
     languageId: number,
     type: ExamType,
   ) {
-    const count = await this.examRepository
-      .createQueryBuilder('exam')
-      .innerJoinAndSelect('exam.language', 'language')
-      .leftJoinAndSelect('exam.exerciseResults', 'exerciseResult')
-      .where('exam.languageId = :languageId', { languageId })
-      .andWhere('exerciseResult.userId = :userId', { userId })
-      .andWhere('exam.type = :type', { type })
-      .getCount();
+    const progress =
+      await this.progressService.findCurrentActiveProgress(userId);
 
-    return count;
+    const queryBuilder = this.examRepository
+      .createQueryBuilder('exam')
+      .innerJoin('exam.language', 'language')
+      .leftJoin('exam.examResults', 'examResults')
+      .innerJoin('examResults.progress', 'progress')
+      .where('exam.languageId = :languageId', { languageId })
+      .andWhere('exam.type = :type', { type })
+      .andWhere('progress.id = :progressId', {
+        progressId: progress.id,
+      });
+    console.log(queryBuilder.getSql());
+
+    return queryBuilder.getCount();
   }
 
   async countExamsByType(languageId: number, type: ExamType) {

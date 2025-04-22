@@ -1,4 +1,3 @@
-import Joi from 'joi';
 import { Exam } from 'src/exams/entities/exam.entity';
 import { Progress } from 'src/progress/entities/progress.entity';
 import {

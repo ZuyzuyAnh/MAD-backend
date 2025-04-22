@@ -43,7 +43,12 @@ export class VocabGamesService {
 
     const queryBuilder = this.vocabGameRepository
       .createQueryBuilder('vocabGame')
-      .select(['vocabGame.id', 'vocabGame.title', 'vocabTopic.name'])
+      .select([
+        'vocabGame.id',
+        'vocabGame.title',
+        'vocabTopic.topic',
+        'vocabGame.createdAt',
+      ])
       .innerJoin('vocabGame.vocabTopic', 'vocabTopic')
       .where('vocabTopic.languageId = :languageId', { languageId });
 
