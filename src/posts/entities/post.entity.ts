@@ -1,4 +1,6 @@
 import { Language } from 'src/languages/entities/language.entity';
+import { PostComment } from 'src/post_comments/entities/post_comment.entity';
+import { PostLike } from 'src/post_likes/entities/post_like.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -6,6 +8,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -27,8 +30,8 @@ export class Post {
   @Column({ name: 'language_id' })
   languageId: number;
 
-  @Column({ name: 'tags' })
-  tags: string;
+  @Column({ name: 'tags', type: 'simple-array', nullable: true })
+  tags: string[];
 
   @Column({ name: 'image_urls', type: 'simple-array', nullable: true })
   imageUrls: string[];
@@ -46,4 +49,10 @@ export class Post {
   @ManyToOne(() => Language)
   @JoinColumn({ name: 'language_id' })
   language: Language;
+
+  @OneToMany(() => PostComment, (comment) => comment.post)
+  comments: Comment[];
+
+  @OneToMany(() => PostLike, (like) => like.post)
+  likes: PostLike[];
 }
