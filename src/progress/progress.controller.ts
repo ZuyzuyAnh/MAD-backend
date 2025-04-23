@@ -90,7 +90,10 @@ export class ProgressController {
     @Body() createProgressDto: CreateProgressDto,
     @GetUser('sub') id: number,
   ) {
-    await this.progressService.create(id, createProgressDto);
+    await this.progressService.createOrUpdateProgress(
+      id,
+      createProgressDto.languageId,
+    );
 
     return AppResponse.success();
   }
