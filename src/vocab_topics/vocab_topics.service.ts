@@ -72,7 +72,7 @@ export class VocabTopicsService {
 
     const queryBuilder = this.vocabTopicRepository
       .createQueryBuilder('vocab_topic')
-      .select(['vocab_topic.id', 'vocab_topic.topic', 'vocab_topic.level'])
+      .select(['vocab_topic.id', 'vocab_topic.topic', 'vocab_topic.level','vocab_topic.imageUrl'])
       .innerJoin('vocab_topic.language', 'language')
       .loadRelationCountAndMap('vocab_topic.totalVocabs', 'vocab_topic.vocabs');
 
