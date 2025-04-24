@@ -37,6 +37,37 @@ export class ExamsController {
 
   @Get('completed')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Lấy số lượng bài kiểm tra đã hoàn thành',
+    description: 'Trả về số lượng bài kiểm tra mà người dùng đã hoàn thành',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lấy thông tin thành công',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(AppResponse) },
+        {
+          properties: {
+            data: {
+              type: 'object',
+              properties: {
+                count: { type: 'number', example: 5 },
+              },
+            },
+            statusCode: { type: 'number', example: 200 },
+            message: { type: 'string', example: 'Success' },
+            success: { type: 'boolean', example: true },
+          },
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Chưa xác thực',
+  })
   async countCompletedExams(@GetUser('sub') userId: number) {
     const data = await this.examsService.getCompletedAmount(userId);
 
@@ -47,6 +78,56 @@ export class ExamsController {
 
   @Get('overview')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Lấy tổng quan về bài kiểm tra',
+    description:
+      'Trả về thông tin tổng quan về bài kiểm tra của người dùng bao gồm tiến độ và kết quả',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lấy thông tin tổng quan thành công',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(AppResponse) },
+        {
+          properties: {
+            data: {
+              type: 'object',
+              properties: {
+                totalExams: { type: 'number', example: 10 },
+                completedExams: { type: 'number', example: 5 },
+                averageScore: { type: 'number', example: 85.5 },
+                highestScore: { type: 'number', example: 98 },
+                recentExams: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'number', example: 1 },
+                      title: {
+                        type: 'string',
+                        example: 'Kiểm tra ngữ pháp tiếng Anh tuần 3',
+                      },
+                      score: { type: 'number', example: 85 },
+                      completedAt: { type: 'string', format: 'date-time' },
+                    },
+                  },
+                },
+              },
+            },
+            statusCode: { type: 'number', example: 200 },
+            message: { type: 'string', example: 'Success' },
+            success: { type: 'boolean', example: true },
+          },
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Chưa xác thực',
+  })
   async getExamsOverview(@GetUser('sub') userId: number) {
     const overview = await this.examsService.getExamsOverview(userId);
     return AppResponse.successWithData({
