@@ -85,6 +85,8 @@ export class VocabRepetitionsService {
       },
     });
 
+    console.log(existingRepetitions);
+
     const existingVocabIds = existingRepetitions.map(
       (repetition) => repetition.vocab.id,
     );

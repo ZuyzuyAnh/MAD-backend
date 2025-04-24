@@ -15,7 +15,7 @@ export class VocabRepetition {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Vocab)
+  @ManyToOne(() => Vocab, { eager: true })
   @JoinColumn({ name: 'vocab_id' })
   vocab: Vocab;
 
