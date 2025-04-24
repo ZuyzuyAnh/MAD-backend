@@ -68,6 +68,8 @@ export class UsersService {
         'user.lastName',
         'user.email',
         'user.profileImageUrl',
+        'user.role',
+        'user.createdAt',
       ])
       .leftJoinAndSelect('user.progress', 'progress')
       .leftJoin('user.userAchievements', 'userAchievements')
