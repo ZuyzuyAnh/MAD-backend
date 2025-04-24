@@ -108,10 +108,7 @@ export class VocabTopicsController {
   @Post()
   @AdminOnly()
   @UseInterceptors(FileInterceptor('image'))
-
   @ApiBearerAuth()
-
-
   async create(@Body() createVocabTopicDto: CreateVocabTopicDto) {
     const topic = await this.vocabTopicsService.create(createVocabTopicDto);
     return AppResponse.successWithData({
@@ -124,7 +121,6 @@ export class VocabTopicsController {
    * Lấy danh sách chủ đề từ vựng
    */
   @Get()
-
   async findAll(
     @Query() paginateDto: PaginateDto,
     @Query('topic') topic?: string,
@@ -135,16 +131,17 @@ export class VocabTopicsController {
     try {
       const parsedLanguageId = languageId ? Number(languageId) : undefined;
 
-      const parsedIsRandom =
-        typeof isRandom === 'string' ? isRandom === 'true' : isRandom === true;
+      //     const parsedIsRandom =
+      //       typeof isRandom === 'string' ? isRandom === 'true' : isRandom === true;
 
-      const result = await this.vocabTopicsService.findAll(
-        paginateDto,
-        topic,
-        parsedLanguageId,
-        level,
-        parsedIsRandom,
-      );
+      //     const result = await this.vocabTopicsService.findAll(
+      //       paginateDto,
+      //       userId,
+      //       topic,
+      //       parsedLanguageId,
+      //       level,
+      //       parsedIsRandom,
+      //     );
 
       return AppResponse.successWithData({
         data: result,
@@ -159,7 +156,6 @@ export class VocabTopicsController {
   }
 
   @Get(':id')
-
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const topic = await this.vocabTopicsService.findOne(id);
     return AppResponse.successWithData({
@@ -175,7 +171,6 @@ export class VocabTopicsController {
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
   @ApiBearerAuth()
-
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateVocabTopicDto: UpdateVocabTopicDto,
@@ -211,7 +206,6 @@ export class VocabTopicsController {
   @Delete(':id')
   @AdminOnly()
   @ApiBearerAuth()
-  
   async remove(@Param('id', ParseIntPipe) id: number) {
     await this.vocabTopicsService.remove(id);
     return AppResponse.successWithData({
@@ -223,7 +217,6 @@ export class VocabTopicsController {
   @Get('learning')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-
   async findLearningTopics(
     @Query() paginateDto: PaginateDto,
     @GetUser('sub') userId: number,

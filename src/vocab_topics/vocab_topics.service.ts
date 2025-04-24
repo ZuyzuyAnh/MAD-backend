@@ -48,33 +48,37 @@ export class VocabTopicsService {
     const languageId =
       await this.languageService.getLanguageIdForCurrentUser(userId);
 
-    return this.findAll(paginateDto, topic, languageId, level);
+    return this.findAll(paginateDto, userId, topic, languageId, level);
   }
 
   async findAll(
     paginateDto: PaginateDto,
+    userId?: number,
     topic?: string,
     languageId?: number,
     level?: VocabLevel,
     isRandom?: boolean,
-  ): Promise<{
-    data: VocabTopic[];
-    meta: {
-      total: number;
-      page: number;
-      limit: number;
-      totalPages: number;
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-    };
-  }> {
+  ) {
     const { page, limit } = paginateDto;
 
     const queryBuilder = this.vocabTopicRepository
       .createQueryBuilder('vocab_topic')
       .select(['vocab_topic.id', 'vocab_topic.topic', 'vocab_topic.level','vocab_topic.imageUrl'])
       .innerJoin('vocab_topic.language', 'language')
+      .leftJoin('vocab_topic.vocabTopicProgress', 'vocab_topic_progress')
       .loadRelationCountAndMap('vocab_topic.totalVocabs', 'vocab_topic.vocabs');
+
+    if (userId) {
+      const progress =
+        await this.progressService.findCurrentActiveProgress(userId);
+
+      queryBuilder.leftJoinAndSelect(
+        'vocab_topic.vocabTopicProgress',
+        'vtp',
+        'vtp.progressId = :progressId',
+        { progressId: progress.id },
+      );
+    }
 
     if (topic) {
       queryBuilder.andWhere('LOWER(vocab_topic.topic) LIKE LOWER(:topic)', {
@@ -106,8 +110,16 @@ export class VocabTopicsService {
 
     const totalPages = Math.ceil(total / limit);
 
+    const data = results.map((result) => {
+      const { vocabTopicProgress, ...rest } = result;
+      return {
+        ...rest,
+        hasProgress: result.vocabTopicProgress.length > 0,
+      };
+    });
+
     return {
-      data: results,
+      data,
       meta: {
         total,
         page,
