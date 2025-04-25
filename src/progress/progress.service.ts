@@ -81,6 +81,15 @@ export class ProgressService {
   }
 
   async createOrUpdateProgress(userId: number, languageId: number) {
+    await this.progressRepository
+      .createQueryBuilder()
+      .update(Progress)
+      .set({ isCurrentActive: false })
+      .where('userId = :userId', {
+        userId: userId,
+      })
+      .execute();
+
     let progress = await this.progressRepository.findOne({
       where: {
         user: { id: userId },
@@ -91,16 +100,6 @@ export class ProgressService {
 
     if (progress) {
       progress.isCurrentActive = true;
-
-      await this.progressRepository
-        .createQueryBuilder()
-        .update(Progress)
-        .set({ isCurrentActive: false })
-        .where('userId = :userId AND id != :progressId', {
-          userId: userId,
-          progressId: progress.id,
-        })
-        .execute();
     } else {
       progress = this.progressRepository.create({
         user: { id: userId },

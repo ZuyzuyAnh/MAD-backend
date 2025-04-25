@@ -26,6 +26,12 @@ export class Progress {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
+  @Column({ name: 'user_id' })
+  userId: number;
+
+  @Column({ name: 'language_id' })
+  languageId: number;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User;
