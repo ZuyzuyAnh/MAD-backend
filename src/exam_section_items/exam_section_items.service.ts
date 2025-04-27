@@ -51,4 +51,10 @@ export class ExamSectionItemsService {
     const examSectionItem = await this.findOne(id);
     await this.examSectionItemRepository.remove(examSectionItem);
   }
+
+  async countBySectionId(sectionId: number): Promise<number> {
+    return this.examSectionItemRepository.count({
+      where: { examSectionId: sectionId },
+    });
+  }
 }

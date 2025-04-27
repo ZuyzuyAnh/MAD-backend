@@ -49,4 +49,10 @@ export class ExamSingleQuestionsService {
     const examSingleQuestion = await this.findOne(id);
     await this.examSingleQuestionRepository.remove(examSingleQuestion);
   }
+
+  async countByExamId(examId: number): Promise<number> {
+    return this.examSingleQuestionRepository.count({
+      where: { examId },
+    });
+  }
 }

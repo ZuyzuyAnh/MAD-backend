@@ -4,44 +4,26 @@ export default class AppResponse<T> {
   @ApiProperty({ description: 'Dữ liệu trả về' })
   data: T;
 
-  @ApiProperty({ description: 'Mã trạng thái HTTP', default: 200 })
-  statusCode: number;
-
   @ApiProperty({ description: 'Thông báo kết quả', default: 'Success' })
   message: string;
 
-  @ApiProperty({ description: 'Trạng thái thành công', default: true })
-  success: boolean;
-
-  constructor(
-    data: T,
-    statusCode: number = 200,
-    message: string = 'Success',
-    success: boolean = true,
-  ) {
-    this.data = data;
-    this.statusCode = statusCode;
+  constructor(message: string = 'Success', data: T) {
     this.message = message;
-    this.success = success;
+    this.data = data;
   }
 
-  static success(message?: string, statusCode?: number): AppResponse<null> {
-    return new AppResponse<null>(null, statusCode || 200, message || 'Success');
+  static success(message?: string): AppResponse<null> {
+    return new AppResponse<null>(message, null);
   }
 
   static successWithData<T>(params: {
     data: T;
     message?: string;
-    statusCode?: number;
   }): AppResponse<T> {
-    return new AppResponse<T>(
-      params.data,
-      params.statusCode || 200,
-      params.message || 'Success',
-    );
+    return new AppResponse<T>(params.message, params.data);
   }
 
-  static error(message: string, statusCode: number = 400): AppResponse<null> {
-    return new AppResponse<null>(null, statusCode, message, false);
+  static error(message: string): AppResponse<null> {
+    return new AppResponse<null>(message, null);
   }
 }

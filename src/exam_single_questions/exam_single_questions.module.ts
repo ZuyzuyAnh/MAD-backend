@@ -8,5 +8,6 @@ import { ExamSingleQuestion } from './entities/exam_single_question.entity';
   imports: [TypeOrmModule.forFeature([ExamSingleQuestion])],
   controllers: [ExamSingleQuestionsController],
   providers: [ExamSingleQuestionsService],
+  exports: [ExamSingleQuestionsService],
 })
 export class ExamSingleQuestionsModule {}

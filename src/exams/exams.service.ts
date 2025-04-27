@@ -9,6 +9,8 @@ import { PaginateDto } from 'src/common/dto/paginate.dto';
 import { ProgressService } from 'src/progress/progress.service';
 import { ExamResultsService } from 'src/exam_results/exam_results.service';
 import { VocabTopicsService } from 'src/vocab_topics/vocab_topics.service';
+import { ExamSectionsService } from 'src/exam_sections/exam_sections.service';
+import { ExamSingleQuestionsService } from 'src/exam_single_questions/exam_single_questions.service';
 
 @Injectable()
 export class ExamsService {
@@ -19,6 +21,8 @@ export class ExamsService {
     private readonly progressService: ProgressService,
     private readonly examResultService: ExamResultsService,
     private readonly vocabTopicService: VocabTopicsService,
+    private readonly examSectionService: ExamSectionsService,
+    private readonly examSingleQuestionService: ExamSingleQuestionsService,
   ) {}
 
   async create(createExamDto: CreateExamDto): Promise<Exam> {
@@ -47,10 +51,27 @@ export class ExamsService {
       .take(limit)
       .getMany();
 
+    const examWithQuestionCount = await Promise.all(
+      exams.map(async (exam) => {
+        console.log(exam.id);
+
+        const singleQuestionCount =
+          await this.examSingleQuestionService.countByExamId(exam.id);
+
+        const multipleChoiceQuestionCount =
+          await this.examSectionService.countSectionItemsByExamId(exam.id);
+
+        return {
+          ...exam,
+          numberOfQuestions: singleQuestionCount + multipleChoiceQuestionCount,
+        };
+      }),
+    );
+
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: exams,
+      data: examWithQuestionCount,
       meta: {
         total,
         page,

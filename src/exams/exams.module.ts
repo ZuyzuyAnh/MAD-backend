@@ -7,6 +7,8 @@ import { LanguagesModule } from 'src/languages/languages.module';
 import { ProgressModule } from 'src/progress/progress.module';
 import { ExamResultsModule } from 'src/exam_results/exam_results.module';
 import { VocabTopicsModule } from 'src/vocab_topics/vocab_topics.module';
+import { ExamSectionsModule } from 'src/exam_sections/exam_sections.module';
+import { ExamSingleQuestionsModule } from 'src/exam_single_questions/exam_single_questions.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { VocabTopicsModule } from 'src/vocab_topics/vocab_topics.module';
     ProgressModule,
     ExamResultsModule,
     VocabTopicsModule,
+    ExamSectionsModule,
+    ExamSingleQuestionsModule,
   ],
   controllers: [ExamsController],
   providers: [ExamsService],

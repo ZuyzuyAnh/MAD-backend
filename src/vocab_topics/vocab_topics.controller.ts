@@ -233,7 +233,6 @@ export class VocabTopicsController {
     } catch (error) {
       return AppResponse.error(
         error.message || 'Không tìm thấy chủ đề từ vựng đang học',
-        error.status || 404,
       );
     }
   }

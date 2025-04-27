@@ -302,12 +302,16 @@ export class ExamsController {
     description: 'Chưa xác thực',
   })
   @UseGuards(JwtAuthGuard)
-  findAll(
+  async findAll(
     @Query() paginateDto: PaginateDto,
     @Query('type') type: ExamType,
     @GetUser('sub') userId: number,
   ) {
-    return this.examsService.findAll(paginateDto, userId, type);
+    const data = await this.examsService.findAll(paginateDto, userId, type);
+
+    return AppResponse.successWithData({
+      data,
+    });
   }
 
   @Get(':id')

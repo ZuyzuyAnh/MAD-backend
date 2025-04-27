@@ -8,5 +8,6 @@ import { ExamSectionItem } from './entities/exam_section_item.entity';
   imports: [TypeOrmModule.forFeature([ExamSectionItem])],
   controllers: [ExamSectionItemsController],
   providers: [ExamSectionItemsService],
+  exports: [ExamSectionItemsService],
 })
 export class ExamSectionItemsModule {}

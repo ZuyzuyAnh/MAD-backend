@@ -4,12 +4,14 @@ import { Repository } from 'typeorm';
 import { CreateExamSectionDto } from './dto/create-exam_section.dto';
 import { UpdateExamSectionDto } from './dto/update-exam_section.dto';
 import { ExamSection } from './entities/exam_section.entity';
+import { ExamSectionItemsService } from 'src/exam_section_items/exam_section_items.service';
 
 @Injectable()
 export class ExamSectionsService {
   constructor(
     @InjectRepository(ExamSection)
     private readonly examSectionRepository: Repository<ExamSection>,
+    private readonly examSectionItemService: ExamSectionItemsService,
   ) {}
 
   async create(
@@ -46,5 +48,19 @@ export class ExamSectionsService {
   async remove(id: number): Promise<void> {
     const examSection = await this.findOne(id);
     await this.examSectionRepository.remove(examSection);
+  }
+
+  async countSectionItemsByExamId(examId: number): Promise<number> {
+    const sections = await this.examSectionRepository.find({
+      where: { examId },
+    });
+
+    const sectionItemCounts = await Promise.all(
+      sections.map((section) =>
+        this.examSectionItemService.countBySectionId(section.id),
+      ),
+    );
+
+    return sectionItemCounts.reduce((total, count) => total + count, 0);
   }
 }

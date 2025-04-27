@@ -199,6 +199,6 @@ export class AuthController {
   async register(@Body() createUserDto: CreateUserDto) {
     await this.authService.register(createUserDto);
 
-    return AppResponse.success(undefined, HttpStatus.CREATED);
+    return AppResponse.success(undefined);
   }
 }
