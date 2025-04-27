@@ -150,7 +150,6 @@ export class VocabTopicsController {
     } catch (error) {
       return AppResponse.error(
         error.message || 'Lỗi khi lấy danh sách chủ đề từ vựng',
-        error.status || 400,
       );
     }
   }

@@ -71,6 +71,7 @@ export class PostsController {
       createPostDto,
       userId,
       files?.files,
+      
     );
 
     return AppResponse.successWithData({
