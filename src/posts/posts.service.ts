@@ -36,7 +36,13 @@ export class PostsService {
       imageUrls,
     });
 
-    return this.postRepository.save(post);
+    const savedPost = await this.postRepository.save(post);
+  
+  // Lấy post với thông tin đầy đủ của user
+  return this.postRepository.findOne({
+    where: { id: savedPost.id },
+    relations: ['user', 'language'],
+  });
   }
 
   async findAll(paginateDto: PaginateDto, languageId?: number) {
