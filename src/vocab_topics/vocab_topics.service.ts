@@ -68,6 +68,9 @@ export class VocabTopicsService {
         'vocab_topic.topic',
         'vocab_topic.level',
         'vocab_topic.imageUrl',
+        'vocab_topic.createdAt',
+        'vocab_topic.updatedAt',
+        'language.id',
       ])
       .innerJoin('vocab_topic.language', 'language')
       .leftJoin('vocab_topic.vocabTopicProgress', 'vocab_topic_progress')

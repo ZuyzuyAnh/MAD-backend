@@ -120,40 +120,40 @@ export class VocabTopicsController {
   /**
    * Lấy danh sách chủ đề từ vựng
    */
-  // @Get()
-  // async findAll(
-  //   @Query() paginateDto: PaginateDto,
-  //   @Query('topic') topic?: string,
-  //   @Query('languageId') languageId?: number,
-  //   @Query('level') level?: VocabLevel,
-  //   @Query('isRandom') isRandom?: boolean,
-  // ) {
-  //   try {
-  //     const parsedLanguageId = languageId ? Number(languageId) : undefined;
+  @Get()
+  async findAll(
+    @Query() paginateDto: PaginateDto,
+    @Query('topic') topic?: string,
+    @Query('languageId') languageId?: number,
+    @Query('level') level?: VocabLevel,
+    @Query('isRandom') isRandom?: boolean,
+  ) {
+    try {
+      const parsedLanguageId = languageId ? Number(languageId) : undefined;
 
-  //     //     const parsedIsRandom =
-  //     //       typeof isRandom === 'string' ? isRandom === 'true' : isRandom === true;
+          const parsedIsRandom =
+            typeof isRandom === 'string' ? isRandom === 'true' : isRandom === true;
 
-  //     //     const result = await this.vocabTopicsService.findAll(
-  //     //       paginateDto,
-  //     //       userId,
-  //     //       topic,
-  //     //       parsedLanguageId,
-  //     //       level,
-  //     //       parsedIsRandom,
-  //     //     );
+          const result = await this.vocabTopicsService.findAll(
+            paginateDto,
+            1,
+            topic,
+            parsedLanguageId,
+            level,
+            parsedIsRandom,
+          );
 
-  //     return AppResponse.successWithData({
-  //       data: result,
-  //       message: 'Lấy danh sách chủ đề từ vựng thành công',
-  //     });
-  //   } catch (error) {
-  //     return AppResponse.error(
-  //       error.message || 'Lỗi khi lấy danh sách chủ đề từ vựng',
-  //       error.status || 400,
-  //     );
-  //   }
-  // }
+      return AppResponse.successWithData({
+        data: result,
+        message: 'Lấy danh sách chủ đề từ vựng thành công',
+      });
+    } catch (error) {
+      return AppResponse.error(
+        error.message || 'Lỗi khi lấy danh sách chủ đề từ vựng',
+        error.status || 400,
+      );
+    }
+  }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {

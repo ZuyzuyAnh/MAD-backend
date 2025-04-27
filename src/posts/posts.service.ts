@@ -45,6 +45,7 @@ export class PostsService {
     const query = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.comments', 'comments')
+      .leftJoinAndSelect('comments.user', 'commentUser') 
       .leftJoinAndSelect('post.likes', 'likes')
       .leftJoinAndSelect('post.user', 'user');
 
