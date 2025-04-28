@@ -40,6 +40,11 @@ export class CreateExerciseDto {
   @IsOptional()
   difficulty?: ExerciseDifficulty = ExerciseDifficulty.BEGINNER;
 
+  @IsOptional()
+  theory?: string;
+
+  audioUrl?: string;
+
   @ApiProperty({
     description: 'ID của ngôn ngữ',
     example: 1,

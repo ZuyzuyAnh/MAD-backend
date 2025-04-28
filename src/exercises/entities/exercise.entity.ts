@@ -50,6 +50,12 @@ export class Exercise {
   @Column({ type: 'text', nullable: true })
   description: string;
 
+  @Column({ type: 'text', nullable: true })
+  theory: string;
+
+  @Column({ name: 'audio_url', type: 'text', nullable: true })
+  audioUrl: string;
+
   @ApiProperty({
     description: 'Loại bài tập',
     enum: ExerciseType,

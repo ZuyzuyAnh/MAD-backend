@@ -9,6 +9,7 @@ import { PaginateDto } from '../common/dto/paginate.dto';
 import { ExerciseResultsService } from 'src/exercise_results/exercise-results.service';
 import { LanguagesService } from 'src/languages/languages.service';
 import { ProgressService } from 'src/progress/progress.service';
+import { UploadFileService } from 'src/aws/uploadfile.s3.service';
 
 @Injectable()
 export class ExercisesService {
@@ -18,9 +19,19 @@ export class ExercisesService {
     private readonly exerciseResultService: ExerciseResultsService,
     private readonly languageService: LanguagesService,
     private readonly progressServicce: ProgressService,
+    private readonly fileUploadService: UploadFileService,
   ) {}
 
-  async create(createExerciseDto: CreateExerciseDto): Promise<Exercise> {
+  async create(
+    createExerciseDto: CreateExerciseDto,
+    file?: Express.Multer.File,
+  ): Promise<Exercise> {
+    if (file) {
+      const fileUrl =
+        await this.fileUploadService.uploadFileToPublicBucket(file);
+      createExerciseDto.audioUrl = fileUrl;
+    }
+
     const exercise = this.exerciseRepository.create(createExerciseDto);
 
     return this.exerciseRepository.save(exercise);
@@ -94,8 +105,15 @@ export class ExercisesService {
   async update(
     id: number,
     updateExerciseDto: UpdateExerciseDto,
+    file?: Express.Multer.File,
   ): Promise<Exercise> {
     const exercise = await this.findOne(id);
+
+    if (file) {
+      const fileUrl =
+        await this.fileUploadService.uploadFileToPublicBucket(file);
+      updateExerciseDto.audioUrl = fileUrl;
+    }
 
     Object.assign(exercise, updateExerciseDto);
 
