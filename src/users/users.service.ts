@@ -102,7 +102,7 @@ export class UsersService {
     }
 
     if (file) {
-      updateUserDto.profile_image_url =
+      updateUserDto.profileImageUrl =
         await this.fileService.uploadFileToPublicBucket(file);
     }
 

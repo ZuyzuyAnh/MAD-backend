@@ -79,7 +79,7 @@ export class PostsService {
   findOne(id: number) {
     return this.postRepository.findOne({
       where: { id },
-      relations: ['user', 'comments', 'likes'],
+      relations: ['user', 'comments', 'likes','comments.user'],
     });
   }
 
