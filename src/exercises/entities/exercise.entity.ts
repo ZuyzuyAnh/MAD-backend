@@ -53,8 +53,8 @@ export class Exercise {
   @Column({ type: 'text', nullable: true })
   theory: string;
 
-  @Column({ name: 'audio_url', type: 'text', nullable: true })
-  audioUrl: string;
+  @Column({ name: 'audio_text', type: 'text', nullable: true })
+  audioText: string;
 
   @ApiProperty({
     description: 'Loại bài tập',

@@ -43,7 +43,7 @@ export class CreateExerciseDto {
   @IsOptional()
   theory?: string;
 
-  audioUrl?: string;
+  audioText?: string;
 
   @ApiProperty({
     description: 'ID của ngôn ngữ',

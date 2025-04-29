@@ -22,16 +22,7 @@ export class ExercisesService {
     private readonly fileUploadService: UploadFileService,
   ) {}
 
-  async create(
-    createExerciseDto: CreateExerciseDto,
-    file?: Express.Multer.File,
-  ): Promise<Exercise> {
-    if (file) {
-      const fileUrl =
-        await this.fileUploadService.uploadFileToPublicBucket(file);
-      createExerciseDto.audioUrl = fileUrl;
-    }
-
+  async create(createExerciseDto: CreateExerciseDto): Promise<Exercise> {
     const exercise = this.exerciseRepository.create(createExerciseDto);
 
     return this.exerciseRepository.save(exercise);
@@ -105,15 +96,8 @@ export class ExercisesService {
   async update(
     id: number,
     updateExerciseDto: UpdateExerciseDto,
-    file?: Express.Multer.File,
   ): Promise<Exercise> {
     const exercise = await this.findOne(id);
-
-    if (file) {
-      const fileUrl =
-        await this.fileUploadService.uploadFileToPublicBucket(file);
-      updateExerciseDto.audioUrl = fileUrl;
-    }
 
     Object.assign(exercise, updateExerciseDto);
 
