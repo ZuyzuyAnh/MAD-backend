@@ -28,6 +28,7 @@ import { PostCommentsModule } from './post_comments/post_comments.module';
 import { VocabGameResultsModule } from './vocab_game_results/vocab_game_results.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { SpeakingDataModule } from './speaking_data/speaking_data.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     PostCommentsModule,
     VocabGameResultsModule,
     AchievementsModule,
+    SpeakingDataModule,
   ],
   controllers: [],
   providers: [],

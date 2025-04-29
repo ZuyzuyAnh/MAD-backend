@@ -14,6 +14,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Language } from 'src/languages/entities/language.entity';
 import { Question } from 'src/questions/entities/question.entity';
 import { ExerciseResult } from 'src/exercise_results/entities/exercise-result.entity';
+import { SpeakingDatum } from 'src/speaking_data/entities/speaking_datum.entity';
 
 export enum ExerciseType {
   GRAMMAR = 'grammar',
@@ -96,6 +97,9 @@ export class Exercise {
     name: 'exercise_questions',
   })
   questions: Question[];
+
+  @OneToMany(() => SpeakingDatum, (speakingDatum) => speakingDatum.exercise)
+  speakingData: SpeakingDatum[];
 
   @ApiProperty({
     description: 'Thời gian tạo bài tập',
