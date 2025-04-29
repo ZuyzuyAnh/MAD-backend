@@ -9,13 +9,22 @@ import {
   Query,
   ParseIntPipe,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import AppResponse from '../common/dto/api-response.dto';
 import { PaginateDto } from '../common/dto/paginate.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { ExerciseDifficulty, ExerciseType } from './entities/exercise.entity';
 import { AdminOnly } from 'src/auth/decorators/admin-only.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -46,6 +55,8 @@ export class ExercisesController {
 
   @Post()
   @AdminOnly()
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Tạo bài tập mới' })
   @ApiResponse({
     status: 201,
@@ -69,8 +80,14 @@ export class ExercisesController {
       },
     },
   })
-  async create(@Body() createExerciseDto: CreateExerciseDto) {
-    const exercise = await this.exercisesService.create(createExerciseDto);
+  async create(
+    @Body() createExerciseDto: CreateExerciseDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const exercise = await this.exercisesService.create(
+      createExerciseDto,
+      file,
+    );
     return AppResponse.successWithData({
       data: exercise,
       message: 'Tạo bài tập thành công',

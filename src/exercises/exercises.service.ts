@@ -189,6 +189,9 @@ export class ExercisesService {
   }
 
   async getExerciseOverView(userId: number) {
+    const progress =
+      await this.progressServicce.findCurrentActiveProgress(userId);
+
     const numberOfGrammar = await this.countNumberOfExercises(
       ExerciseType.GRAMMAR,
     );
@@ -201,19 +204,19 @@ export class ExercisesService {
 
     const completedGrammar =
       await this.exerciseResultService.getNumberOfExerciseCompleted(
-        userId,
+        progress.id,
         ExerciseType.GRAMMAR,
       );
 
     const completedListening =
       await this.exerciseResultService.getNumberOfExerciseCompleted(
-        userId,
+        progress.id,
         ExerciseType.LISTENING,
       );
 
     const completedSpeaking =
       await this.exerciseResultService.getNumberOfExerciseCompleted(
-        userId,
+        progress.id,
         ExerciseType.SPEAKING,
       );
 
