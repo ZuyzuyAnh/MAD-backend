@@ -3,7 +3,7 @@ import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsNumber,
-  IsObject,
+  IsArray,
   IsString,
   Min,
   ValidateNested,
@@ -28,14 +28,24 @@ class SpeakingDataContent {
 }
 
 export class CreateSpeakingDatumDto {
-  @IsObject()
-  @ValidateNested()
+  @IsArray()
+  @ValidateNested({ each: true })
   @Type(() => SpeakingDataContent)
   @ApiProperty({
     description: 'Dữ liệu câu luyện nói',
-    type: SpeakingDataContent,
+    type: [SpeakingDataContent],
+    example: [
+      {
+        sentence: 'How are you today?',
+        translation: 'Bạn khỏe không hôm nay?',
+      },
+      {
+        sentence: 'What is your name?',
+        translation: 'Tên bạn là gì?',
+      },
+    ],
   })
-  data: SpeakingDataContent;
+  data: SpeakingDataContent[];
 
   @IsNumber()
   @Min(1)

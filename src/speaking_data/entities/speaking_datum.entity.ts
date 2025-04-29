@@ -22,7 +22,7 @@ export class SpeakingDatum {
   data: {
     sentence: string;
     translation: string;
-  };
+  }[];
 
   @Column({ name: 'exercise_id' })
   @ApiProperty({
