@@ -23,10 +23,9 @@ export enum ExerciseType {
 
 export enum ExerciseDifficulty {
   BEGINNER = 'beginner',
-  NOVICE = 'novice',
+  NOVICE = 'basic',
   INTERMEDIATE = 'intermediate',
   ADVANCED = 'advanced',
-  EXPERT = 'expert',
 }
 
 @Entity('exercises')
