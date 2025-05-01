@@ -21,6 +21,6 @@ export class CreateExerciseResultDto {
   @IsNumber()
   @Min(0)
   @Max(100)
-  @IsOptional()
-  score?: number = 0;
+  @IsNotEmpty()
+  score: number = 0;
 }

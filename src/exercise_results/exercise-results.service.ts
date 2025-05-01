@@ -32,7 +32,10 @@ export class ExerciseResultsService {
     );
 
     if (existingResult) {
-      existingResult.score = createExerciseResultDto.score || 0;
+      existingResult.score = Math.max(
+        existingResult.score,
+        createExerciseResultDto.score,
+      );
       return this.exerciseResultRepository.save(existingResult);
     }
 
