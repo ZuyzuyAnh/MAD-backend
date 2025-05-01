@@ -43,6 +43,7 @@ export class CreateExerciseDto {
   @IsOptional()
   theory?: string;
 
+  @IsOptional()
   audioText?: string;
 
   @ApiProperty({

@@ -6,6 +6,7 @@ import { UpdateQuestionDto } from './dto/update-question.dto';
 import { Question } from './entities/question.entity';
 import { PaginateDto } from '../common/dto/paginate.dto';
 import EntityNotFoundException from '../exception/notfound.exception';
+import { ExercisesService } from 'src/exercises/exercises.service';
 
 @Injectable()
 export class QuestionsService {
