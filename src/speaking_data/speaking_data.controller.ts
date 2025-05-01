@@ -20,10 +20,12 @@ import {
   ApiParam,
   ApiBody,
   ApiBearerAuth,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import AppResponse from 'src/common/dto/api-response.dto';
 import { AdminOnly } from 'src/auth/decorators/admin-only.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { SpeakingDatum } from './entities/speaking_datum.entity';
 
 @ApiTags('Dữ liệu luyện nói')
 @Controller('speaking-data')
