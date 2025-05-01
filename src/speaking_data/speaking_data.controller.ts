@@ -37,41 +37,10 @@ export class SpeakingDataController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Tạo mới dữ liệu luyện nói' })
-  @ApiBody({
-    type: CreateSpeakingDatumDto,
-    description: 'Dữ liệu luyện nói mới',
-    examples: {
-      example1: {
-        summary: 'Mẫu dữ liệu luyện nói',
-        value: {
-          data: [
-            {
-              sentence: 'How are you today?',
-              translation: 'Bạn khỏe không hôm nay?',
-            },
-            {
-              sentence: 'What is your name?',
-              translation: 'Tên bạn là gì?',
-            },
-          ],
-          exerciseId: 1,
-        },
-      },
-    },
-  })
+  @ApiBody({ type: CreateSpeakingDatumDto })
   @ApiResponse({
     status: 201,
     description: 'Tạo dữ liệu luyện nói thành công',
-    schema: {
-      properties: {
-        statusCode: { type: 'number', example: 200 },
-        message: {
-          type: 'string',
-          example: 'Tạo dữ liệu luyện nói thành công',
-        },
-        data: { $ref: getSchemaPath(SpeakingDatum) },
-      },
-    },
   })
   async create(@Body() createSpeakingDatumDto: CreateSpeakingDatumDto) {
     const speakingDatum = await this.speakingDataService.create(
