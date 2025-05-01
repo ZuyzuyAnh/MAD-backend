@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { ExerciseResultsService } from './exercise-results.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -31,7 +32,7 @@ export class ExerciseResultsController {
     private readonly exerciseResultsService: ExerciseResultsService,
   ) {}
 
-  @Post()
+  @Put()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
@@ -52,10 +53,13 @@ export class ExerciseResultsController {
   @ApiBadRequestResponse({
     description: 'Dữ liệu không hợp lệ',
   })
-  create(
+  createOrUpdate(
     @Body() createExerciseResultDto: CreateExerciseResultDto,
     @GetUser('sub') userId: number,
   ) {
-    return this.exerciseResultsService.create(userId, createExerciseResultDto);
+    return this.exerciseResultsService.createOrUpdate(
+      userId,
+      createExerciseResultDto,
+    );
   }
 }

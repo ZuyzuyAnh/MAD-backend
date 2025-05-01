@@ -19,12 +19,22 @@ export class ExerciseResultsService {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  async create(
+  async createOrUpdate(
     userId: number,
     createExerciseResultDto: CreateExerciseResultDto,
   ): Promise<ExerciseResult> {
     const progress =
       await this.progressService.findCurrentActiveProgress(userId);
+
+    const existingResult = await this.findByUserAndExercise(
+      progress.id,
+      createExerciseResultDto.exerciseId,
+    );
+
+    if (existingResult) {
+      existingResult.score = createExerciseResultDto.score || 0;
+      return this.exerciseResultRepository.save(existingResult);
+    }
 
     const exerciseResult = this.exerciseResultRepository.create({
       progressId: progress.id,
@@ -119,14 +129,12 @@ export class ExerciseResultsService {
   }
 
   async findByUserAndExercise(
-    userId: number,
+    progressId: number,
     exerciseId: number,
   ): Promise<ExerciseResult | null> {
     const result = await this.exerciseResultRepository
       .createQueryBuilder('exerciseResult')
-      .leftJoinAndSelect('exerciseResult.progress', 'progress')
-      .leftJoinAndSelect('exerciseResult.exercise', 'exercise')
-      .where('progress.user.id = :userId', { userId })
+      .where('exerciseResult.progressId = :progressId', { progressId })
       .andWhere('exerciseResult.exerciseId = :exerciseId', { exerciseId })
       .orderBy('exerciseResult.createdAt', 'DESC')
       .getOne();
