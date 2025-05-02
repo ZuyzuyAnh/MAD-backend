@@ -29,6 +29,7 @@ import { VocabGameResultsModule } from './vocab_game_results/vocab_game_results.
 import { AchievementsModule } from './achievements/achievements.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SpeakingDataModule } from './speaking_data/speaking_data.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -78,6 +79,7 @@ import { SpeakingDataModule } from './speaking_data/speaking_data.module';
     VocabGameResultsModule,
     AchievementsModule,
     SpeakingDataModule,
+    NotificationsModule,
   ],
   controllers: [],
   providers: [],
