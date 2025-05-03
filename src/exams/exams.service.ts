@@ -40,7 +40,7 @@ export class ExamsService {
       .createQueryBuilder('exam')
       .select(['exam.id', 'exam.title', 'exam.type', 'examResults.score'])
       .innerJoin('exam.language', 'language')
-      .leftJoinAndSelect('exam.examResults', 'examResults')
+      .leftJoin('exam.examResults', 'examResults')
       .where('exam.languageId = :languageId', { languageId })
       .andWhere('exam.type = :type', { type });
 
