@@ -101,4 +101,7 @@ export class Question {
 
   @Column({ name: 'media_url', nullable: true })
   mediaUrl?: string;
+
+  @Column({ name: 'explanation', nullable: true, type: 'text' })
+  explanation?: string;
 }

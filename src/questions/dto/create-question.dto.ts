@@ -31,4 +31,7 @@ export class CreateQuestionDto {
 
   @IsOptional()
   mediaUrl?: string;
+
+  @IsOptional()
+  explanation?: string;
 }
