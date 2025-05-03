@@ -9,6 +9,7 @@ import { ProgressService } from 'src/progress/progress.service';
 import { VocabTopicProgressService } from 'src/vocab_topic_progress/vocab_topic_progress.service';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { UpdateAchievementDto } from './dto/update-achievement.dto';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class AchievementsService {
@@ -20,6 +21,7 @@ export class AchievementsService {
     private exerciseResultService: ExerciseResultsService,
     private progressService: ProgressService,
     private vocabTopicProgressService: VocabTopicProgressService,
+    private notificationsService: NotificationsService,
   ) {}
 
   // CRUD Operations
@@ -131,7 +133,20 @@ export class AchievementsService {
         userId,
         achievementId,
       });
+       // Lấy thông tin thành tựu
+    const achievement = await this.achievementRepository.findOne({
+      where: { id: achievementId },
+    });
 
+    // Gửi thông báo cho người dùng
+    if (achievement) {
+      await this.notificationsService.createAchievementNotification(
+        userId,
+        achievement.title
+      );
+    } else {
+      console.error(`Achievement with ID ${achievementId} not found.`);
+    }
       console.log(`User ${userId} unlocked achievement ${achievementId}`);
     }
   }
