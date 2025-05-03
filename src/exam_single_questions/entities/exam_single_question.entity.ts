@@ -12,7 +12,6 @@ import {
 
 @Entity('exam_single_questions')
 @Unique(['examId', 'questionId'])
-@Unique(['examId', 'sequence'])
 export class ExamSingleQuestion {
   @PrimaryGeneratedColumn()
   id: number;
@@ -22,9 +21,6 @@ export class ExamSingleQuestion {
 
   @Column({ name: 'question_id' })
   questionId: number;
-
-  @Column({ name: 'sequence' })
-  sequence: number;
 
   @ManyToOne(() => Exam)
   @JoinColumn({ name: 'exam_id' })

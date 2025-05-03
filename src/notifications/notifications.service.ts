@@ -16,74 +16,74 @@ export class NotificationsService {
     private userRepository: Repository<User>,
   ) {}
 
-   // Chức năng tạo thông báo cho một hoặc nhiều người dùng
-   async create(
+  async create(
     createNotificationDto: CreateNotificationDto,
     userId?: number,
   ): Promise<Notification | Notification[]> {
-    // Nếu có userId, chỉ tạo thông báo cho người dùng đó
     if (userId) {
       const notification = this.notificationRepository.create({
         ...createNotificationDto,
         userId,
       });
       return this.notificationRepository.save(notification);
-    } 
-    // Nếu không có userId, tạo thông báo cho tất cả người dùng
-    else {
+    } else {
       const allUsers = await this.userRepository.find();
-      const notifications = allUsers.map(user => 
+      const notifications = allUsers.map((user) =>
         this.notificationRepository.create({
           ...createNotificationDto,
           userId: user.id,
-        })
+        }),
       );
       return this.notificationRepository.save(notifications);
     }
   }
 
-  // Phương thức tạo thông báo hệ thống cho một người dùng cụ thể hoặc tất cả người dùng
   async createSystemNotification(
     title: string,
     content: string,
     data?: Record<string, any>,
     userId?: number,
   ): Promise<Notification | Notification[]> {
-    return this.create({
-      title,
-      content,
-      type: NotificationType.SYSTEM,
-      data,
-    }, userId);
+    return this.create(
+      {
+        title,
+        content,
+        type: NotificationType.SYSTEM,
+        data,
+      },
+      userId,
+    );
   }
-
- 
-
-  
 
   async createCommentNotification(
     userId: number,
     commenterName: string,
     postId: number,
   ): Promise<Notification> {
-    return this.create({
-      title: 'Bình luận mới',
-      content: `${commenterName} đã bình luận bài viết của bạn`,
-      type: NotificationType.COMMENT,
-      data: { postId },
-    }, userId) as Promise<Notification>;
+    return this.create(
+      {
+        title: 'Bình luận mới',
+        content: `${commenterName} đã bình luận bài viết của bạn`,
+        type: NotificationType.COMMENT,
+        data: { postId },
+      },
+      userId,
+    ) as Promise<Notification>;
   }
 
   async createAchievementNotification(
     userId: number,
     achievementTitle: string,
   ): Promise<Notification> {
-    return this.create({
-      title: 'Thành tựu mới',
-      content: `Bạn đã đạt được thành tựu: ${achievementTitle}`,
-      type: NotificationType.ACHIEVEMENT,
-      data: { achievementTitle },
-    }, userId) as Promise<Notification>;
+    return this.create(
+      {
+        title: 'Thành tựu mới',
+        content: `Bạn đã đạt được thành tựu: ${achievementTitle}`,
+        type: NotificationType.ACHIEVEMENT,
+        data: { achievementTitle },
+      },
+      userId,
+    ) as Promise<Notification>;
   }
 
   async findAll(userId: number, paginateDto: PaginateDto) {
@@ -146,7 +146,10 @@ export class NotificationsService {
     });
   }
 
-  async getNewNotifications(userId: number, lastCheckTime: Date): Promise<Notification[]> {
+  async getNewNotifications(
+    userId: number,
+    lastCheckTime: Date,
+  ): Promise<Notification[]> {
     return this.notificationRepository.find({
       where: {
         userId,

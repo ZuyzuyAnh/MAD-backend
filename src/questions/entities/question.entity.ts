@@ -98,4 +98,7 @@ export class Question {
   })
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @Column({ name: 'media_url', nullable: true })
+  mediaUrl?: string;
 }

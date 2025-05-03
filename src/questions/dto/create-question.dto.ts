@@ -28,4 +28,7 @@ export class CreateQuestionDto {
   @IsNumber()
   @IsNotEmpty()
   languageId: number;
+
+  @IsOptional()
+  mediaUrl?: string;
 }

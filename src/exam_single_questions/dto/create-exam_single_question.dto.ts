@@ -17,12 +17,4 @@ export class CreateExamSingleQuestionDto {
   @IsInt()
   @IsPositive()
   questionId: number;
-
-  @ApiProperty({
-    description: 'The sequence order of this question within the exam',
-    example: 5,
-  })
-  @IsInt()
-  @IsPositive()
-  sequence: number;
 }

@@ -19,9 +19,6 @@ export class ExamSectionItem {
   @Column({ name: 'question_id' })
   questionId: number;
 
-  @Column({ name: 'sequence' })
-  sequence: number;
-
   @ManyToOne(() => ExamSection)
   @JoinColumn({ name: 'exam_section_id' })
   examSection: ExamSection;

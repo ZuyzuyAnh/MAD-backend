@@ -17,12 +17,4 @@ export class CreateExamSectionItemDto {
   @IsInt()
   @IsPositive()
   questionId: number;
-
-  @ApiProperty({
-    description: 'The sequence order of this item within the section',
-    example: 3,
-  })
-  @IsInt()
-  @IsPositive()
-  sequence: number;
 }

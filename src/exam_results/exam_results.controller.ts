@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { ExamResultsService } from './exam_results.service';
 import { CreateExamResultDto } from './dto/create-exam_result.dto';
@@ -34,7 +35,7 @@ import { ExamResult } from './entities/exam_result.entity';
 export class ExamResultsController {
   constructor(private readonly examResultsService: ExamResultsService) {}
 
-  @Post()
+  @Put()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Create a new exam result',
@@ -56,7 +57,7 @@ export class ExamResultsController {
     @Body() createExamResultDto: CreateExamResultDto,
     @GetUser('sub') userId: number,
   ) {
-    return this.examResultsService.create(userId, createExamResultDto);
+    return this.examResultsService.createOrUpdate(userId, createExamResultDto);
   }
 
   @Get()

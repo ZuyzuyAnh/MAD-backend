@@ -14,18 +14,36 @@ export class ExamResultsService {
     private readonly progressService: ProgressService,
   ) {}
 
-  async create(
+  async createOrUpdate(
     userId: number,
     createExamResultDto: CreateExamResultDto,
   ): Promise<ExamResult> {
     const progress =
       await this.progressService.findCurrentActiveProgress(userId);
+    const progressId = progress.id;
 
-    const examResult = this.examResultRepository.create({
-      ...createExamResultDto,
-      progressId: progress.id,
+    const existingResult = await this.examResultRepository.findOne({
+      where: {
+        examId: createExamResultDto.examId,
+        progressId: progressId,
+      },
     });
-    return this.examResultRepository.save(examResult);
+
+    if (existingResult) {
+      Object.assign(existingResult, {
+        score: Math.max(existingResult.score, createExamResultDto.score),
+      });
+
+      return this.examResultRepository.save(existingResult);
+    } else {
+      // Create new result
+      const newExamResult = this.examResultRepository.create({
+        ...createExamResultDto,
+        progressId: progressId,
+      });
+
+      return this.examResultRepository.save(newExamResult);
+    }
   }
 
   async findAll(): Promise<ExamResult[]> {

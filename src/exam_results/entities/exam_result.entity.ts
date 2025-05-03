@@ -8,10 +8,12 @@ import {
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('exam_results')
+@Unique(['examId', 'progressId'])
 export class ExamResult {
   @PrimaryGeneratedColumn()
   id: number;
