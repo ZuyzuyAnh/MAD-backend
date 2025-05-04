@@ -10,12 +10,15 @@ import { VocabTopicProgress } from 'src/vocab_topic_progress/entities/vocab_topi
 import EntityNotFoundException from '../exception/notfound.exception';
 import { Language } from 'src/languages/entities/language.entity';
 import { LanguagesService } from 'src/languages/languages.service';
+import { VocabRepetition } from 'src/vocab_repetitions/entities/vocab_repetition.entity';
 
 @Injectable()
 export class VocabsService {
   constructor(
     @InjectRepository(Vocab)
     private vocabRepository: Repository<Vocab>,
+    @InjectRepository(VocabRepetition)
+    private vocabRepetitionRepository: Repository<VocabRepetition>,
     private languageService: LanguagesService,
   ) {}
 
@@ -105,6 +108,15 @@ export class VocabsService {
   async remove(id: number): Promise<void> {
     const vocab = await this.findOne(id);
 
+    // Xóa tất cả các bản ghi vocab_repetition liên quan
+    await this.vocabRepetitionRepository
+      .createQueryBuilder()
+      .delete()
+      .from(VocabRepetition)
+      .where('vocab.id = :vocabId', { vocabId: id })
+      .execute();
+
+    // Sau đó mới xóa từ vựng
     await this.vocabRepository.remove(vocab);
   }
 
