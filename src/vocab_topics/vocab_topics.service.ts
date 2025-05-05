@@ -15,6 +15,7 @@ import { ProgressService } from 'src/progress/progress.service';
 import { VocabTopicProgressService } from 'src/vocab_topic_progress/vocab_topic_progress.service';
 import { VocabsService } from 'src/vocabs/vocabs.service';
 import { VocabGameResultsService } from 'src/vocab_game_results/vocab_game_results.service';
+import { UploadFileService } from '../aws/uploadfile.s3.service';
 
 @Injectable()
 export class VocabTopicsService {
@@ -26,11 +27,22 @@ export class VocabTopicsService {
     private readonly vocabTopicProgressService: VocabTopicProgressService,
     private readonly vocabService: VocabsService,
     private readonly vocabGameResultService: VocabGameResultsService,
+    private readonly uploadFileService: UploadFileService,
   ) {}
 
-  async create(createVocabTopicDto: CreateVocabTopicDto): Promise<VocabTopic> {
+  async create(
+    createVocabTopicDto: CreateVocabTopicDto,
+    image?: Express.Multer.File,
+  ): Promise<VocabTopic> {
+    let imageUrl = createVocabTopicDto.imageUrl;
+
+    if (image) {
+      imageUrl = await this.uploadFileService.uploadFileToPublicBucket(image);
+    }
+
     const vocabTopic = this.vocabTopicRepository.create({
       ...createVocabTopicDto,
+      imageUrl,
       language: {
         id: createVocabTopicDto.languageId,
       },
@@ -59,8 +71,6 @@ export class VocabTopicsService {
     level?: VocabLevel,
     isRandom?: boolean,
   ) {
-    const { page, limit } = paginateDto;
-
     const queryBuilder = this.vocabTopicRepository
       .createQueryBuilder('vocab_topic')
       .select([
@@ -75,11 +85,11 @@ export class VocabTopicsService {
       .innerJoin('vocab_topic.language', 'language')
       .leftJoin('vocab_topic.vocabTopicProgress', 'vocab_topic_progress')
       .loadRelationCountAndMap('vocab_topic.totalVocabs', 'vocab_topic.vocabs');
-
+  
     if (userId) {
       const progress =
         await this.progressService.findCurrentActiveProgress(userId);
-
+  
       queryBuilder.leftJoinAndSelect(
         'vocab_topic.vocabTopicProgress',
         'vtp',
@@ -87,37 +97,32 @@ export class VocabTopicsService {
         { progressId: progress.id },
       );
     }
-
+  
     if (topic) {
       queryBuilder.andWhere('LOWER(vocab_topic.topic) LIKE LOWER(:topic)', {
         topic: `%${topic}%`,
       });
     }
-
+  
     if (languageId) {
       queryBuilder.andWhere('vocab_topic.language.id = :languageId', {
         languageId,
       });
     }
-
+  
     if (level) {
       queryBuilder.andWhere('vocab_topic.level = :level', { level });
     }
-
+  
     if (isRandom) {
       queryBuilder.orderBy('RAND()');
     }
-
-    const total = await queryBuilder.getCount();
-
+  
+    // Lấy tất cả các topic, không phân trang
     const results = await queryBuilder
-      .skip((page - 1) * limit)
-      .take(limit)
       .orderBy('vocab_topic.topic', 'ASC')
       .getMany();
-
-    const totalPages = Math.ceil(total / limit);
-
+  
     const data = results.map((result) => {
       const { vocabTopicProgress, ...rest } = result;
       return {
@@ -125,16 +130,25 @@ export class VocabTopicsService {
         hasProgress: result.vocabTopicProgress.length > 0,
       };
     });
-
+  
+    // Sắp xếp: các topic đã làm (hasProgress = true) lên trên
+    data.sort((a, b) => {
+      if (a.hasProgress === b.hasProgress) {
+        return 0;
+      }
+      return a.hasProgress ? -1 : 1;
+    });
+  
+    // Trả về tất cả data mà không có phân trang
     return {
       data,
       meta: {
-        total,
-        page,
-        limit,
-        totalPages,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
+        total: data.length,
+        page: 1,
+        limit: data.length,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPreviousPage: false,
       },
     };
   }
@@ -158,6 +172,11 @@ export class VocabTopicsService {
     image?: Express.Multer.File,
   ): Promise<VocabTopic> {
     const vocabTopic = await this.findOne(id);
+
+    if (image) {
+      const imageUrl = await this.uploadFileService.uploadFileToPublicBucket(image);
+      vocabTopic.imageUrl = imageUrl;
+    }
 
     Object.assign(vocabTopic, updateVocabTopicDto);
 
@@ -188,12 +207,6 @@ export class VocabTopicsService {
     return this.vocabTopicRepository.remove(vocabTopic);
   }
 
-  /**
-   * Lấy danh sách chủ đề từ vựng mà người dùng đang học
-   * @param userId ID của người dùng
-   * @param paginateDto Thông số phân trang
-   * @returns Danh sách chủ đề từ vựng đang học và thông tin phân trang
-   */
   async findLearningTopics(userId: number, paginateDto: PaginateDto) {
     const { page, limit } = paginateDto;
 

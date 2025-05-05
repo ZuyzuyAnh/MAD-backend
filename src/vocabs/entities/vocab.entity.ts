@@ -44,6 +44,14 @@ export class Vocab {
   vocabTopicId: number;
 
   @ApiProperty({
+    description: 'Phiên âm của từ vựng',
+    example: '/kæt/',
+    required: false,
+  })
+  @Column({ length: 100, nullable: true })
+  transcription: string;
+  
+  @ApiProperty({
     description: 'Ví dụ sử dụng từ vựng',
     example: 'I have a pet cat at home.',
     required: false,

@@ -79,4 +79,8 @@ export class UpdateVocabDto extends PartialType(CreateVocabDto) {
   @IsOptional()
   @IsString()
   imageUrl?: string;
+
+  @IsString()
+  @Length(1, 255)
+  transcription: string;
 }

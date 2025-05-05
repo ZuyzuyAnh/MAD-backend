@@ -28,7 +28,8 @@ export class CreateVocabTopicDto {
     required: false,
   })
   @IsString()
-  imageUrl: string;
+  @IsOptional()
+  imageUrl?: string;
 
   @ApiProperty({
     description: 'Cấp độ của chủ đề từ vựng',
