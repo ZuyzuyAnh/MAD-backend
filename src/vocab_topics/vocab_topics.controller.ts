@@ -108,9 +108,26 @@ export class VocabTopicsController {
   @Post()
   @AdminOnly()
   @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
   @ApiBearerAuth()
-  async create(@Body() createVocabTopicDto: CreateVocabTopicDto) {
-    const topic = await this.vocabTopicsService.create(createVocabTopicDto);
+  async create(
+    @Body() createVocabTopicDto: CreateVocabTopicDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: /(jpg|jpeg|png)$/,
+        })
+        .addMaxSizeValidator({
+          maxSize: 5 * 1024 * 1024, // 5MB
+        })
+        .build({
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+          fileIsRequired: false,
+        }),
+    )
+    image?: Express.Multer.File,
+  ) {
+    const topic = await this.vocabTopicsService.create(createVocabTopicDto, image);
     return AppResponse.successWithData({
       data: topic,
       message: 'Tạo chủ đề từ vựng thành công',
@@ -131,17 +148,17 @@ export class VocabTopicsController {
     try {
       const parsedLanguageId = languageId ? Number(languageId) : undefined;
 
-          const parsedIsRandom =
-            typeof isRandom === 'string' ? isRandom === 'true' : isRandom === true;
+      const parsedIsRandom =
+        typeof isRandom === 'string' ? isRandom === 'true' : isRandom === true;
 
-          const result = await this.vocabTopicsService.findAll(
-            paginateDto,
-            1,
-            topic,
-            parsedLanguageId,
-            level,
-            parsedIsRandom,
-          );
+      const result = await this.vocabTopicsService.findAll(
+        paginateDto,
+        1,
+        topic,
+        parsedLanguageId,
+        level,
+        parsedIsRandom,
+      );
 
       return AppResponse.successWithData({
         data: result,

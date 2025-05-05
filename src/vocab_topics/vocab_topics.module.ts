@@ -8,6 +8,7 @@ import { ProgressModule } from 'src/progress/progress.module';
 import { VocabTopicProgressModule } from 'src/vocab_topic_progress/vocab_topic_progress.module';
 import { VocabsModule } from 'src/vocabs/vocabs.module';
 import { VocabGameResultsModule } from 'src/vocab_game_results/vocab_game_results.module';
+import { AwsModule } from '../aws/aws.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { VocabGameResultsModule } from 'src/vocab_game_results/vocab_game_result
     VocabTopicProgressModule,
     VocabsModule,
     VocabGameResultsModule,
+    AwsModule,
   ],
   controllers: [VocabTopicsController],
   providers: [VocabTopicsService],
