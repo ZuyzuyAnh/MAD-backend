@@ -131,17 +131,17 @@ export class VocabTopicsController {
     try {
       const parsedLanguageId = languageId ? Number(languageId) : undefined;
 
-          const parsedIsRandom =
-            typeof isRandom === 'string' ? isRandom === 'true' : isRandom === true;
+      const parsedIsRandom =
+        typeof isRandom === 'string' ? isRandom === 'true' : isRandom === true;
 
-          const result = await this.vocabTopicsService.findAll(
-            paginateDto,
-            1,
-            topic,
-            parsedLanguageId,
-            level,
-            parsedIsRandom,
-          );
+      const result = await this.vocabTopicsService.findAll(
+        paginateDto,
+        1,
+        topic,
+        parsedLanguageId,
+        level,
+        parsedIsRandom,
+      );
 
       return AppResponse.successWithData({
         data: result,
