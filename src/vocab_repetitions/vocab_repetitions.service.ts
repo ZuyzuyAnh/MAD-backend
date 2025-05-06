@@ -23,23 +23,22 @@ export class VocabRepetitionsService {
   ) {}
 
   async getVocabsToReview(userId: number, topicId: number, limit: number = 20) {
-    const progress =
-      await this.progressService.findCurrentActiveProgress(userId);
-
-    const vocabTopicProgress =
-      await this.vocabTopicProgressService.findOneByProgressAndTopic(
-        progress.id,
-        topicId,
-      );
-
+    const progress = await this.progressService.findCurrentActiveProgress(userId);
+  
+    const vocabTopicProgress = await this.vocabTopicProgressService.findOneByProgressAndTopic(
+      progress.id,
+      topicId,
+    );
+  
     if (!vocabTopicProgress) {
       throw new EntityNotFoundException('Tiến độ chủ đề', 'id', topicId);
     }
-
+  
     const recentTimestamp = new Date();
     recentTimestamp.setMinutes(recentTimestamp.getMinutes() - 5);
-
-    const repetitions = await this.vocabRepetitionRepository.find({
+  
+    // Bước 1: Lấy các từ chưa ôn hoặc ôn > 5 phút
+    const primaryRepetitions = await this.vocabRepetitionRepository.find({
       where: [
         {
           vocabTopicProgress: { id: vocabTopicProgress.id },
@@ -56,10 +55,32 @@ export class VocabRepetitionsService {
       },
       take: limit,
     });
-
+  
+    let repetitions = primaryRepetitions;
+  
+    // Bước 2: Nếu chưa đủ ít nhất 10 từ, lấy thêm các từ đã ôn gần đây nhất
+    if (repetitions.length < 10) {
+      const extraRepetitions = await this.vocabRepetitionRepository.find({
+        where: {
+          vocabTopicProgress: { id: vocabTopicProgress.id },
+        },
+        relations: ['vocab'],
+        order: {
+          lastReviewedAt: 'DESC', // các từ ôn gần nhất lên trước
+          priorityScore: 'DESC',
+        },
+        take: limit,
+      });
+  
+      const existingIds = new Set(repetitions.map(r => r.id));
+      const additional = extraRepetitions.filter(r => !existingIds.has(r.id)).slice(0, 5 - repetitions.length);
+  
+      repetitions = [...repetitions, ...additional];
+    }
+  
     return repetitions.map((repetition) => repetition.vocab);
   }
-
+  
   async initializeRepetitionsForTopic(userId: number, topicId: number) {
     const progress =
       await this.progressService.findCurrentActiveProgress(userId);
