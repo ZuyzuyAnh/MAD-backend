@@ -127,7 +127,10 @@ export class VocabTopicsController {
     )
     image?: Express.Multer.File,
   ) {
-    const topic = await this.vocabTopicsService.create(createVocabTopicDto, image);
+    const topic = await this.vocabTopicsService.create(
+      createVocabTopicDto,
+      image,
+    );
     return AppResponse.successWithData({
       data: topic,
       message: 'Tạo chủ đề từ vựng thành công',

@@ -85,11 +85,11 @@ export class VocabTopicsService {
       .innerJoin('vocab_topic.language', 'language')
       .leftJoin('vocab_topic.vocabTopicProgress', 'vocab_topic_progress')
       .loadRelationCountAndMap('vocab_topic.totalVocabs', 'vocab_topic.vocabs');
-  
+
     if (userId) {
       const progress =
         await this.progressService.findCurrentActiveProgress(userId);
-  
+
       queryBuilder.leftJoinAndSelect(
         'vocab_topic.vocabTopicProgress',
         'vtp',
@@ -97,32 +97,32 @@ export class VocabTopicsService {
         { progressId: progress.id },
       );
     }
-  
+
     if (topic) {
       queryBuilder.andWhere('LOWER(vocab_topic.topic) LIKE LOWER(:topic)', {
         topic: `%${topic}%`,
       });
     }
-  
+
     if (languageId) {
       queryBuilder.andWhere('vocab_topic.language.id = :languageId', {
         languageId,
       });
     }
-  
+
     if (level) {
       queryBuilder.andWhere('vocab_topic.level = :level', { level });
     }
-  
+
     if (isRandom) {
       queryBuilder.orderBy('RAND()');
     }
-  
+
     // Lấy tất cả các topic, không phân trang
     const results = await queryBuilder
       .orderBy('vocab_topic.topic', 'ASC')
       .getMany();
-  
+
     const data = results.map((result) => {
       const { vocabTopicProgress, ...rest } = result;
       return {
@@ -130,7 +130,7 @@ export class VocabTopicsService {
         hasProgress: result.vocabTopicProgress.length > 0,
       };
     });
-  
+
     // Sắp xếp: các topic đã làm (hasProgress = true) lên trên
     data.sort((a, b) => {
       if (a.hasProgress === b.hasProgress) {
@@ -138,7 +138,7 @@ export class VocabTopicsService {
       }
       return a.hasProgress ? -1 : 1;
     });
-  
+
     // Trả về tất cả data mà không có phân trang
     return {
       data,
@@ -174,7 +174,8 @@ export class VocabTopicsService {
     const vocabTopic = await this.findOne(id);
 
     if (image) {
-      const imageUrl = await this.uploadFileService.uploadFileToPublicBucket(image);
+      const imageUrl =
+        await this.uploadFileService.uploadFileToPublicBucket(image);
       vocabTopic.imageUrl = imageUrl;
     }
 
