@@ -30,6 +30,7 @@ import { AchievementsModule } from './achievements/achievements.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SpeakingDataModule } from './speaking_data/speaking_data.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { StudyScheduleModule } from './study_schedule/study_schedule.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     AchievementsModule,
     SpeakingDataModule,
     NotificationsModule,
+    StudyScheduleModule,
   ],
   controllers: [],
   providers: [],

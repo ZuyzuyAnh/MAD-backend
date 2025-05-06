@@ -50,7 +50,7 @@ export class Vocab {
   })
   @Column({ length: 100, nullable: true })
   transcription: string;
-  
+
   @ApiProperty({
     description: 'Ví dụ sử dụng từ vựng',
     example: 'I have a pet cat at home.',

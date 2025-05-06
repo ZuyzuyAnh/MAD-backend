@@ -4,6 +4,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
@@ -11,6 +12,7 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { Language } from '../../languages/entities/language.entity';
 import { Exclude } from 'class-transformer';
+import { StudySchedule } from 'src/study_schedule/entities/study_schedule.entity';
 
 @Entity('progress')
 @Unique(['user', 'language'])
@@ -42,4 +44,9 @@ export class Progress {
 
   @Column({ name: 'is_current_active', default: true })
   isCurrentActive: boolean;
+
+  @OneToMany(() => StudySchedule, (studySchedule) => studySchedule.progress, {
+    onDelete: 'CASCADE',
+  })
+  studySchedules: StudySchedule[];
 }
