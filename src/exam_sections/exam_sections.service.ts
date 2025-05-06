@@ -5,6 +5,7 @@ import { CreateExamSectionDto } from './dto/create-exam_section.dto';
 import { UpdateExamSectionDto } from './dto/update-exam_section.dto';
 import { ExamSection } from './entities/exam_section.entity';
 import { ExamSectionItemsService } from 'src/exam_section_items/exam_section_items.service';
+import { UploadFileService } from 'src/aws/uploadfile.s3.service';
 
 @Injectable()
 export class ExamSectionsService {
@@ -12,6 +13,7 @@ export class ExamSectionsService {
     @InjectRepository(ExamSection)
     private readonly examSectionRepository: Repository<ExamSection>,
     private readonly examSectionItemService: ExamSectionItemsService,
+    private readonly FileUploadService: UploadFileService,
   ) {}
 
   async create(

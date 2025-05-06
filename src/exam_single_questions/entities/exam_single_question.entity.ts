@@ -26,7 +26,7 @@ export class ExamSingleQuestion {
   @JoinColumn({ name: 'exam_id' })
   exam: Exam;
 
-  @OneToOne(() => Question, (question) => question.id)
+  @ManyToOne(() => Question, (question) => question.id)
   @JoinColumn({ name: 'question_id' })
   question: Question;
 }
