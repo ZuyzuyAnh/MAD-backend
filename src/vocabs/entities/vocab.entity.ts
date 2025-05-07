@@ -43,13 +43,6 @@ export class Vocab {
   @Column({ name: 'vocab_topic_id' })
   vocabTopicId: number;
 
-  @ApiProperty({
-    description: 'Phiên âm của từ vựng',
-    example: '/kæt/',
-    required: false,
-  })
-  @Column({ length: 100, nullable: true })
-  transcription: string;
 
   @ApiProperty({
     description: 'Ví dụ sử dụng từ vựng',

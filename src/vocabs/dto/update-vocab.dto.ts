@@ -71,6 +71,7 @@ export class UpdateVocabDto extends PartialType(CreateVocabDto) {
   topicId?: number;
 
   @ApiProperty({
+    
     description: 'URL hình ảnh minh họa cho từ vựng',
     example: 'https://example.com/images/cat_updated.jpg',
     required: false,
@@ -80,7 +81,5 @@ export class UpdateVocabDto extends PartialType(CreateVocabDto) {
   @IsString()
   imageUrl?: string;
 
-  @IsString()
-  @Length(1, 255)
-  transcription: string;
+
 }

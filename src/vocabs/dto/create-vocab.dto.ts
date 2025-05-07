@@ -76,8 +76,5 @@ export class CreateVocabDto {
   @IsString()
   imageUrl?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @Length(1, 255)
-  transcription: string;
+  
 }
