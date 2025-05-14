@@ -31,6 +31,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SpeakingDataModule } from './speaking_data/speaking_data.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { StudyScheduleModule } from './study_schedule/study_schedule.module';
+import { StudyPlansModule } from './study_plans/study-plans.module';
+import { PostReportsModule } from './post_reports/post_reports.module';
 
 @Module({
   imports: [
@@ -82,6 +84,8 @@ import { StudyScheduleModule } from './study_schedule/study_schedule.module';
     SpeakingDataModule,
     NotificationsModule,
     StudyScheduleModule,
+    StudyPlansModule,
+    PostReportsModule,
   ],
   controllers: [],
   providers: [],

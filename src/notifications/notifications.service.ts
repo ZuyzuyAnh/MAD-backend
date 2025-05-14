@@ -71,6 +71,23 @@ export class NotificationsService {
     ) as Promise<Notification>;
   }
 
+  async createLikeNotification(
+    userId: number,
+    likerName: string,
+    postId: number,
+    postTitle: string,
+  ): Promise<Notification> {
+    return this.create(
+      {
+        title: 'Lượt thích mới',
+        content: `${likerName} đã thích bài viết "${postTitle}" của bạn`,
+        type: NotificationType.LIKE,
+        data: { postId },
+      },
+      userId,
+    ) as Promise<Notification>;
+  }
+
   async createAchievementNotification(
     userId: number,
     achievementTitle: string,

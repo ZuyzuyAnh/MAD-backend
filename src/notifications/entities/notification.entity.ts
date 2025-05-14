@@ -12,6 +12,7 @@ import {
 export enum NotificationType {
   SYSTEM = 'system',
   COMMENT = 'comment',
+  LIKE = 'like',
   ACHIEVEMENT = 'achievement',
   REMINDER = 'reminder',
 }

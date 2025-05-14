@@ -71,7 +71,6 @@ export class PostsController {
       createPostDto,
       userId,
       files?.files,
-      
     );
 
     return AppResponse.successWithData({
@@ -85,17 +84,37 @@ export class PostsController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'languageId', required: false, type: Number })
-  @ApiQuery({ name: 'title', required: false, type: String })
-  @ApiQuery({ name: 'tags', required: false, type: String })
+  @ApiQuery({
+    name: 'title',
+    required: false,
+    type: String,
+    description: 'Tìm kiếm theo tiêu đề',
+  })
+  @ApiQuery({
+    name: 'content',
+    required: false,
+    type: String,
+    description: 'Tìm kiếm theo nội dung',
+  })
+  @ApiQuery({
+    name: 'tags',
+    required: false,
+    type: String,
+    description: 'Tìm kiếm theo tags (phân cách bằng dấu phẩy)',
+  })
   async findAll(
     @Query() paginateDto: PaginateDto,
     @Query('languageId') languageId?: number,
     @Query('title') title?: string,
+    @Query('content') content?: string,
     @Query('tags') tags?: string,
   ) {
     const result = await this.postsService.findAll(
       paginateDto,
       languageId ? Number(languageId) : undefined,
+      title,
+      content,
+      tags ? tags.split(',') : undefined,
     );
 
     return AppResponse.successWithData({
@@ -118,6 +137,32 @@ export class PostsController {
     @Query('tags') tags?: string,
   ) {
     const result = await this.postsService.findMyPosts(userId, paginateDto);
+
+    return AppResponse.successWithData({
+      data: result,
+    });
+  }
+
+  @Get('hashtags')
+  @ApiOperation({ summary: 'Lấy danh sách tất cả các hashtag' })
+  async getAllTags() {
+    const tags = await this.postsService.getAllTags();
+
+    return AppResponse.successWithData({
+      data: tags,
+    });
+  }
+
+  @Get('hashtags/:tag')
+  @ApiOperation({ summary: 'Lấy danh sách bài viết theo hashtag' })
+  @ApiParam({ name: 'tag', description: 'Hashtag cần tìm kiếm' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async findByTag(
+    @Param('tag') tag: string,
+    @Query() paginateDto: PaginateDto,
+  ) {
+    const result = await this.postsService.findByTag(tag, paginateDto);
 
     return AppResponse.successWithData({
       data: result,
@@ -148,12 +193,20 @@ export class PostsController {
         title: { type: 'string', example: 'Tiêu đề đã cập nhật' },
         content: { type: 'string', example: 'Nội dung đã cập nhật' },
         tags: { type: 'string', example: 'cập nhật,tags mới' },
+        imagesToRemove: {
+          type: 'string',
+          example:
+            'https://example.com/image1.jpg,https://example.com/image2.jpg',
+          description:
+            'Danh sách URL hình ảnh cần xóa (phân cách bằng dấu phẩy)',
+        },
         files: {
           type: 'array',
           items: {
             type: 'string',
             format: 'binary',
           },
+          description: 'Hình ảnh mới cần thêm vào bài viết',
         },
       },
     },
@@ -203,5 +256,50 @@ export class PostsController {
     await this.postsService.remove(id);
 
     return AppResponse.success('Xóa bài viết thành công');
+  }
+
+  @Get('popular')
+  @ApiOperation({ summary: 'Lấy danh sách bài viết phổ biến' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Số lượng bài viết trả về',
+  })
+  async getPopularPosts(@Query('limit') limit?: number) {
+    const posts = await this.postsService.getPopularPosts(limit ? +limit : 10);
+
+    return AppResponse.successWithData({
+      data: posts,
+    });
+  }
+
+  @Get('trending')
+  @ApiOperation({ summary: 'Lấy danh sách bài viết theo xu hướng gần đây' })
+  @ApiQuery({
+    name: 'days',
+    required: false,
+    type: Number,
+    description: 'Số ngày gần đây',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Số lượng bài viết trả về',
+  })
+    
+  async getTrendingPosts(
+    @Query('days') days?: number,
+    @Query('limit') limit?: number,
+  ) {
+    const posts = await this.postsService.getTrendingPosts(
+      days ? +days : 7,
+      limit ? +limit : 10,
+    );
+
+    return AppResponse.successWithData({
+      data: posts,
+    });
   }
 }

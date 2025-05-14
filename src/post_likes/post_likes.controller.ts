@@ -26,6 +26,7 @@ import {
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { PostLike } from './entities/post_like.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @ApiTags('Lượt thích bài viết')
 @Controller('post-likes')
@@ -67,6 +68,25 @@ export class PostLikesController {
   })
   findAll() {
     return this.postLikesService.findAll();
+  }
+
+  @Get('post/:postId/users')
+  @ApiOperation({
+    summary: 'Lấy danh sách người dùng đã thích bài viết',
+    description: 'Trả về danh sách người dùng đã thích một bài viết cụ thể',
+  })
+  @ApiParam({
+    name: 'postId',
+    description: 'ID của bài viết cần lấy danh sách người thích',
+    type: 'number',
+  })
+  @ApiOkResponse({
+    description: 'Danh sách người dùng đã thích bài viết',
+    type: [User],
+  })
+  @ApiNotFoundResponse({ description: 'Không tìm thấy bài viết' })
+  findUsersByPostId(@Param('postId') postId: string) {
+    return this.postLikesService.findUsersByPostId(+postId);
   }
 
   @Get(':id')

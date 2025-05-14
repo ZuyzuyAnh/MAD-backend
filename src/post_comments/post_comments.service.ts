@@ -33,17 +33,29 @@ export class PostCommentsService {
     // Gửi thông báo cho người đăng bài (nếu không phải là người bình luận)
     if (post && post.post.userId !== userId) {
       await this.notificationsService.createCommentNotification(
-        post.post.userId, 
+        post.post.userId,
         post.user.firstName + ' ' + post.user.lastName,
-        post.post.id
+        post.post.id,
       );
     }
 
     return savedComment;
   }
 
-  findAll() {
-    return this.postCommentRepository.find();
+  async findAll() {
+    return this.postCommentRepository.find({
+      relations: ['user'],
+    });
+  }
+
+  async findByPostId(postId: number) {
+    return this.postCommentRepository.find({
+      where: { postId },
+      relations: ['user'],
+      order: {
+        createdAt: 'DESC',
+      },
+    });
   }
 
   findOne(id: number) {
@@ -51,6 +63,7 @@ export class PostCommentsService {
   }
 
   update(id: number, updatePostCommentDto: UpdatePostCommentDto) {
+    // tạo noti update
     return this.postCommentRepository.update(id, updatePostCommentDto);
   }
 

@@ -1,12 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 
 export class CreatePostDto {
   @ApiProperty({
@@ -39,7 +33,15 @@ export class CreatePostDto {
     example: 'tiếng anh,học tập,kinh nghiệm',
     required: false,
   })
-  @IsArray()
   @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter(Boolean);
+    }
+    return value;
+  })
   tags?: string[];
 }

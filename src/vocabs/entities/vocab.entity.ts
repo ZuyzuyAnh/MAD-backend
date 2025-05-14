@@ -43,7 +43,6 @@ export class Vocab {
   @Column({ name: 'vocab_topic_id' })
   vocabTopicId: number;
 
-
   @ApiProperty({
     description: 'Ví dụ sử dụng từ vựng',
     example: 'I have a pet cat at home.',

@@ -24,7 +24,7 @@ export class AchievementsService {
     private notificationsService: NotificationsService,
   ) {}
 
-  // CRUD Operations
+  // CRUD 
   async create(
     createAchievementDto: CreateAchievementDto,
   ): Promise<Achievement> {
@@ -78,11 +78,13 @@ export class AchievementsService {
       payload.userId,
     );
 
+    // lấy số bài hoàn thành
     const exerciseCount =
       await this.exerciseResultService.getNumberOfExerciseCompleted(
         progress.id,
       );
 
+    // lấy thành tựu
     const achievements = await this.achievementRepository.find({
       where: {
         triggerCondition: 'COMPLETE_EXERCISES',
