@@ -30,7 +30,7 @@ export class ExamSection {
   @Column({ name: 'title', nullable: true })
   title: string;
 
-  @Column({ name: 'description' })
+  @Column({ name: 'description', nullable: true })
   description: string;
 
   @Column({ name: 'audio_url', nullable: true })

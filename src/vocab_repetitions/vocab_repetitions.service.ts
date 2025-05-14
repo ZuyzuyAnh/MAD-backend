@@ -22,7 +22,7 @@ export class VocabRepetitionsService {
     private vocabService: VocabsService,
   ) {}
 
-  async getVocabsToReview(userId: number, topicId: number, limit: number = 20) {
+  async getVocabsToReview(userId: number, topicId: number, limit: number = 10) {
     const progress = await this.progressService.findCurrentActiveProgress(userId);
   
     const vocabTopicProgress = await this.vocabTopicProgressService.findOneByProgressAndTopic(
@@ -58,24 +58,40 @@ export class VocabRepetitionsService {
   
     let repetitions = primaryRepetitions;
   
-    // Bước 2: Nếu chưa đủ ít nhất 10 từ, lấy thêm các từ đã ôn gần đây nhất
-    if (repetitions.length < 10) {
+    // Bước 2: Nếu không có từ nào hoặc số lượng từ quá ít, lấy thêm các từ ưu tiên cao nhất
+    if (repetitions.length < limit) {
       const extraRepetitions = await this.vocabRepetitionRepository.find({
         where: {
           vocabTopicProgress: { id: vocabTopicProgress.id },
         },
         relations: ['vocab'],
         order: {
-          lastReviewedAt: 'DESC', // các từ ôn gần nhất lên trước
-          priorityScore: 'DESC',
+          priorityScore: 'DESC',  // Ưu tiên các từ cần ôn tập nhất
         },
         take: limit,
       });
   
       const existingIds = new Set(repetitions.map(r => r.id));
-      const additional = extraRepetitions.filter(r => !existingIds.has(r.id)).slice(0, 5 - repetitions.length);
+      // Lấy đủ số từ còn thiếu để đạt đến limit
+      const additional = extraRepetitions
+        .filter(r => !existingIds.has(r.id))
+        .slice(0, limit - repetitions.length);
   
       repetitions = [...repetitions, ...additional];
+    }
+  
+    // Bước 3: Nếu vẫn không có từ nào (hiếm gặp), lấy các từ theo thứ tự ngẫu nhiên
+    if (repetitions.length === 0) {
+      repetitions = await this.vocabRepetitionRepository.find({
+        where: {
+          vocabTopicProgress: { id: vocabTopicProgress.id },
+        },
+        relations: ['vocab'],
+        order: {
+          lastReviewedAt: 'ASC',  // Ưu tiên các từ ôn lâu nhất
+        },
+        take: limit,
+      });
     }
   
     return repetitions.map((repetition) => repetition.vocab);
